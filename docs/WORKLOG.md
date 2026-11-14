@@ -202,3 +202,67 @@
    - Successfully pushed to GitHub (`main -> origin/main`).
 4. **Git Protocol Established:**
    - All subsequent tasks across Phase 4, Phase 5, and Phase 6 will maintain clean, atomic Git commits and remote branch synchronization.
+
+---
+
+## [2026-11-14] — Phase 4: Silent Deterioration Engine & Explainable Alerts Complete
+
+### Work Performed
+1. **TASK-401: OLS Linear Regression Trend & z-Score Engine:**
+   - Implemented `backend/app/services/analytics/ols_trends.py`:
+     - Ordinary Least Squares linear regression slope $m = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sum (x_i - \bar{x})^2}$ in change-per-day units.
+     - Rolling standardized deviation ($z$-scores) relative to active personal baseline ($\mu, \sigma$).
+     - Defined physiological thresholds grounded in NASA HRP evidence:
+       - RHR Drift: $m \ge +0.8\text{ bpm/day}$ and $z \ge +1.5\sigma$.
+       - Sleep Deficit: $m \le -0.25\text{ hours/day}$ and $z \le -1.5\sigma$.
+       - Recovery Delay: $m \le -1.5\text{ bpm/day}$ and $z \le -1.5\sigma$.
+     - Enforced minimum sample count constraint ($N \ge 3$) for linear fit validity.
+   - Wrote automated tests in `tests/test_trends.py` (5/5 passed).
+
+2. **TASK-402: Multi-Indicator Persistence Rule & Single-Spike Filter:**
+   - Implemented `backend/app/services/deterioration_engine.py`:
+     - Baseline Guard: Verifies astronaut has an `ACTIVE` baseline across all 3 target indicators; halts and suppresses alerts if baseline status is `INSUFFICIENT_BASELINE_DATA`.
+     - Multi-Indicator Persistence Rule: Requires $\ge 2$ of 3 indicators to demonstrate concurrent adverse drift over a 3-to-5 day sliding window.
+     - Single-Spike Invariance: Isolated single-day spikes (e.g. Day 5 EVA spike) are filtered and suppressed from alert generation.
+     - Temporal Cross-Correlation: Queries `mission_events` (operational workload) and `environmental_telemetry` (cabin $CO_2$ and radiation) overlapping the anomaly window. Explicitly cites temporal correlation without claiming automated causal diagnosis.
+     - Priority Grading: Sets priority to `HIGH` if $\ge 3$ indicators deviate or any $|z| \ge 3.0\sigma$; otherwise `MEDIUM`.
+
+3. **TASK-403: Alert Evidence Linking & Analysis Run Audit Logging:**
+   - Built `backend/app/api/alerts.py` exposing:
+     - `GET /api/v1/alerts`: lists active and historical alerts.
+     - `GET /api/v1/alerts/{id}`: retrieves single alert.
+     - `GET /api/v1/alerts/{id}/evidence`: provides explainable drill-down containing raw observation records, z-scores, OLS slopes, baseline parameters, and NASA HRP evidence citations.
+     - `POST /api/v1/alerts/run-analysis`: executes fleet analysis and records an auditable `AnalysisRun` with duration in ms and alert counts.
+     - `PATCH /api/v1/alerts/{id}/status`: transitions alert lifecycle (`NEW -> UNDER_REVIEW -> MONITORING -> RESOLVED`) and logs `cmo_followups` review history.
+     - `GET /api/v1/analysis-runs`: retrieves audit history of engine execution runs.
+   - Registered `alerts_router` and `runs_router` in `backend/app/main.py`.
+   - Updated Pydantic schemas in `backend/app/schemas/schemas.py`.
+
+4. **Automated Acceptance Testing (Tests 8, 9, 10, 11, 12):**
+   - Implemented `tests/test_deterioration.py`:
+     - `test_acceptance_8_stable_pattern_invariance` (PASSED: 7 days nominal vitals -> 0 alerts).
+     - `test_acceptance_9_isolated_spike_filtering` (PASSED: acute RHR spike to 92 bpm -> 0 alerts).
+     - `test_acceptance_10_sustained_multi_indicator_deterioration` (PASSED: Scenario C multi-indicator drift -> HIGH priority alert generated with full narrative and NASA HRP reference).
+     - `test_acceptance_11_and_12_evidence_audit_and_status_transition` (PASSED: deep evidence inspection, linked observation UUIDs, and status transition to `UNDER_REVIEW` with CMO follow-up history).
+   - Full test suite execution: **25/25 automated tests passed in 2.93s**.
+
+### Files Created / Modified
+- `backend/app/services/analytics/__init__.py` (Created)
+- `backend/app/services/analytics/ols_trends.py` (Created)
+- `backend/app/services/deterioration_engine.py` (Created)
+- `backend/app/api/alerts.py` (Created)
+- `backend/app/api/__init__.py` (Updated)
+- `backend/app/main.py` (Updated)
+- `backend/app/schemas/schemas.py` (Updated)
+- `backend/app/services/baseline_engine.py` (Updated to handle observation-anchored reference times)
+- `tests/test_trends.py` (Created)
+- `tests/test_deterioration.py` (Created)
+- `docs/TASKS.md` (Updated)
+- `docs/WORKLOG.md` (Updated)
+
+### Verification Summary
+- **Backend tests:** 25/25 tests passed with 0 warnings.
+- **Frontend build:** `npm run build` compiled 1589 modules in 3.15s with 0 errors.
+
+### Next Step
+- Present completed Phase 4 to the user, commit & push to GitHub repository, and request authorization for **Phase 5: CMO Dashboard, Clinical Countermeasures & User Interface**.

@@ -203,6 +203,24 @@ class DeteriorationAlertOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class AlertEvidenceDetailOut(BaseModel):
+    alert: DeteriorationAlertOut
+    astronaut_callsign: str
+    astronaut_full_name: str
+    evidence_items: List[AlertEvidenceItemOut]
+    countermeasures: List["ClinicalCountermeasureOut"] = []
+    followups: List["CMOFollowupOut"] = []
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AlertStatusUpdate(BaseModel):
+    lifecycle_status: str = Field(..., examples=["UNDER_REVIEW"])
+    reviewer_callsign: str = Field(..., examples=["CMO-01"])
+    notes: str = Field(..., examples=["Reviewed trend; ordered supplemental sleep and fluid intake."])
+
+
+
 class ClinicalCountermeasureCreate(BaseModel):
     prescribed_by: str = Field(..., examples=["CMO-01"])
     countermeasure_type: str = Field(..., examples=["SLEEP_SCHEDULE_ADJUSTMENT"])

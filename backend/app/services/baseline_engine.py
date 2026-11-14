@@ -19,7 +19,24 @@ def compute_astronaut_baseline(
     reference_time: Optional[datetime] = None,
 ) -> PersonalBaseline:
     if reference_time is None:
-        reference_time = datetime.now(timezone.utc)
+        # Check latest observation time for this astronaut and indicator
+        latest_obs = (
+            db.query(HealthObservation)
+            .filter(
+                HealthObservation.astronaut_id == astronaut_id,
+                HealthObservation.indicator_id == indicator_id,
+                HealthObservation.quality_status.in_(["VALID", "STALE"]),
+            )
+            .order_by(HealthObservation.observation_time.desc())
+            .first()
+        )
+        if latest_obs:
+            from dateutil import parser as date_parser
+            reference_time = date_parser.isoparse(latest_obs.observation_time)
+            if reference_time.tzinfo is None:
+                reference_time = reference_time.replace(tzinfo=timezone.utc)
+        else:
+            reference_time = datetime.now(timezone.utc)
     elif reference_time.tzinfo is None:
         reference_time = reference_time.replace(tzinfo=timezone.utc)
 

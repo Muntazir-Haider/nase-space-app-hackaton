@@ -117,23 +117,23 @@
 *Objective: Implement multi-indicator trend detection, OLS regression slopes, environmental cross-correlation, and evidence tracking.*
 *Approval Gate: Requires Phase 3 verification and user sign-off.*
 
-- [ ] **TASK-401: OLS Linear Regression Trend & $z$-Score Engine**
+- [x] **TASK-401: OLS Linear Regression Trend & $z$-Score Engine**
   - **Scope:** Compute rolling $z$-scores and Ordinary Least Squares slopes for RHR, Sleep, and HRR-1 across 3-to-5 day sliding windows.
   - **Target Files:** `backend/app/services/analytics/ols_trends.py`
   - **Verification:** `pytest tests/test_trends.py -v` verifies slope and deviation calculations against NumPy reference.
-  - **Status:** `TODO`
+  - **Status:** `DONE`
 
-- [ ] **TASK-402: Multi-Indicator Persistence Rule & Single-Spike Filter**
+- [x] **TASK-402: Multi-Indicator Persistence Rule & Single-Spike Filter**
   - **Scope:** Implement rule requiring $\ge 2$ indicators deviating for $\ge 3$ consecutive days; filter out isolated acute spikes; cross-correlate with cabin $CO_2$ and workload.
   - **Target Files:** `backend/app/services/deterioration_engine.py`
   - **Verification:** `pytest tests/test_deterioration.py -v` (Tests 8, 9, 10) confirms single spike suppresses alert, sustained drift triggers alert.
-  - **Status:** `TODO`
+  - **Status:** `DONE`
 
-- [ ] **TASK-403: Alert Evidence Linking & Analysis Run Audit Logging**
+- [x] **TASK-403: Alert Evidence Linking & Analysis Run Audit Logging**
   - **Scope:** Log execution run in `analysis_runs`; generate structured explainable alert linking raw observation UUIDs in `alert_evidence_links` and NASA HRP citations; expose `/api/v1/alerts/{id}/evidence`.
-  - **Target Files:** `backend/app/api/alerts.py`, `backend/app/services/alert_service.py`
-  - **Verification:** `pytest tests/test_alerts.py -v` (Tests 11, 12).
-  - **Status:** `TODO`
+  - **Target Files:** `backend/app/api/alerts.py`, `backend/app/services/deterioration_engine.py`
+  - **Verification:** `pytest tests/test_deterioration.py -v` (Tests 11, 12).
+  - **Status:** `DONE`
 
 ---
 
