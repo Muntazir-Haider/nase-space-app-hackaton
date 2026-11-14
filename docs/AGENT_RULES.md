@@ -1,124 +1,231 @@
-# MISSION SENTINEL: AI AGENT OPERATING PROTOCOL & GOVERNANCE RULES
-**Project:** Mission Sentinel — Astronaut Health Intelligence and Medical Review Support System  
+# ANTIGRAVITY — PERMANENT SYSTEM-WIDE DEVELOPMENT RULES
+**Project:** Mission Sentinel  
+**Subtitle:** Astronaut Health Intelligence and Medical Review Support System  
 **Event:** NASA Space Apps Challenge 2026 (Superior University, Faisalabad)  
 **Selected Challenge:** *Create Health Monitoring Software for Astronauts on Space Missions*  
-**Operating Principle:** Modular, testable, evidence-based, incremental, offline-first  
+**Primary User:** Crew Medical Officer (CMO)  
+**Document Status:** Permanent System-Wide Governance Charter  
 
-These rules govern all AI coding agents working on Mission Sentinel. Every tool execution, code generation, file modification, and architectural decision must strictly comply with these rules.
-
----
-
-## 1. Documentation Structure & Single Source of Truth
-
-All project documentation is centralized in the `docs/` folder:
-
-```
-Nasa Space App/
-├── README.md                      <-- Root Entrypoint & Navigation Guide
-└── docs/                          <-- Centralized Documentation & Governance
-    ├── AGENT_RULES.md             <-- AI Agent Operating Protocol & Governance Rules
-    ├── TASKS.md                   <-- Active Task Ledger with Test Conditions
-    ├── WORKLOG.md                 <-- Append-Only Chronological Audit Log
-    ├── REQUIREMENTS.md            <-- System Spec, Indicator Math & 16 Acceptance Tests
-    ├── ARCHITECTURE.md            <-- 13-Table SQLite Schemas, REST API Contracts & OLS Math
-    └── RESEARCH_AND_REFERENCES.md <-- NASA HRP Evidence, RIDGE Hazards & Citations
-```
-
-- **Rule 1 — Source of Truth:** `docs/REQUIREMENTS.md` and `docs/ARCHITECTURE.md` are the authoritative sources of truth for behavior and schemas. Never invent unapproved endpoints, columns, or metrics.
-- **Rule 2 — Document Integrity:** Keep `docs/TASKS.md` actionable, `docs/WORKLOG.md` chronological, and specification files synchronized. Update documents immediately when an approved change is made.
+These rules apply to the entire Mission Sentinel project, permanently. They are not specific to Phase 1, a particular feature, or a single development session. Every future task, phase, implementation, modification, bug fix, research activity, testing activity, and refactoring must follow these standards.
 
 ---
 
-## 2. Pre-Task Verification Protocol (Mandatory Before Any Coding)
+## 1. QUALITY OVER SPEED
 
-Before modifying or creating any code file, the AI agent MUST perform the following pre-flight sequence:
-
-1. **Verify Approval Gate:** Confirm that the user has explicitly approved the phase containing the target task.
-2. **Inspect Target Task:** Read the exact objective, file paths, and acceptance conditions in `docs/TASKS.md`.
-3. **Review Schema & Contract:** Read the corresponding table definitions and API schemas in `docs/ARCHITECTURE.md`.
-4. **Update Task State:** Change the task status in `docs/TASKS.md` from `TODO` to `IN PROGRESS`.
-
----
-
-## 3. Strict Development Standards
-
-### Rule 3 — Understand Before Modifying
-Inspect the existing codebase before modifying or adding code. Never rewrite an entire module when a targeted, incremental change will suffice. Never delete existing functionality to make a new implementation easier.
-
-### Rule 4 — Zero Fake Code & Anti-Hallucination Policy
-Never create:
-- Hardcoded dashboard values or dummy calculations in frontend components.
-- Mock API endpoints that return canned responses instead of querying the SQLite database.
-- Buttons, dropdowns, or controls that do nothing when clicked.
-- Fake success alerts/toasts without backend confirmation.
-- Unexplained "AI confidence scores" without verifiable mathematical formulas.
-
-### Rule 5 — Offline-First & Local Monolith Discipline
-- The entire stack must run locally on `localhost` (127.0.0.1).
-- No external network or cloud service dependencies are permitted.
-- All persistent state must be committed to the local SQLite database (`data/sentinel.db`).
-- SQLite foreign key constraints (`PRAGMA foreign_keys = ON;`) must be enabled on every database connection.
-
-### Rule 6 — Coding & Code Quality Standards
-- **Backend (Python 3.10+):**
-  - Adhere to PEP 8 conventions.
-  - Mandatory type annotations for all function signatures and Pydantic models.
-  - SQLAlchemy 2.0 declarative models matching all 13 tables in `docs/ARCHITECTURE.md`.
-  - Never log raw astronaut health values to stdout/terminal logs (protect physiological privacy).
-- **Frontend (React 18+ / TypeScript / Vite):**
-  - Strict TypeScript mode enabled; zero `any` types permitted.
-  - Modular component structure under `src/components/`, `src/services/`, and `src/types/`.
-  - Recharts for data visualization with explicit axes, labels, units, and baseline reference bands.
-  - Tailwind CSS dark-mode "Mission Control" aesthetic.
+- We are not in a hurry.
+- Never sacrifice correctness, completeness, research, usability, or reliability for speed.
+- Never intentionally produce superficial implementations just to finish a task quickly.
+- Investigate problems thoroughly before attempting solutions.
+- Prefer complete, reliable, maintainable implementations over quick patches.
+- Do not rush to declare work finished.
 
 ---
 
-## 4. Scientific Grounding & Medical Safety (NASA Standard)
+## 2. RESEARCH BEFORE IMPLEMENTATION
 
-### Rule 7 — Decision Support, Not Automated Physician
-Mission Sentinel is an autonomous decision-support system for the Crew Medical Officer (CMO).
-- Never claim that the software diagnoses medical diseases or prescribes treatments.
-- Never output messages like "AI detected heart failure". Output explainable observations: e.g., *"Resting Heart Rate elevation (+12 bpm, +4.95σ) detected persisting across 4 observation cycles under heavy workload"*.
-- Every alert is an observational notification requiring human CMO clinical review.
+Before implementing any meaningful feature or making architectural decisions:
 
-### Rule 8 — Mandatory Scientific Grounding & Evidence Provenance
-- All physiological metrics, baseline calculations, and detection thresholds must cite verified NASA research recorded in `docs/RESEARCH_AND_REFERENCES.md`.
-- Telemetry ingestion schemas must map to NASA Open Science Data Repository (OSDR) standards.
-- Alert explanations must explicitly reference published NASA Human Research Program (HRP) Evidence Reports.
-- All synthetic datasets must carry explicit provenance labels (`data_origin = 'SIMULATED'`).
+- Understand the actual requirement and its purpose.
+- Inspect existing project code and documentation.
+- Research relevant official documentation and reliable sources.
+- Investigate appropriate technologies, methods, datasets, and established practices.
+- Identify limitations, dependencies, edge cases, and risks.
+- Compare reasonable implementation approaches when necessary.
+- Record important findings and sources in the appropriate existing project documentation (`docs/REQUIREMENTS.md`).
 
----
+For NASA-related functionality, research NASA's actual challenge requirements, scientific context, relevant research, and available datasets.
 
-## 5. Verification & Definition of Done (DoD)
-
-### Rule 9 — Test Execution Before Completion
-No task may be marked `DONE` merely because code was written. For every task:
-1. Run the target automated test suite (e.g., `pytest tests/test_data_quality.py -v`).
-2. Verify that all assertions pass cleanly without warnings.
-3. Verify that database records persist after process restart.
-4. If a test fails, diagnose and fix the root cause immediately; never bypass or comment out failing assertions.
-
-### Rule 10 — Definition of Done (DoD) Checklist
-A task is `DONE` if and only if:
-- [ ] Code is implemented matching the exact specification in `docs/ARCHITECTURE.md`.
-- [ ] Automated tests verify all positive, negative, and edge-case scenarios.
-- [ ] No regression introduced to previously completed features.
-- [ ] `docs/TASKS.md` updated with status `DONE`.
-- [ ] `docs/WORKLOG.md` updated with timestamped summary of work, files changed, and test results.
+**Never invent NASA datasets, scientific findings, astronaut measurements, or claims of NASA validation.**
 
 ---
 
-## 6. Incremental Phase Approval Gates
+## 3. REQUIREMENT COMPLETENESS
 
-### Rule 11 — Strict User Approval Gates
-Follow this disciplined loop:
-1. Inspect and prepare.
-2. Present the plan and test strategy for the phase.
-3. **Wait for explicit user approval before beginning any major implementation phase.**
-4. Implement the approved phase incrementally, task by task.
-5. Execute the test suite and verify acceptance criteria.
-6. Present the verified outcome to the user.
-7. **Wait for user confirmation before advancing to the next phase.**
+- Read the relevant requirements before starting.
+- Implement every requirement applicable to the approved task.
+- Never silently remove, simplify, or ignore requirements.
+- Never replace real functionality with placeholders without explicit approval.
+- Never consider a feature complete merely because its basic structure exists.
+- Identify missing functionality, dependencies, and edge cases before declaring completion.
+- If requirements are unclear, research first and ask when a consequential ambiguity remains.
 
-### Rule 12 — No Uncontrolled Continuation
-Never automatically cascade from one phase to the next without explicit user sign-off. Report the completion of the milestone, demonstrate the functioning capabilities, and pause.
+---
+
+## 4. EXISTING CODE AND ARCHITECTURE
+
+- Inspect the existing implementation before modifying it.
+- Reuse working code and existing components whenever appropriate.
+- Avoid unnecessary rewrites, duplication, and architectural complexity.
+- Maintain consistent architecture, naming, API contracts, and design patterns.
+- Make focused changes without damaging unrelated functionality.
+- Do not introduce unnecessary dependencies or modules.
+- Keep the application maintainable and understandable.
+
+---
+
+## 5. UI AND UX QUALITY
+
+Every user-facing feature must have a properly implemented interface:
+
+- Build consistent, polished, responsive interfaces.
+- Maintain consistent navigation, typography, spacing, colors, and components.
+- Implement loading, empty, error, and success states where applicable.
+- Ensure buttons, forms, navigation, filters, and other controls actually work.
+- Ensure the interface accurately reflects backend functionality and application state.
+- Handle unavailable services, missing data, and offline conditions appropriately.
+- Use accessible interaction patterns.
+- Avoid generic, unfinished, inconsistent, or superficial UI implementations.
+- Never use fake charts, fabricated health information, or misleading visualizations.
+- Never make an interface appear functional when its underlying feature is not implemented.
+
+---
+
+## 6. BACKEND AND DATA INTEGRITY
+
+For backend features:
+
+- Implement actual business logic.
+- Use proper validation and centralized error handling.
+- Maintain consistent API contracts.
+- Ensure correct persistence and data integrity.
+- Use appropriate database constraints, foreign keys, and transactions.
+- Handle invalid input, missing records, duplicate requests, and failure conditions.
+- Keep frontend and backend responsibilities properly separated.
+- Never substitute hardcoded responses for real functionality.
+- Never claim data was saved, processed, or synchronized unless it actually was.
+
+---
+
+## 7. TESTING AND VERIFICATION
+
+Testing is mandatory for every meaningful implementation:
+
+- Test the actual implementation.
+- Run relevant automated tests (`pytest`, TypeScript build).
+- Test integration between affected components.
+- Test error cases and invalid input.
+- Verify persistence across restarts when applicable.
+- Verify the UI and actual interactions.
+- Check application logs and runtime errors.
+- Perform regression testing where existing functionality could be affected.
+- Fix discovered problems and repeat relevant tests.
+
+**A task is not DONE simply because code was written or files were created.**
+
+Every completion claim must be supported by actual verification.
+
+If testing cannot be performed, clearly report the limitation and leave the task unverified.
+
+---
+
+## 8. COMPLETENESS GATE
+
+Before marking any task, feature, phase, or implementation DONE, verify:
+
+1. All applicable requirements are implemented.
+2. No required functionality is missing.
+3. No unresolved implementation errors remain.
+4. All required UI elements and interactions work.
+5. Backend and database behavior is correct where applicable.
+6. Integration works correctly.
+7. Relevant tests pass.
+8. No unacceptable regressions were introduced.
+9. Documentation is updated.
+10. Remaining limitations are disclosed.
+
+Report each applicable acceptance criterion as:
+
+- **PASS** — verified with evidence.
+- **FAIL** — implementation or verification failed.
+- **BLOCKED** — cannot be completed or verified, with the reason.
+- **NOT APPLICABLE** — genuinely irrelevant to the task, with justification.
+
+**Never mark a task DONE while a mandatory acceptance criterion is FAIL or BLOCKED.**
+
+---
+
+## 9. HONESTY AND TRANSPARENCY
+
+- Never fabricate research, test results, data, functionality, or completion status.
+- Never hide errors or missing requirements.
+- Never describe a partial implementation as complete.
+- Never claim clinical accuracy, scientific validation, or NASA approval without appropriate evidence.
+- Clearly distinguish implemented, simulated, experimental, and planned functionality.
+- Report limitations honestly.
+
+---
+
+## 10. DOCUMENTATION AND PROJECT MEMORY
+
+Maintain exactly these 4 project documentation files:
+
+- `REQUIREMENTS.md` — Consolidated Master Requirements, Research, Architecture & Acceptance Tests.
+- `AGENT_RULES.md` — AI Agent Operating Protocol & Permanent System-Wide Development Rules.
+- `TASKS.md` — Active Task Ledger with Test Conditions & Progress Tracking.
+- `WORKLOG.md` — Append-Only Chronological Audit Log & Verification History.
+
+**Do not create additional documentation files without approval.**
+
+Keep requirements accurate, task statuses honest, and worklog chronological.
+
+Before starting work, review the relevant documentation and existing project state.
+
+After completing work, update the appropriate documents.
+
+---
+
+## 11. TASK MANAGEMENT
+
+- Break meaningful work into actionable tasks.
+- Define measurable acceptance criteria.
+- Track progress honestly.
+- Maintain `TODO`, `IN PROGRESS`, `BLOCKED`, `TESTING`, and `DONE` statuses.
+- Do not mark tasks `DONE` prematurely.
+- Identify dependencies and blockers.
+- Do not silently skip incomplete tasks.
+
+---
+
+## 12. APPROVAL AND PHASE CONTROL
+
+- Respect the approved project scope and development phases.
+- Complete the current approved phase before moving forward.
+- **Do not begin a new major phase without user approval.**
+- Report findings and proposed changes before making consequential scope changes.
+- Small corrections within approved scope may proceed normally.
+- Never assume permission to redesign the entire project or change its requirements.
+
+---
+
+## 13. COMPLETION REPORT
+
+At the end of meaningful work, provide a truthful summary of:
+
+- What was requested.
+- What was researched.
+- What was implemented.
+- What files changed.
+- What tests were executed.
+- Actual test results.
+- Acceptance criteria status.
+- Remaining issues and limitations.
+- Any blocked or incomplete work.
+- Relevant next steps.
+
+---
+
+## 14. UNIVERSAL EXECUTION STANDARD
+
+For every task, follow this workflow as appropriate:
+
+$$\text{Understand} \longrightarrow \text{Inspect} \longrightarrow \text{Research} \longrightarrow \text{Plan} \longrightarrow \text{Implement} \longrightarrow \text{Test} \longrightarrow \text{Fix} \longrightarrow \text{Verify Completeness} \longrightarrow \text{Document} \longrightarrow \text{Report}$$
+
+Do not skip essential stages merely to save time.
+
+---
+
+### FINAL RULE
+
+These instructions are permanent project-wide standards. They apply automatically to all current and future work.
+
+**The objective is not to generate code quickly. The objective is to build Mission Sentinel correctly, completely, professionally, and reliably.**
