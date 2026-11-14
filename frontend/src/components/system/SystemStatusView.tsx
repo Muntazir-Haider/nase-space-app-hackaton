@@ -6,7 +6,6 @@ import {
   RefreshCw, 
   Radio, 
   ShieldCheck, 
-  BookOpen, 
   Layers, 
   Send, 
   Loader2, 
@@ -93,7 +92,7 @@ export function SystemStatusView({ onRefreshHealth }: SystemStatusViewProps) {
       setFlushFeedback(`Flush failed: ${msg}`);
     } finally {
       setFlushing(false);
-      setTimeout(() => setFlushFeedback(''), 6000);
+      setTimeout(() => setFlushFeedback(''), 5000);
     }
   }
 
@@ -112,13 +111,13 @@ export function SystemStatusView({ onRefreshHealth }: SystemStatusViewProps) {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      setSnapshotFeedback(`Database backup exported successfully (${snap.total_tables} tables, ${snap.total_records} records).`);
+      setSnapshotFeedback(`Database backup exported (${snap.total_tables} tables, ${snap.total_records} records).`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      setSnapshotFeedback(`Snapshot export failed: ${msg}`);
+      setSnapshotFeedback(`Snapshot failed: ${msg}`);
     } finally {
       setExportingSnapshot(false);
-      setTimeout(() => setSnapshotFeedback(''), 6000);
+      setTimeout(() => setSnapshotFeedback(''), 5000);
     }
   }
 
@@ -126,7 +125,6 @@ export function SystemStatusView({ onRefreshHealth }: SystemStatusViewProps) {
     e.preventDefault();
     setSubmittingEnv(true);
     try {
-      // Use existing mission ID from readings or fallback
       const missionId = envReadings.length > 0 ? envReadings[0].mission_id : 'MISSION-ARTEMIS-III';
       await recordEnvironmentalTelemetry({
         mission_id: missionId,
@@ -152,15 +150,15 @@ export function SystemStatusView({ onRefreshHealth }: SystemStatusViewProps) {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in">
+    <div className="flex flex-col gap-6 animate-fade-in font-sans">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <HardDrive className="w-5 h-5 text-emerald-400" /> Station Architecture &amp; SQLite Persistence Diagnostics
+          <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <HardDrive className="w-5 h-5 text-[#0b3d91]" /> Station Diagnostics &amp; Environmental Status
           </h2>
-          <p className="text-xs text-slate-400 font-mono mt-1">
-            Autonomous, offline-first execution environment for deep-space missions (NASA Space Apps 2026)
+          <p className="text-xs text-slate-500 mt-0.5">
+            Local storage, environmental telemetry, and store-and-forward comms
           </p>
         </div>
 
@@ -168,332 +166,382 @@ export function SystemStatusView({ onRefreshHealth }: SystemStatusViewProps) {
           <button
             onClick={handleExportSnapshot}
             disabled={exportingSnapshot || loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-space-850 hover:bg-space-800 border border-space-700 text-xs font-mono text-slate-200 hover:text-white transition shadow"
-            title="Download full 14-table database JSON snapshot"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 transition shadow-sm"
           >
             {exportingSnapshot ? (
-              <Loader2 className="w-3.5 h-3.5 text-nasa-amber animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 text-amber-600 animate-spin" />
             ) : (
-              <Download className="w-3.5 h-3.5 text-nasa-amber" />
+              <Download className="w-3.5 h-3.5 text-amber-600" />
             )}
-            <span>Export Database Backup (JSON)</span>
+            <span>Export Backup</span>
           </button>
 
           <button
             onClick={loadData}
             disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-space-850 hover:bg-space-800 border border-space-700 text-xs font-mono text-slate-200 transition shadow"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 transition shadow-sm"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-nasa-cyan' : ''}`} />
-            <span>Refresh Diagnostics</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-[#0b3d91]' : ''}`} />
+            <span>Refresh</span>
           </button>
         </div>
       </div>
 
       {snapshotFeedback && (
-        <div className="p-3 rounded-xl bg-space-950 border border-nasa-cyan/40 text-nasa-cyan text-xs font-mono flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-nasa-cyan" />
+        <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>{snapshotFeedback}</span>
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-4 rounded-xl bg-red-950/60 border border-red-500/50 text-red-300 text-xs font-mono">
+        <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs font-mono">
           {errorMsg}
         </div>
       )}
 
-      {/* Persistence & Architecture Metrics */}
+      {/* Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-space-900 border border-space-800 rounded-2xl p-5 shadow">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
-            <span>Database Storage File</span>
-            <Database className="w-4 h-4 text-emerald-400" />
+        <div className="bg-white border border-slate-200 rounded-md p-5 shadow-sm">
+          <div className="flex items-center justify-between text-slate-500 text-xs">
+            <span className="font-semibold text-slate-700">Database Storage</span>
+            <Database className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-lg font-bold font-mono text-white mt-2">
+          <div className="text-xl font-bold font-mono text-slate-900 mt-2">
             {health?.database_file || 'sentinel.db'}
           </div>
-          <p className="text-xs text-emerald-400 font-mono mt-1 flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" /> SQLite WAL Mode · Strict Foreign Keys
+          <p className="text-xs text-emerald-700 mt-1 flex items-center gap-1 font-medium">
+            <CheckCircle2 className="w-3.5 h-3.5" /> SQLite WAL Mode · 100% Offline
           </p>
-          <div className="mt-3 pt-3 border-t border-space-800/80 text-[11px] font-mono text-slate-400">
-            <span>File Size: </span>
-            <span className="text-slate-200 font-bold">
+          <div className="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-500 flex items-center justify-between font-mono">
+            <span>Size on disk:</span>
+            <span className="text-slate-800 font-bold">
               {diagnostics?.database_size_bytes 
                 ? `${(diagnostics.database_size_bytes / 1024).toFixed(1)} KB` 
-                : 'Active on disk'}
+                : 'Active'}
             </span>
           </div>
         </div>
 
-        <div className="bg-space-900 border border-space-800 rounded-2xl p-5 shadow">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
-            <span>Comms Latency Simulation</span>
-            <Radio className="w-4 h-4 text-nasa-cyan" />
+        <div className="bg-white border border-slate-200 rounded-md p-5 shadow-sm">
+          <div className="flex items-center justify-between text-slate-500 text-xs">
+            <span className="font-semibold text-slate-700">Earth Comms Latency</span>
+            <Radio className="w-4 h-4 text-[#0b3d91]" />
           </div>
-          <div className="text-lg font-bold font-mono text-nasa-cyan mt-2">
+          <div className="text-xl font-bold font-mono text-[#0b3d91] mt-2">
             22m 14s (One-Way)
           </div>
-          <p className="text-xs text-slate-400 font-mono mt-1">
-            Mars Transit / Artemis Deep Space
+          <p className="text-xs text-slate-500 mt-1">
+            Deep-Space Distance
           </p>
-          <div className="mt-3 pt-3 border-t border-space-800/80 text-[11px] font-mono text-emerald-400 flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5" /> 100% Autonomous Local Decisions
+          <div className="mt-3 pt-3 border-t border-slate-100 text-xs text-emerald-700 flex items-center gap-1 font-medium">
+            <ShieldCheck className="w-3.5 h-3.5" /> Local Autonomous Operations
           </div>
         </div>
 
-        <div className="bg-space-900 border border-space-800 rounded-2xl p-5 shadow">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
-            <span>Total Relational Records</span>
-            <Layers className="w-4 h-4 text-indigo-400" />
+        <div className="bg-white border border-slate-200 rounded-md p-5 shadow-sm">
+          <div className="flex items-center justify-between text-slate-500 text-xs">
+            <span className="font-semibold text-slate-700">Station Records</span>
+            <Layers className="w-4 h-4 text-purple-600" />
           </div>
-          <div className="text-lg font-bold font-mono text-indigo-300 mt-2">
+          <div className="text-xl font-bold font-mono text-slate-900 mt-2">
             {diagnostics?.total_records ?? 0} Records
           </div>
-          <p className="text-xs text-slate-400 font-mono mt-1">
+          <p className="text-xs text-slate-500 font-mono mt-1">
             Across 14 relational tables
           </p>
-          <div className="mt-3 pt-3 border-t border-space-800/80 text-[11px] font-mono text-slate-400">
+          <div className="mt-3 pt-3 border-t border-slate-100 text-xs font-mono text-slate-500">
             <span>Status: </span>
-            <span className="text-emerald-400 font-bold">STATION OPERATIONAL</span>
+            <span className="text-emerald-700 font-bold">OPERATIONAL</span>
           </div>
         </div>
       </div>
 
       {/* Offline Store-and-Forward Sync Queue & DSN Pass Simulator */}
-      <section className="bg-space-900 border border-space-800 rounded-2xl p-6 shadow">
+      <section className="bg-white border border-slate-200 rounded-md p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
-            <h3 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-              <Radio className="w-4 h-4 text-nasa-cyan" /> Store-and-Forward Offline Sync Queue (SHA-256 Idempotency)
+            <h3 className="text-sm font-bold text-slate-900 font-mono flex items-center gap-2">
+              <Radio className="w-4 h-4 text-[#0b3d91]" /> Store-and-Forward Sync Queue (SHA-256)
             </h3>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">
-              Deep space asynchronous batch synchronization with Mission Control on Earth
+            <p className="text-xs text-slate-500 font-mono mt-0.5">
+              Deep space asynchronous batch sync with Mission Control
             </p>
           </div>
 
           <button
             onClick={handleFlushComms}
             disabled={flushing}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-nasa-blue hover:bg-nasa-blue/80 text-white font-mono text-xs font-bold transition shadow"
-            title="Simulate high-gain Deep Space Network (DSN) uplink pass to transmit queued transactions"
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#0b3d91] hover:bg-blue-800 text-white font-mono text-xs font-bold transition shadow-sm"
           >
             {flushing ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
-              <Send className="w-3.5 h-3.5 text-nasa-cyan" />
+              <Send className="w-3.5 h-3.5 text-white" />
             )}
-            <span>{flushing ? 'Transmitting to DSN...' : 'Simulate DSN High-Gain Pass'}</span>
+            <span>{flushing ? 'Transmitting...' : 'Simulate DSN Comms Pass'}</span>
           </button>
         </div>
 
         {flushFeedback && (
-          <div className="p-3 mb-4 rounded-xl bg-space-950 border border-nasa-cyan/40 text-nasa-cyan text-xs font-mono flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-nasa-cyan" />
+          <div className="p-3 mb-4 rounded-md bg-blue-50 border border-blue-200 text-[#0b3d91] text-xs font-mono flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-[#0b3d91]" />
             <span>{flushFeedback}</span>
           </div>
         )}
 
         {/* Sync Summary Counters */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          <div className="bg-space-950 border border-space-800 rounded-xl p-3">
-            <span className="text-[11px] font-mono text-slate-400 block">Total Enqueued</span>
-            <span className="text-base font-bold font-mono text-white mt-1 block">
+          <div className="bg-slate-50 border border-slate-200 rounded-md p-3">
+            <span className="text-xs font-mono text-slate-500 block">Total Transactions</span>
+            <span className="text-base font-bold font-mono text-slate-900 mt-1 block">
               {syncSummary?.total_transactions ?? 0}
             </span>
           </div>
 
-          <div className="bg-space-950 border border-space-800 rounded-xl p-3">
-            <span className="text-[11px] font-mono text-amber-400 block">Queued (Pending Uplink)</span>
-            <span className="text-base font-bold font-mono text-amber-300 mt-1 block">
+          <div className="bg-slate-50 border border-slate-200 rounded-md p-3">
+            <span className="text-xs font-mono text-amber-700 block">Pending Uplink</span>
+            <span className="text-base font-bold font-mono text-amber-800 mt-1 block">
               {syncSummary?.queued_pending ?? 0}
             </span>
           </div>
 
-          <div className="bg-space-950 border border-space-800 rounded-xl p-3">
-            <span className="text-[11px] font-mono text-emerald-400 block">Synced to Earth</span>
-            <span className="text-base font-bold font-mono text-emerald-300 mt-1 block">
+          <div className="bg-slate-50 border border-slate-200 rounded-md p-3">
+            <span className="text-xs font-mono text-emerald-700 block">Synced to Earth</span>
+            <span className="text-base font-bold font-mono text-emerald-800 mt-1 block">
               {syncSummary?.synced_to_earth ?? 0}
             </span>
           </div>
 
-          <div className="bg-space-950 border border-space-800 rounded-xl p-3">
-            <span className="text-[11px] font-mono text-slate-400 block">Deduplication Engine</span>
-            <span className="text-base font-bold font-mono text-nasa-cyan mt-1 block">
-              SHA-256 Valid
+          <div className="bg-slate-50 border border-slate-200 rounded-md p-3">
+            <span className="text-xs font-mono text-slate-500 block">Deduplication</span>
+            <span className="text-base font-bold font-mono text-[#0b3d91] mt-1 block">
+              SHA-256 Active
             </span>
           </div>
         </div>
 
-        {/* Recent Offline Transactions Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left font-mono text-xs">
-            <thead className="border-b border-space-800 text-[11px] text-slate-400 uppercase tracking-wider bg-space-950/60">
-              <tr>
-                <th className="py-2.5 px-3">Transaction Type</th>
-                <th className="py-2.5 px-3">Entity Table</th>
-                <th className="py-2.5 px-3">SHA-256 Idempotency Hash</th>
-                <th className="py-2.5 px-3">Sync Status</th>
-                <th className="py-2.5 px-3">Timestamp</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-space-850 text-slate-300">
-              {syncSummary?.recent_items && syncSummary.recent_items.length > 0 ? (
-                syncSummary.recent_items.map((item) => (
-                  <tr key={item.id} className="hover:bg-space-850/50 transition">
-                    <td className="py-2.5 px-3 font-bold text-white">{item.transaction_type}</td>
-                    <td className="py-2.5 px-3 text-slate-400">{item.entity_table}</td>
-                    <td className="py-2.5 px-3 text-nasa-cyan text-[11px] font-mono">{item.idempotency_hash}</td>
-                    <td className="py-2.5 px-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                        item.sync_status === 'QUEUED'
-                          ? 'bg-amber-950/70 text-amber-400 border-amber-500/40 animate-pulse'
-                          : 'bg-emerald-950/70 text-emerald-400 border-emerald-500/40'
-                      }`}>
-                        {item.sync_status}
-                      </span>
-                    </td>
-                    <td className="py-2.5 px-3 text-slate-500 text-[11px]">
-                      {new Date(item.created_at).toISOString().slice(0, 19).replace('T', ' ')} UTC
+        {/* Recent Transactions Excel Table */}
+        <div className="excel-grid-container">
+          <div className="excel-formula-bar">
+            <div className="bg-white border border-slate-300 px-2 py-0.5 text-[10px] font-bold text-slate-600 rounded">
+              A1:E{Math.max(syncSummary?.recent_items?.length || 1, 1)}
+            </div>
+            <div className="text-slate-400 font-serif italic text-xs font-bold">fx</div>
+            <div className="text-slate-700 text-[11px] truncate flex-1">
+              =AUDIT_LOG(ENTITY="STATION_OUTBOX", STATUS="SYNCHRONIZED", HASH_ALGO="SHA256")
+            </div>
+          </div>
+          <div className="overflow-x-auto max-h-64 overflow-y-auto">
+            <table className="excel-table">
+              <thead>
+                <tr>
+                  <th className="excel-col-letter w-9 min-w-9">#</th>
+                  <th className="excel-col-letter">A</th>
+                  <th className="excel-col-letter">B</th>
+                  <th className="excel-col-letter">C</th>
+                  <th className="excel-col-letter">D</th>
+                  <th className="excel-col-letter">E</th>
+                </tr>
+                <tr>
+                  <th className="excel-th w-9 min-w-9 text-center">Row</th>
+                  <th className="excel-th">Transaction Type ▼</th>
+                  <th className="excel-th">Entity Table ▼</th>
+                  <th className="excel-th">SHA-256 Idempotency Hash ▼</th>
+                  <th className="excel-th">Sync Status ▼</th>
+                  <th className="excel-th">Recorded Timestamp ▼</th>
+                </tr>
+              </thead>
+              <tbody>
+                {syncSummary?.recent_items && syncSummary.recent_items.length > 0 ? (
+                  syncSummary.recent_items.map((item, idx) => (
+                    <tr key={item.id} className="excel-row">
+                      <td className="excel-row-num">{idx + 1}</td>
+                      <td className="excel-td font-bold text-slate-900">{item.transaction_type}</td>
+                      <td className="excel-td text-slate-600 font-mono">{item.entity_table}</td>
+                      <td className="excel-td text-[#0b3d91] text-[11px] font-mono">{item.idempotency_hash}</td>
+                      <td className="excel-td">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                          item.sync_status === 'QUEUED'
+                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        }`}>
+                          {item.sync_status}
+                        </span>
+                      </td>
+                      <td className="excel-td text-slate-500 text-[11px]">
+                        {new Date(item.created_at).toISOString().slice(0, 19).replace('T', ' ')} UTC
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr className="excel-row">
+                    <td className="excel-row-num">1</td>
+                    <td colSpan={5} className="excel-td py-6 text-center text-slate-400">
+                      No transactions currently in queue.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="py-6 text-center text-slate-500">
-                    No transactions currently in offline sync queue. Ingest telemetry or log countermeasures to generate queued records.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="excel-status-bar">
+            <span>READY | Sheet: Outbox_Sync_Queue | Encrypted: AES-256-GCM</span>
+            <span>Items: <strong className="text-slate-800">{syncSummary?.recent_items?.length || 0}</strong></span>
+          </div>
         </div>
       </section>
 
-      {/* Habitat Environmental Telemetry & Life Support Synergy */}
-      <section className="bg-space-900 border border-space-800 rounded-2xl p-6 shadow">
+      {/* Habitat Environmental Telemetry */}
+      <section className="bg-white border border-slate-200 rounded-md p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
           <div>
-            <h3 className="text-sm font-bold text-white font-mono flex items-center gap-2">
-              <Wind className="w-4 h-4 text-nasa-cyan" /> Habitat Environmental Telemetry &amp; Life Support Synergy
+            <h3 className="text-sm font-bold text-slate-900 font-mono flex items-center gap-2">
+              <Wind className="w-4 h-4 text-[#0b3d91]" /> Habitat Environmental Telemetry
             </h3>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">
-              Cabin CO₂ scrubbers, ionizing radiation exposure, and habitat module atmospheric telemetry
+            <p className="text-xs text-slate-500 font-mono mt-0.5">
+              Cabin atmospheric conditions and sensor readings
             </p>
           </div>
 
           <button
             onClick={() => setShowEnvModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-space-850 hover:bg-space-800 border border-space-700 hover:border-nasa-cyan text-xs font-mono text-slate-200 transition shadow"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white hover:bg-slate-50 border border-slate-200 text-xs font-mono font-semibold text-slate-700 transition shadow-sm"
           >
-            <PlusCircle className="w-3.5 h-3.5 text-nasa-cyan" />
-            <span>+ Log Habitat Telemetry</span>
+            <PlusCircle className="w-3.5 h-3.5 text-[#0b3d91]" />
+            <span>+ Log Reading</span>
           </button>
         </div>
 
         {/* Environmental Quick Counters */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-          <div className="bg-space-950 border border-space-800 rounded-xl p-3 font-mono">
-            <span className="text-[11px] text-slate-400 block">LATEST CABIN CO₂</span>
+          <div className="bg-slate-50 border border-slate-200 rounded-md p-3 font-mono">
+            <span className="text-xs text-slate-500 block">CABIN CO₂</span>
             {(() => {
               const latestCo2 = envReadings.find((r) => r.parameter_name === 'CABIN_CO2_PPM');
               const val = latestCo2 ? latestCo2.value : 520;
               const isHigh = val > 1000;
               return (
                 <div className="flex items-baseline justify-between mt-1">
-                  <span className={`text-lg font-bold ${isHigh ? 'text-red-400' : 'text-emerald-300'}`}>
+                  <span className={`text-lg font-bold ${isHigh ? 'text-red-600' : 'text-emerald-700'}`}>
                     {val} ppm
                   </span>
                   <span className={`text-[10px] px-2 py-0.5 rounded border ${
-                    isHigh ? 'bg-red-950/70 border-red-500/50 text-red-300' : 'bg-emerald-950/70 border-emerald-500/50 text-emerald-300'
+                    isHigh ? 'bg-red-50 border-red-200 text-red-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'
                   }`}>
-                    {isHigh ? 'ELEVATED (>1000)' : 'NOMINAL (<1000)'}
+                    {isHigh ? 'ELEVATED' : 'NOMINAL'}
                   </span>
                 </div>
               );
             })()}
           </div>
 
-          <div className="bg-space-950 border border-space-800 rounded-xl p-3 font-mono">
-            <span className="text-[11px] text-slate-400 block">IONIZING RADIATION EXPOSURE</span>
+          <div className="bg-slate-50 border border-slate-200 rounded-md p-3 font-mono">
+            <span className="text-xs text-slate-500 block">RADIATION EXPOSURE</span>
             {(() => {
               const rads = envReadings.filter((r) => r.parameter_name.includes('RADIATION'));
               const total = rads.reduce((acc, r) => acc + r.value, 0);
               return (
                 <div className="flex items-baseline justify-between mt-1">
-                  <span className="text-lg font-bold text-white">
+                  <span className="text-lg font-bold text-slate-900">
                     {total > 0 ? `${total.toFixed(2)} μSv` : '0.45 μSv/h'}
                   </span>
-                  <span className="text-[10px] bg-space-850 px-2 py-0.5 rounded border border-space-700 text-slate-300">
-                    Cosmic Ray Shielded
+                  <span className="text-[10px] bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-600">
+                    Shielded
                   </span>
                 </div>
               );
             })()}
           </div>
 
-          <div className="bg-space-950 border border-space-800 rounded-xl p-3 font-mono">
-            <span className="text-[11px] text-slate-400 block">HABITAT MODULE ATMOSPHERE</span>
+          <div className="bg-slate-50 border border-slate-200 rounded-md p-3 font-mono">
+            <span className="text-xs text-slate-500 block">PRESSURE &amp; TEMP</span>
             <div className="flex items-baseline justify-between mt-1">
-              <span className="text-lg font-bold text-nasa-cyan">
+              <span className="text-lg font-bold text-[#0b3d91]">
                 101.3 kPa
               </span>
-              <span className="text-[10px] bg-space-850 px-2 py-0.5 rounded border border-space-700 text-slate-300">
-                21.5°C · 78% N₂ / 21% O₂
+              <span className="text-[10px] bg-white px-2 py-0.5 rounded border border-slate-200 text-slate-600">
+                21.5°C
               </span>
             </div>
           </div>
         </div>
 
-        {/* Environmental Readings Table */}
-        <div className="overflow-x-auto max-h-60 overflow-y-auto">
-          <table className="w-full text-left font-mono text-xs">
-            <thead className="border-b border-space-800 text-[11px] text-slate-400 uppercase tracking-wider bg-space-950/60 sticky top-0">
-              <tr>
-                <th className="py-2 px-3">Parameter Name</th>
-                <th className="py-2 px-3">Value</th>
-                <th className="py-2 px-3">Habitat Zone</th>
-                <th className="py-2 px-3">Quality Status</th>
-                <th className="py-2 px-3">Timestamp</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-space-850 text-slate-300">
-              {envReadings.length > 0 ? (
-                envReadings.map((r) => (
-                  <tr key={r.id} className="hover:bg-space-850/50 transition">
-                    <td className="py-2 px-3 font-bold text-white">{r.parameter_name}</td>
-                    <td className="py-2 px-3 text-nasa-cyan font-bold">{r.value} {r.unit}</td>
-                    <td className="py-2 px-3 text-slate-400">{r.habitat_zone}</td>
-                    <td className="py-2 px-3">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                        r.quality_status === 'VALID'
-                          ? 'bg-emerald-950/70 text-emerald-400 border-emerald-500/40'
-                          : 'bg-red-950/70 text-red-400 border-red-500/40'
-                      }`}>
-                        {r.quality_status}
-                      </span>
-                    </td>
-                    <td className="py-2 px-3 text-slate-500 text-[11px]">
-                      {new Date(r.timestamp).toISOString().slice(0, 19).replace('T', ' ')} UTC
+        {/* Environmental Readings Excel Table */}
+        <div className="excel-grid-container">
+          <div className="excel-formula-bar">
+            <div className="bg-white border border-slate-300 px-2 py-0.5 text-[10px] font-bold text-slate-600 rounded">
+              A1:E{Math.max(envReadings.length, 1)}
+            </div>
+            <div className="text-slate-400 font-serif italic text-xs font-bold">fx</div>
+            <div className="text-slate-700 text-[11px] truncate flex-1">
+              =ENVIRONMENTAL_TELEMETRY(ZONE="ALL", WINDOW="RECENT_BURST", INTEGRITY="CHECKED")
+            </div>
+          </div>
+          <div className="overflow-x-auto max-h-56 overflow-y-auto">
+            <table className="excel-table">
+              <thead>
+                <tr>
+                  <th className="excel-col-letter w-9 min-w-9">#</th>
+                  <th className="excel-col-letter">A</th>
+                  <th className="excel-col-letter">B</th>
+                  <th className="excel-col-letter">C</th>
+                  <th className="excel-col-letter">D</th>
+                  <th className="excel-col-letter">E</th>
+                </tr>
+                <tr>
+                  <th className="excel-th w-9 min-w-9 text-center">Row</th>
+                  <th className="excel-th">Atmospheric Parameter ▼</th>
+                  <th className="excel-th">Sensor Value ▼</th>
+                  <th className="excel-th">Habitat Zone ▼</th>
+                  <th className="excel-th">Sensor Quality ▼</th>
+                  <th className="excel-th">Telemetry Timestamp ▼</th>
+                </tr>
+              </thead>
+              <tbody>
+                {envReadings.length > 0 ? (
+                  envReadings.map((r, idx) => (
+                    <tr key={r.id} className="excel-row">
+                      <td className="excel-row-num">{idx + 1}</td>
+                      <td className="excel-td font-bold text-slate-900">{r.parameter_name}</td>
+                      <td className="excel-td text-[#0b3d91] font-bold">{r.value} {r.unit}</td>
+                      <td className="excel-td text-slate-600">{r.habitat_zone}</td>
+                      <td className="excel-td">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                          r.quality_status === 'VALID'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : 'bg-red-50 text-red-700 border-red-200'
+                        }`}>
+                          {r.quality_status}
+                        </span>
+                      </td>
+                      <td className="excel-td text-slate-500 text-[11px]">
+                        {new Date(r.timestamp).toISOString().slice(0, 19).replace('T', ' ')} UTC
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr className="excel-row">
+                    <td className="excel-row-num">1</td>
+                    <td colSpan={5} className="excel-td py-6 text-center text-slate-400">
+                      No environmental telemetry records.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={5} className="py-6 text-center text-slate-500">
-                    No environmental telemetry records currently in station database.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="excel-status-bar">
+            <span>READY | Sheet: Habitat_Atmosphere_Grid | Status: Online</span>
+            <span>Total Sensors: <strong className="text-slate-800">{envReadings.length}</strong></span>
+          </div>
         </div>
       </section>
 
-      {/* 14 Relational Tables Breakdown */}
-      <section className="bg-space-900 border border-space-800 rounded-2xl p-6 shadow">
-        <h3 className="text-sm font-bold text-white font-mono flex items-center gap-2 mb-4">
-          <Database className="w-4 h-4 text-emerald-400" /> 14-Table Relational Schema Row Counts (Live SQLite Query)
+      {/* 14 Relational Tables */}
+      <section className="bg-white border border-slate-200 rounded-md p-6 shadow-sm">
+        <h3 className="text-sm font-bold text-slate-900 font-mono flex items-center gap-2 mb-4">
+          <Database className="w-4 h-4 text-[#0b3d91]" /> Relational Schema Row Counts (Live SQLite Query)
         </h3>
 
         {diagnostics?.table_counts ? (
@@ -501,67 +549,34 @@ export function SystemStatusView({ onRefreshHealth }: SystemStatusViewProps) {
             {Object.entries(diagnostics.table_counts).map(([tableName, count]) => (
               <div 
                 key={tableName} 
-                className="bg-space-950 border border-space-800/80 rounded-xl p-3 flex flex-col justify-between"
+                className="bg-slate-50 border border-slate-200 rounded-md p-3 flex flex-col justify-between"
               >
-                <span className="text-[11px] font-mono text-slate-400 truncate" title={tableName}>
+                <span className="text-[11px] font-mono text-slate-500 truncate" title={tableName}>
                   {tableName}
                 </span>
-                <span className="text-base font-bold font-mono text-white mt-1">
+                <span className="text-base font-bold font-mono text-slate-900 mt-1">
                   {typeof count === 'number' ? count.toLocaleString() : count}
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-xs text-slate-500 font-mono">No table count diagnostics available.</p>
+          <p className="text-xs text-slate-400 font-mono">No table count diagnostics available.</p>
         )}
       </section>
 
-      {/* NASA Scientific Evidence Grounding Dossier */}
-      <section className="bg-space-900 border border-space-800 rounded-2xl p-6 shadow">
-        <h3 className="text-sm font-bold text-white font-mono flex items-center gap-2 mb-4">
-          <BookOpen className="w-4 h-4 text-nasa-cyan" /> NASA Human Research Program Grounding &amp; Scientific Rules
-        </h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
-          <div className="bg-space-950 border border-space-800 rounded-xl p-4 flex flex-col gap-2">
-            <span className="text-nasa-cyan font-bold">1. Cardiovascular Deconditioning</span>
-            <p className="text-slate-400 leading-relaxed">
-              NASA HRP HRR-CV evidence: Microgravity cephalad fluid redistribution causes plasma contraction and resting heart rate elevation.
-            </p>
-            <span className="text-[10px] text-slate-500 mt-auto">Indicator: Resting Heart Rate (bpm)</span>
-          </div>
-
-          <div className="bg-space-950 border border-space-800 rounded-xl p-4 flex flex-col gap-2">
-            <span className="text-indigo-400 font-bold">2. Sleep Loss &amp; Work Overload</span>
-            <p className="text-slate-400 leading-relaxed">
-              NASA HRP HRR-Sleep: ISS crews average 6.0–6.4 hours/night. Cumulative sleep debt degrades neurobehavioral vigilance and cardiac stability.
-            </p>
-            <span className="text-[10px] text-slate-500 mt-auto">Indicator: Sleep Duration (hours)</span>
-          </div>
-
-          <div className="bg-space-950 border border-space-800 rounded-xl p-4 flex flex-col gap-2">
-            <span className="text-amber-400 font-bold">3. Exercise Recovery Velocity</span>
-            <p className="text-slate-400 leading-relaxed">
-              NASA HRP Exercise: Slowed 1-minute heart rate recovery post-ARED/T2 workout indicates autonomic fatigue and deconditioning.
-            </p>
-            <span className="text-[10px] text-slate-500 mt-auto">Indicator: HRR-1 (bpm drop)</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Habitat Environmental Telemetry Entry Modal */}
+      {/* Environmental Entry Modal */}
       {showEnvModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="bg-space-900 border border-space-750 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden font-mono">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-space-800 bg-space-950">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white border border-slate-200 rounded-md w-full max-w-md shadow-2xl overflow-hidden font-mono">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
               <div className="flex items-center gap-2">
-                <Wind className="w-5 h-5 text-nasa-cyan" />
-                <h3 className="text-sm font-bold text-white">Log Habitat Telemetry</h3>
+                <Wind className="w-5 h-5 text-[#0b3d91]" />
+                <h3 className="text-sm font-bold text-slate-800">Log Habitat Telemetry</h3>
               </div>
               <button
                 onClick={() => setShowEnvModal(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-space-800 transition"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -569,8 +584,8 @@ export function SystemStatusView({ onRefreshHealth }: SystemStatusViewProps) {
 
             <form onSubmit={handleRecordEnv} className="p-6 space-y-4 text-xs">
               <div>
-                <label className="block text-slate-400 mb-1 uppercase text-[11px] font-bold">
-                  Parameter Name
+                <label className="block text-slate-600 mb-1 font-bold">
+                  Parameter
                 </label>
                 <select
                   value={envParam}
@@ -591,18 +606,18 @@ export function SystemStatusView({ onRefreshHealth }: SystemStatusViewProps) {
                       setEnvValue(21.5);
                     }
                   }}
-                  className="w-full bg-space-950 border border-space-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-nasa-cyan"
+                  className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs focus:outline-none focus:border-[#0b3d91]"
                 >
                   <option value="CABIN_CO2_PPM">Cabin CO₂ (ppm)</option>
                   <option value="RADIATION_RATE_USV_H">Ionizing Radiation Rate (μSv/h)</option>
-                  <option value="CABIN_PRESSURE_KPA">Cabin Atmospheric Pressure (kPa)</option>
+                  <option value="CABIN_PRESSURE_KPA">Cabin Pressure (kPa)</option>
                   <option value="AMBIENT_TEMP_CELSIUS">Ambient Temperature (°C)</option>
                 </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 mb-1 uppercase text-[11px] font-bold">
+                  <label className="block text-slate-600 mb-1 font-bold">
                     Value ({envUnit})
                   </label>
                   <input
@@ -611,17 +626,17 @@ export function SystemStatusView({ onRefreshHealth }: SystemStatusViewProps) {
                     value={envValue}
                     onChange={(e) => setEnvValue(parseFloat(e.target.value))}
                     required
-                    className="w-full bg-space-950 border border-space-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-nasa-cyan font-bold"
+                    className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-xs focus:outline-none focus:border-[#0b3d91] font-bold"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 mb-1 uppercase text-[11px] font-bold">
+                  <label className="block text-slate-600 mb-1 font-bold">
                     Habitat Zone
                   </label>
                   <select
                     value={envZone}
                     onChange={(e) => setEnvZone(e.target.value)}
-                    className="w-full bg-space-950 border border-space-700 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-nasa-cyan"
+                    className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs focus:outline-none focus:border-[#0b3d91]"
                   >
                     <option value="CREW_QUARTERS">Crew Quarters</option>
                     <option value="AIRLOCK">Airlock / Suit Prep</option>
@@ -631,23 +646,18 @@ export function SystemStatusView({ onRefreshHealth }: SystemStatusViewProps) {
                 </div>
               </div>
 
-              <div className="p-3 bg-space-950 border border-space-800 rounded-xl text-[10px] text-slate-400 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Reading will be persisted to SQLite environmental table and verified for safety limits.</span>
-              </div>
-
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowEnvModal(false)}
-                  className="px-4 py-2 rounded-xl bg-space-850 hover:bg-space-800 text-slate-300 text-xs transition"
+                  className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingEnv}
-                  className="px-4 py-2 rounded-xl bg-nasa-blue hover:bg-nasa-blue/80 text-white text-xs font-bold transition flex items-center gap-1.5 shadow"
+                  className="px-4 py-2 rounded-lg bg-[#0b3d91] hover:bg-blue-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                 >
                   {submittingEnv ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <PlusCircle className="w-3.5 h-3.5" />}
                   <span>{submittingEnv ? 'Logging...' : 'Save Reading'}</span>

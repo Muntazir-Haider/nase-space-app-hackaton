@@ -23,6 +23,7 @@ from backend.app.api import (
     sync_router,
     analytics_router,
     reports_router,
+    auth_router,
 )
 
 # Initialize structured logging
@@ -72,6 +73,7 @@ app.include_router(scenarios_router, prefix=settings.API_V1_STR)
 app.include_router(sync_router, prefix=settings.API_V1_STR)
 app.include_router(analytics_router, prefix=settings.API_V1_STR)
 app.include_router(reports_router, prefix=settings.API_V1_STR)
+app.include_router(auth_router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def root():

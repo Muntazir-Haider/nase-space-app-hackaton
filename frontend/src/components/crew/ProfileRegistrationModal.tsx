@@ -45,7 +45,7 @@ export function ProfileRegistrationModal({ onClose, onSuccess }: ProfileRegistra
     setSuccessMsg('');
 
     if (!callsign.trim()) {
-      setErrorMsg('Astronaut callsign is required (e.g. ARTEMIS-04).');
+      setErrorMsg('Astronaut callsign is required.');
       return;
     }
     if (!fullName.trim()) {
@@ -66,7 +66,7 @@ export function ProfileRegistrationModal({ onClose, onSuccess }: ProfileRegistra
         flight_role: flightRole,
         medical_clearance_status: medicalClearance,
       });
-      setSuccessMsg(`Astronaut ${created.callsign} (${created.full_name}) registered successfully.`);
+      setSuccessMsg(`Astronaut ${created.callsign} registered.`);
       setTimeout(() => {
         onSuccess(created.id);
         onClose();
@@ -80,57 +80,57 @@ export function ProfileRegistrationModal({ onClose, onSuccess }: ProfileRegistra
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-space-950/80 backdrop-blur-sm animate-fade-in">
-      <div className="bg-space-900 border border-space-750 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col font-sans">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-space-800 bg-space-850">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-nasa-blue/30 border border-nasa-cyan/40 text-nasa-cyan">
+            <div className="p-2 rounded-lg bg-blue-50 border border-blue-200 text-[#0b3d91]">
               <UserPlus className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-base text-white">Register Crew Member Profile</h3>
-              <p className="text-xs text-slate-400 font-mono">CMO Crew Roster Management & Medical Enlistment</p>
+              <h3 className="font-bold text-base text-slate-800">Register Crew Member</h3>
+              <p className="text-xs text-slate-500 font-mono">Crew Roster Enrollment</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-space-750 transition"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4 text-xs font-mono">
           {errorMsg && (
-            <div className="flex items-start gap-2 p-3 rounded-xl bg-red-950/60 border border-red-500/50 text-red-300 text-xs font-mono">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-800">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 text-xs font-mono">
-              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
               <span>{successMsg}</span>
             </div>
           )}
 
           {/* Mission Assignment */}
           <div>
-            <label className="block text-xs font-mono text-slate-300 mb-1">
+            <label className="block text-slate-600 font-bold mb-1">
               Mission Assignment
             </label>
             {loadingMissions ? (
-              <div className="p-2 rounded-xl bg-space-950 border border-space-800 text-xs text-slate-500 font-mono flex items-center gap-2">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-nasa-cyan" /> Loading missions...
+              <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-500 flex items-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0b3d91]" /> Loading missions...
               </div>
             ) : (
               <select
                 value={missionId}
                 onChange={(e) => setMissionId(e.target.value)}
-                className="w-full bg-space-950 border border-space-750 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-nasa-cyan"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-[#0b3d91]"
               >
                 {missions.map((m) => (
                   <option key={m.id} value={m.id}>
@@ -144,30 +144,29 @@ export function ProfileRegistrationModal({ onClose, onSuccess }: ProfileRegistra
           {/* Callsign & Full Name */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono text-slate-300 mb-1">
-                Callsign <span className="text-red-400">*</span>
+              <label className="block text-slate-600 font-bold mb-1">
+                Callsign <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 placeholder="e.g. ARTEMIS-04"
                 value={callsign}
                 onChange={(e) => setCallsign(e.target.value)}
-                className="w-full bg-space-950 border border-space-750 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-nasa-cyan"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-[#0b3d91]"
                 required
               />
-              <span className="text-[10px] text-slate-500 font-mono">Must be unique across mission fleet</span>
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-300 mb-1">
-                Full Name <span className="text-red-400">*</span>
+              <label className="block text-slate-600 font-bold mb-1">
+                Full Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 placeholder="e.g. Dr. Alex Vogel"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full bg-space-950 border border-space-750 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-nasa-cyan"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-[#0b3d91]"
                 required
               />
             </div>
@@ -176,13 +175,13 @@ export function ProfileRegistrationModal({ onClose, onSuccess }: ProfileRegistra
           {/* Flight Role & Medical Clearance */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono text-slate-300 mb-1">
-                Flight Operational Role
+              <label className="block text-slate-600 font-bold mb-1">
+                Operational Role
               </label>
               <select
                 value={flightRole}
                 onChange={(e) => setFlightRole(e.target.value)}
-                className="w-full bg-space-950 border border-space-750 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-nasa-cyan"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-[#0b3d91]"
               >
                 <option value="COMMANDER">Commander</option>
                 <option value="PILOT">Pilot</option>
@@ -193,13 +192,13 @@ export function ProfileRegistrationModal({ onClose, onSuccess }: ProfileRegistra
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-300 mb-1">
-                Medical Clearance Status
+              <label className="block text-slate-600 font-bold mb-1">
+                Clearance Status
               </label>
               <select
                 value={medicalClearance}
                 onChange={(e) => setMedicalClearance(e.target.value)}
-                className="w-full bg-space-950 border border-space-750 rounded-xl px-3 py-2 text-xs font-mono text-slate-100 focus:outline-none focus:border-nasa-cyan"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:outline-none focus:border-[#0b3d91]"
               >
                 <option value="FULL_FLIGHT_CLEARANCE">Full Flight Clearance</option>
                 <option value="RESTRICTED_DUTY">Restricted Duty</option>
@@ -208,23 +207,19 @@ export function ProfileRegistrationModal({ onClose, onSuccess }: ProfileRegistra
             </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-space-850/60 border border-space-800 text-[11px] font-mono text-slate-400">
-            <strong>Acceptance Test 1 Verification:</strong> Registering this profile will write a permanent record into the local SQLite database (<code className="text-nasa-cyan">data/sentinel.db</code>). The profile remains persisted across process restarts.
-          </div>
-
           {/* Actions */}
-          <div className="flex items-center justify-end gap-3 pt-2 border-t border-space-800 mt-2">
+          <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-200 mt-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-mono text-slate-400 hover:text-white transition"
+              className="px-4 py-2 text-slate-600 hover:text-slate-900 transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-nasa-blue hover:bg-nasa-blue/80 active:bg-nasa-blue/90 disabled:opacity-50 text-white font-mono text-xs font-bold transition shadow-lg shadow-nasa-blue/20"
+              className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#0b3d91] hover:bg-blue-800 disabled:opacity-50 text-white font-bold transition shadow-sm"
             >
               {submitting ? (
                 <>

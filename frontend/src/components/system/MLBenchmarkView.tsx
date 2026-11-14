@@ -65,25 +65,25 @@ export function MLBenchmarkView() {
     : report?.daily_progression_scenario_b || [];
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in font-sans">
       {/* Header Banner */}
-      <div className="bg-space-900 border border-space-800 rounded-2xl p-6 shadow-xl flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white border border-slate-200 rounded-md p-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400">
+            <div className="w-10 h-10 rounded-md bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700">
               <BrainCircuit className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-bold text-white tracking-wide">
-                  Aerospace Clinical Intelligence Benchmark
+                <h2 className="text-xl font-bold text-slate-800 tracking-wide">
+                  Clinical Intelligence Benchmark
                 </h2>
-                <span className="text-[10px] font-mono uppercase bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30">
-                  Experimental ML vs. Rules
+                <span className="text-[10px] font-mono uppercase bg-purple-50 text-purple-700 px-2 py-0.5 rounded border border-purple-200 font-bold">
+                  ML vs. Rules
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-mono">
-                Comparative evaluation of Deterministic OLS Rules vs. Unsupervised Machine Learning (Isolation Forest & LOF)
+              <p className="text-xs text-slate-500 font-mono">
+                Comparative evaluation of Deterministic Rules vs. Isolation Forest &amp; LOF
               </p>
             </div>
           </div>
@@ -93,17 +93,17 @@ export function MLBenchmarkView() {
           <button
             onClick={handleTriggerRun}
             disabled={running || loading}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-mono font-semibold shadow-lg shadow-purple-500/20 disabled:opacity-50 transition"
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-[#0b3d91] hover:bg-blue-800 text-white text-xs font-mono font-semibold shadow-sm disabled:opacity-50 transition"
           >
             {running ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
-                <span>Evaluating Models...</span>
+                <span>Evaluating...</span>
               </>
             ) : (
               <>
                 <Play className="w-4 h-4 fill-white" />
-                <span>Run Live Benchmark</span>
+                <span>Run Benchmark</span>
               </>
             )}
           </button>
@@ -111,19 +111,19 @@ export function MLBenchmarkView() {
       </div>
 
       {errorMsg && (
-        <div className="p-4 rounded-xl bg-red-950/50 border border-red-500/40 text-red-300 text-xs font-mono flex items-center justify-between">
+        <div className="p-4 rounded-md bg-red-50 border border-red-200 text-red-800 text-xs font-mono flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-400" />
-            <span>Benchmark Evaluation Error: {errorMsg}</span>
+            <AlertTriangle className="w-4 h-4 text-red-600" />
+            <span>Benchmark Error: {errorMsg}</span>
           </div>
-          <button onClick={loadBenchmark} className="underline hover:text-white">Retry</button>
+          <button onClick={loadBenchmark} className="underline hover:text-red-950">Retry</button>
         </div>
       )}
 
       {loading && !report ? (
         <div className="p-12 text-center text-slate-400 font-mono text-xs flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
-          <span>Executing local Scikit-Learn Isolation Forest & LOF algorithms...</span>
+          <Loader2 className="w-8 h-8 text-[#0b3d91] animate-spin" />
+          <span>Running Isolation Forest &amp; LOF models...</span>
         </div>
       ) : report ? (
         <>
@@ -136,180 +136,229 @@ export function MLBenchmarkView() {
               return (
                 <div 
                   key={idx}
-                  className={`rounded-2xl p-5 border flex flex-col justify-between transition ${
+                  className={`bg-white rounded-md p-5 border flex flex-col justify-between shadow-sm transition ${
                     isRuleBased
-                      ? 'bg-space-900/90 border-emerald-500/50 shadow-lg shadow-emerald-500/5 ring-1 ring-emerald-500/20'
+                      ? 'border-emerald-300 ring-1 ring-emerald-200'
                       : isIsoForest
-                        ? 'bg-space-900/90 border-cyan-500/40 shadow-lg shadow-cyan-500/5'
-                        : 'bg-space-900/90 border-space-800'
+                        ? 'border-blue-300'
+                        : 'border-slate-200'
                   }`}
                 >
-                  <div className="space-y-4">
-                    {/* Card Top Pill & Title */}
+                  <div className="space-y-3">
+                    {/* Top Pill & Title */}
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-semibold border ${
                           isRuleBased
-                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                             : isIsoForest
-                              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
-                              : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                              ? 'bg-blue-50 text-blue-800 border-blue-200'
+                              : 'bg-amber-50 text-amber-800 border-amber-200'
                         }`}>
-                          {isRuleBased ? 'PRIMARY OPERATIONAL STANDARD' : isIsoForest ? 'EARLY-WARNING COMPANION' : 'EXPERIMENTAL RESEARCH'}
+                          {isRuleBased ? 'PRIMARY STANDARD' : isIsoForest ? 'EARLY-WARNING' : 'EXPERIMENTAL'}
                         </span>
-                        <h3 className="font-bold text-sm text-white mt-1.5">{model.model_name}</h3>
-                        <p className="text-[11px] font-mono text-slate-400 mt-0.5">{model.model_family}</p>
+                        <h3 className="font-bold text-sm text-slate-800 mt-1.5">{model.model_name}</h3>
+                        <p className="text-[11px] font-mono text-slate-500 mt-0.5">{model.model_family}</p>
                       </div>
                       <div className="text-right font-mono">
                         <span className="text-[10px] text-slate-400 block">Latency</span>
-                        <span className="text-xs font-bold text-slate-200">{model.computational_latency_ms} ms</span>
+                        <span className="text-xs font-bold text-slate-700">{model.computational_latency_ms} ms</span>
                       </div>
                     </div>
 
-                    <p className="text-xs text-slate-300 leading-relaxed border-t border-space-800/80 pt-3">
+                    <p className="text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-2">
                       {model.description}
                     </p>
 
                     {/* Performance Metrics Grid */}
-                    <div className="grid grid-cols-2 gap-2 text-xs font-mono bg-space-950/60 p-3 rounded-xl border border-space-800">
+                    <div className="grid grid-cols-2 gap-2 text-xs font-mono bg-slate-50 p-3 rounded-md border border-slate-200">
                       <div>
-                        <span className="text-[10px] text-slate-400 block">Scenario C Detection</span>
-                        <span className="font-bold text-white text-xs">
-                          {model.detection_day_scenario_c ? `Flight Day ${model.detection_day_scenario_c}` : 'Not Detected'}
+                        <span className="text-[10px] text-slate-500 block">Detection Day</span>
+                        <span className="font-bold text-slate-800 text-xs">
+                          {model.detection_day_scenario_c ? `Day ${model.detection_day_scenario_c}` : 'Not Detected'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 block">Scenario B False Alarms</span>
-                        <span className={`font-bold text-xs ${model.scenario_b_false_positives === 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
-                          {model.scenario_b_false_positives} Spurious Alarms
+                        <span className="text-[10px] text-slate-500 block">Spike False Alarms</span>
+                        <span className={`font-bold text-xs ${model.scenario_b_false_positives === 0 ? 'text-emerald-700' : 'text-amber-700'}`}>
+                          {model.scenario_b_false_positives} Spurious
                         </span>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 block">Explainability Score</span>
+                        <span className="text-[10px] text-slate-500 block">Explainability</span>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className={`font-bold text-xs ${model.explainability_score_out_of_10 >= 8 ? 'text-emerald-400' : 'text-cyan-300'}`}>
+                          <span className="font-bold text-xs text-slate-800">
                             {model.explainability_score_out_of_10}/10
                           </span>
-                          <div className="w-12 h-1.5 bg-space-800 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full ${model.explainability_score_out_of_10 >= 8 ? 'bg-emerald-500' : 'bg-cyan-500'}`} 
-                              style={{ width: `${model.explainability_score_out_of_10 * 10}%` }}
-                            />
-                          </div>
                         </div>
                       </div>
                       <div>
-                        <span className="text-[10px] text-slate-400 block">Nominal False Alarms</span>
-                        <span className="font-bold text-emerald-400 text-xs">
-                          {model.scenario_a_false_positives} (Scenario A)
+                        <span className="text-[10px] text-slate-500 block">Nominal Alarms</span>
+                        <span className="font-bold text-emerald-700 text-xs">
+                          {model.scenario_a_false_positives} (0%)
                         </span>
                       </div>
                     </div>
 
-                    {/* Explainability Rationale */}
-                    <div className="text-[11px] text-slate-400 leading-snug space-y-1">
-                      <span className="font-mono text-[10px] text-slate-400 uppercase tracking-wider block font-semibold">
-                        Explainability & Audit Rationale:
-                      </span>
-                      <p className="italic">{model.explainability_rationale}</p>
+                    {/* Flight Surgeon Verdict Footer */}
+                    <div className="text-[11px] font-mono text-slate-600 pt-2 border-t border-slate-100">
+                      <span className="text-[10px] uppercase font-bold text-slate-500 block">Verdict:</span>
+                      <p className="mt-0.5 font-medium">{model.nasa_flight_surgeon_verdict}</p>
                     </div>
-                  </div>
-
-                  {/* Flight Surgeon Verdict Footer */}
-                  <div className="mt-4 pt-3 border-t border-space-800">
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block mb-1">
-                      Flight Surgeon Clinical Verdict:
-                    </span>
-                    <p className={`text-[11px] font-mono font-medium leading-relaxed ${
-                      isRuleBased ? 'text-emerald-300' : isIsoForest ? 'text-cyan-300' : 'text-amber-300'
-                    }`}>
-                      {model.nasa_flight_surgeon_verdict}
-                    </p>
                   </div>
                 </div>
               );
             })}
           </div>
 
+          {/* Excel Model Comparison Scorecard */}
+          <div className="excel-grid-container">
+            <div className="excel-formula-bar">
+              <div className="bg-white border border-slate-300 px-2 py-0.5 text-[10px] font-bold text-slate-600 rounded">
+                A1:G{report.comparison_matrix.length}
+              </div>
+              <div className="text-slate-400 font-serif italic text-xs font-bold">fx</div>
+              <div className="text-slate-700 text-[11px] truncate flex-1">
+                =EVALUATION_SCORECARD(MODELS=report.comparison_matrix, METRICS=["DETECTION_DAY", "FALSE_ALARMS", "EXPLAINABILITY", "LATENCY"])
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="excel-table">
+                <thead>
+                  <tr>
+                    <th className="excel-col-letter w-9 min-w-9">#</th>
+                    <th className="excel-col-letter">A</th>
+                    <th className="excel-col-letter">B</th>
+                    <th className="excel-col-letter">C</th>
+                    <th className="excel-col-letter">D</th>
+                    <th className="excel-col-letter">E</th>
+                    <th className="excel-col-letter">F</th>
+                    <th className="excel-col-letter">G</th>
+                  </tr>
+                  <tr>
+                    <th className="excel-th w-9 min-w-9 text-center">Row</th>
+                    <th className="excel-th">Model Name ▼</th>
+                    <th className="excel-th">Model Architecture ▼</th>
+                    <th className="excel-th">Early Detection (Scenario C) ▼</th>
+                    <th className="excel-th">Spike False Positives ▼</th>
+                    <th className="excel-th">Explainability (/10) ▼</th>
+                    <th className="excel-th">Latency (ms) ▼</th>
+                    <th className="excel-th">Flight Surgeon Clinical Verdict ▼</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {report.comparison_matrix.map((model, idx) => (
+                    <tr key={idx} className="excel-row">
+                      <td className="excel-row-num">{idx + 1}</td>
+                      <td className="excel-td font-bold text-slate-900">{model.model_name}</td>
+                      <td className="excel-td text-slate-600 font-mono text-[11px]">{model.model_family}</td>
+                      <td className="excel-td font-bold text-[#0b3d91]">
+                        {model.detection_day_scenario_c ? `Day ${model.detection_day_scenario_c}` : 'Not Detected'}
+                      </td>
+                      <td className="excel-td">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                          model.scenario_b_false_positives === 0
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : 'bg-amber-50 text-amber-700 border-amber-200'
+                        }`}>
+                          {model.scenario_b_false_positives} Spurious
+                        </span>
+                      </td>
+                      <td className="excel-td font-bold text-slate-800">
+                        {model.explainability_score_out_of_10} / 10
+                      </td>
+                      <td className="excel-td text-slate-600 font-mono">
+                        {model.computational_latency_ms} ms
+                      </td>
+                      <td className="excel-td text-slate-700 max-w-xs truncate" title={model.nasa_flight_surgeon_verdict}>
+                        {model.nasa_flight_surgeon_verdict}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="excel-status-bar">
+              <span>READY | Sheet: Model_Benchmark_Scorecard | Certified by: NASA Medical Informatics</span>
+              <span>Evaluated Models: <strong className="text-slate-800">{report.comparison_matrix.length}</strong></span>
+            </div>
+          </div>
+
           {/* Anomaly Progression Visualizer */}
-          <div className="bg-space-900 border border-space-800 rounded-2xl p-6 shadow-xl space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-space-800 pb-4">
+          <div className="bg-white border border-slate-200 rounded-md p-6 shadow-sm space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
               <div>
-                <h3 className="font-bold text-sm text-white flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-cyan-400" />
-                  <span>Daily Multi-Model Anomaly Progression Timeline</span>
+                <h3 className="font-bold text-sm text-slate-800 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-[#0b3d91]" />
+                  <span>Daily Anomaly Progression</span>
                 </h3>
-                <p className="text-xs text-slate-400 font-mono">
-                  Compare continuous anomaly probabilities from Isolation Forest and LOF against the discrete Rule-Based Alert Trigger.
-                </p>
               </div>
 
               {/* Scenario Toggle Tabs */}
-              <div className="flex items-center gap-1 bg-space-950 p-1 rounded-xl border border-space-800 text-xs font-mono">
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-md text-xs font-mono">
                 <button
                   onClick={() => setActiveScenarioTab('scenario_c')}
-                  className={`px-3 py-1.5 rounded-lg transition ${
+                  className={`px-3 py-1 rounded-lg transition ${
                     activeScenarioTab === 'scenario_c'
-                      ? 'bg-purple-600 text-white font-bold'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-white text-slate-900 font-bold shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  Scenario C: Silent Deterioration (Hero)
+                  Scenario C: Silent Deterioration
                 </button>
                 <button
                   onClick={() => setActiveScenarioTab('scenario_b')}
-                  className={`px-3 py-1.5 rounded-lg transition ${
+                  className={`px-3 py-1 rounded-lg transition ${
                     activeScenarioTab === 'scenario_b'
-                      ? 'bg-amber-600 text-white font-bold'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-white text-slate-900 font-bold shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  Scenario B: Isolated Spike (False Alarm Test)
+                  Scenario B: Exertion Spike
                 </button>
               </div>
             </div>
 
             {/* Recharts Anomaly Curves */}
-            <div className="h-72 w-full pt-2">
+            <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 25 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis 
                     dataKey="day" 
-                    stroke="#64748b" 
+                    stroke="#94a3b8" 
                     tickFormatter={(val) => `FD ${val}`}
-                    tick={{ fontSize: 11, fill: '#94a3b8' }}
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                   />
                   <YAxis 
                     domain={[0, 1.05]} 
-                    stroke="#64748b" 
-                    tick={{ fontSize: 11, fill: '#94a3b8' }}
+                    stroke="#94a3b8" 
+                    tick={{ fontSize: 10, fill: '#64748b' }}
                     tickFormatter={(val) => `${(val * 100).toFixed(0)}%`}
                   />
                   <Tooltip content={<CustomMLTooltip />} />
                   
                   {/* Alert Threshold Guideline */}
-                  <ReferenceLine y={0.5} stroke="#eab308" strokeDasharray="4 4" label={{ value: 'ML Anomaly Threshold (50%)', fill: '#eab308', fontSize: 10, position: 'right' }} />
+                  <ReferenceLine y={0.5} stroke="#d97706" strokeDasharray="4 4" label={{ value: 'ML Threshold (50%)', fill: '#d97706', fontSize: 10, position: 'right' }} />
 
                   {/* Isolation Forest Curve */}
                   <Line 
                     type="monotone" 
                     dataKey="isolation_forest_score" 
-                    stroke="#06b6d4" 
-                    strokeWidth={2.5} 
-                    dot={{ fill: '#06b6d4', r: 4 }}
-                    activeDot={{ r: 6, stroke: '#ffffff', strokeWidth: 2 }}
-                    name="Isolation Forest Anomaly Probability"
+                    stroke="#0284c7" 
+                    strokeWidth={2} 
+                    dot={{ fill: '#0284c7', r: 3 }}
+                    name="Isolation Forest Probability"
                   />
 
                   {/* Local Outlier Factor Curve */}
                   <Line 
                     type="monotone" 
                     dataKey="lof_score" 
-                    stroke="#a855f7" 
+                    stroke="#9333ea" 
                     strokeWidth={2} 
                     strokeDasharray="4 4"
-                    dot={{ fill: '#a855f7', r: 3 }}
+                    dot={{ fill: '#9333ea', r: 3 }}
                     name="LOF Outlier Factor"
                   />
 
@@ -318,48 +367,48 @@ export function MLBenchmarkView() {
                     type="stepAfter" 
                     dataKey={(d: DailyAnomalyScore) => d.rule_based_alert ? 1.0 : 0.0} 
                     stroke="#10b981" 
-                    strokeWidth={2.5} 
+                    strokeWidth={2} 
                     dot={false}
-                    name="Rule-Based Alert Trigger (1.0 = Active)"
+                    name="Rule-Based Alert Active"
                   />
                 </LineChart>
               </ResponsiveContainer>
             </div>
 
-            {/* Chart Legend & Guidance */}
-            <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-400 pt-2 border-t border-space-800">
+            {/* Chart Legend */}
+            <div className="flex flex-wrap items-center justify-between text-xs font-mono text-slate-500 pt-2 border-t border-slate-100">
               <div className="flex items-center gap-6">
-                <span className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-cyan-500 inline-block" />
-                  <span className="text-slate-300">Isolation Forest (Continuous Probability)</span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-sky-600 inline-block" />
+                  <span>Isolation Forest</span>
                 </span>
-                <span className="flex items-center gap-2">
-                  <span className="w-3 h-0.5 bg-purple-500 inline-block" />
-                  <span className="text-slate-300">LOF Density Factor</span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-0.5 bg-purple-600 inline-block" />
+                  <span>LOF Density</span>
                 </span>
-                <span className="flex items-center gap-2">
-                  <span className="w-3 h-1 bg-emerald-500 inline-block" />
-                  <span className="text-slate-300">Rule-Based OLS Alert Active</span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-1 bg-emerald-600 inline-block" />
+                  <span>Rule-Based Alert</span>
                 </span>
               </div>
-              <span className="text-slate-400">
-                Evaluation Window: {chartData.length} Flight Days
+              <span>
+                Window: {chartData.length} Flight Days
               </span>
             </div>
           </div>
 
-          {/* NASA Flight Surgeon & Clinical Engineering Takeaways */}
-          <div className="bg-space-900 border border-space-800 rounded-2xl p-6 shadow-xl space-y-4">
-            <h3 className="font-bold text-sm text-white flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>NASA Spaceflight Clinical Synthesis & System Recommendations</span>
+          {/* NASA Recommendations */}
+          <div className="bg-white border border-slate-200 rounded-md p-6 shadow-sm space-y-3">
+            <h3 className="font-bold text-sm text-slate-800 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Synthesis &amp; Recommendations</span>
             </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {report.synthesis_conclusions.map((conc, i) => (
-                <div key={i} className="p-3.5 rounded-xl bg-space-950 border border-space-800/80 flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <p className="text-xs text-slate-300 leading-relaxed font-sans">{conc}</p>
+                <div key={i} className="p-3 rounded-md bg-slate-50 border border-slate-200 flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-slate-700 leading-relaxed">{conc}</p>
                 </div>
               ))}
             </div>
@@ -375,31 +424,31 @@ function CustomMLTooltip({ active, payload }: any) {
     const data: DailyAnomalyScore = payload[0].payload;
 
     return (
-      <div className="bg-space-900/95 backdrop-blur border border-space-700 p-3.5 rounded-xl shadow-2xl font-mono text-xs max-w-xs">
-        <div className="flex items-center justify-between border-b border-space-700/60 pb-1.5 mb-2">
-          <span className="font-bold text-white">Flight Day {data.day}</span>
+      <div className="bg-white border border-slate-200 p-3 rounded-md shadow-lg font-mono text-xs max-w-xs text-slate-800">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-1.5">
+          <span className="font-bold">Flight Day {data.day}</span>
           <span className="text-[10px] text-slate-400">{data.date}</span>
         </div>
 
         {data.context_event && (
-          <div className="mb-2 p-1.5 rounded bg-space-800/60 text-[10px] text-cyan-300">
-            Context: {data.context_event}
+          <div className="mb-1.5 text-[10px] text-[#0b3d91] font-semibold">
+            {data.context_event}
           </div>
         )}
 
-        <div className="space-y-1.5">
-          <div className="flex justify-between items-center text-emerald-400">
-            <span>Rule-Based Engine:</span>
-            <span className="font-bold">{data.rule_based_alert ? 'ALERT TRIGGERED' : 'NOMINAL'}</span>
+        <div className="space-y-1">
+          <div className="flex justify-between items-center text-emerald-700">
+            <span>Rule-Based:</span>
+            <span className="font-bold">{data.rule_based_alert ? 'ALERT' : 'NOMINAL'}</span>
           </div>
 
-          <div className="flex justify-between items-center text-cyan-400">
-            <span>Isolation Forest Prob:</span>
+          <div className="flex justify-between items-center text-sky-700">
+            <span>Iso Forest:</span>
             <span className="font-bold">{(data.isolation_forest_score * 100).toFixed(1)}%</span>
           </div>
 
-          <div className="flex justify-between items-center text-purple-400">
-            <span>LOF Outlier Factor:</span>
+          <div className="flex justify-between items-center text-purple-700">
+            <span>LOF Score:</span>
             <span className="font-bold">{(data.lof_score * 100).toFixed(1)}%</span>
           </div>
         </div>

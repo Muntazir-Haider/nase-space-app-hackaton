@@ -407,3 +407,46 @@ class FlightSurgeonHandoverReportOut(BaseModel):
     integrity_hash: str
 
 
+# ============================================================================
+# AUTHENTICATION & OPERATOR ROLES
+# ============================================================================
+
+class LoginRequest(BaseModel):
+    callsign: str = Field(..., examples=["ARTEMIS-CMO"])
+    pin: str = Field(..., examples=["2026"])
+    role: Optional[str] = Field(default=None, examples=["CREW_MEDICAL_OFFICER"])
+
+
+class OperatorProfile(BaseModel):
+    id: str
+    callsign: str
+    full_name: str
+    role: str
+    role_display: str
+    rank: str
+    security_clearance: str
+    station_module: str
+    avatar_color: str
+    permissions: List[str]
+
+
+class LoginResponse(BaseModel):
+    success: bool
+    token: str
+    operator: OperatorProfile
+    expires_at: str
+    message: str
+
+
+class OperatorRoleOut(BaseModel):
+    role_key: str
+    title: str
+    description: str
+    default_callsign: str
+    default_pin: str
+    default_name: str
+    clearance_level: str
+    permissions: List[str]
+
+
+

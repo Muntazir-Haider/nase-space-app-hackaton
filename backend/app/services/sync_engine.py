@@ -57,8 +57,8 @@ def get_sync_queue_summary(db: Session) -> Dict[str, Any]:
 
     latest = (
         db.query(OfflineSyncQueue)
-        .order_by(OfflineSyncQueue.created_at.desc())
-        .limit(10)
+        .order_by(OfflineSyncQueue.id.desc())
+        .limit(50)
         .all()
     )
 

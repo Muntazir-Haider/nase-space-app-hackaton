@@ -1,0 +1,14 @@
+{
+  "name": "mission-sentinel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Autonomous Astronaut Health Intelligence & Clinical Decision Support System",
+  "scripts": {
+    "dev": "node ./scripts/dev.js",
+    "backend": "python -m uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000",
+    "frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "test": "python -m pytest tests/ -v"
+  }
+}

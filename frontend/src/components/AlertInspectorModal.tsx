@@ -4,14 +4,12 @@ import {
   ShieldAlert, 
   Activity, 
   FileText, 
-  ExternalLink, 
   CheckCircle, 
-  Clock, 
   Calculator,
   UserCheck,
   Pill,
   PlusCircle,
-  Loader2
+  Clock
 } from 'lucide-react';
 import { AlertEvidenceDetail } from '../types';
 import { updateAlertStatus, prescribeCountermeasure, updateCountermeasureStatus } from '../services/api';
@@ -65,7 +63,7 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
     setErrorMsg('');
     try {
       await updateAlertStatus(alertData.id, newStatus, reviewerCallsign, reviewNotes);
-      setSuccessMsg(`Status updated to ${newStatus}. CMO follow-up logged to permanent audit ledger.`);
+      setSuccessMsg(`Status updated to ${newStatus}.`);
       onStatusUpdated();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -88,7 +86,7 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
         prescription_details: cmDetails.trim(),
         target_duration_hours: Number(cmDuration),
       });
-      setCmSuccessMsg(`Clinical countermeasure prescribed. Alert status moved to MONITORING.`);
+      setCmSuccessMsg(`Countermeasure prescribed.`);
       setShowCountermeasureForm(false);
       onStatusUpdated();
     } catch (err: unknown) {
@@ -104,9 +102,9 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
       await updateCountermeasureStatus(alertData.id, cmId, {
         outcome_status: outcome,
         resolved_by: reviewerCallsign,
-        resolution_notes: `Protocol outcome transitioned to ${outcome} by ${reviewerCallsign}.`,
+        resolution_notes: `Status changed to ${outcome} by ${reviewerCallsign}.`,
       });
-      setCmSuccessMsg(`Countermeasure protocol updated to ${outcome}.`);
+      setCmSuccessMsg(`Protocol marked as ${outcome}.`);
       onStatusUpdated();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -115,194 +113,232 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-space-900 border border-space-750 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto font-sans">
+      <div className="bg-white border border-slate-200 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-space-800 bg-space-850 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-400">
-              <ShieldAlert className="w-6 h-6" />
+            <div className="w-9 h-9 rounded-lg bg-red-100 text-red-600 flex items-center justify-center">
+              <ShieldAlert className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-base text-white">Silent Deterioration Evidence Inspector</h3>
-                <span className="text-[10px] font-mono uppercase bg-red-950/80 text-red-400 px-2 py-0.5 rounded border border-red-500/40 font-bold">
-                  {alertData.review_priority} PRIORITY
+                <h3 className="font-bold text-base text-slate-800">Alert Evidence &amp; Medical Review</h3>
+                <span className="text-[10px] font-mono uppercase bg-red-50 text-red-700 px-2 py-0.5 rounded border border-red-200 font-bold">
+                  {alertData.review_priority}
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 bg-space-800 px-2 py-0.5 rounded border border-space-700">
-                  Status: {alertData.lifecycle_status}
+                <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                  {alertData.lifecycle_status}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-mono mt-0.5">
-                Crew Member: {astronaut_full_name} ({astronaut_callsign}) · Rule: {alertData.rule_version}
+              <p className="text-xs text-slate-500 mt-0.5">
+                Astronaut: <span className="font-semibold text-slate-800">{astronaut_full_name}</span> ({astronaut_callsign})
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-space-800 hover:bg-space-700 text-slate-400 hover:text-white flex items-center justify-center transition"
+            className="w-8 h-8 rounded-lg bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition border border-slate-200"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="p-6 overflow-y-auto space-y-6 text-sm">
+        <div className="p-6 overflow-y-auto space-y-5 text-sm">
           {/* Plain-Language Detection Narrative */}
-          <div className="bg-space-850/80 border border-space-750 rounded-xl p-4">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-nasa-cyan flex items-center gap-1.5 mb-2">
-              <FileText className="w-4 h-4" /> Explainable Detection Narrative
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[#0b3d91] flex items-center gap-1.5 mb-1.5">
+              <FileText className="w-4 h-4" /> Detection Summary
             </h4>
-            <p className="text-slate-200 text-xs leading-relaxed">{alertData.detection_narrative}</p>
+            <p className="text-slate-700 text-xs leading-relaxed">{alertData.detection_narrative}</p>
           </div>
 
           {/* Mathematical Provenance Breakdown */}
-          <div className="bg-space-850/80 border border-space-750 rounded-xl p-4">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 mb-3">
-              <Calculator className="w-4 h-4" /> Mathematical Provenance &amp; OLS Regression
+          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5 mb-2.5">
+              <Calculator className="w-4 h-4 text-[#0b3d91]" /> Statistical Deviation &amp; Slope
             </h4>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs font-mono text-left">
-                <thead className="bg-space-950 text-slate-400 border-b border-space-750">
-                  <tr>
-                    <th className="py-2 px-3">Indicator Metric</th>
-                    <th className="py-2 px-3">7d Baseline (μ ± σ)</th>
-                    <th className="py-2 px-3">Current Value</th>
-                    <th className="py-2 px-3">OLS Slope (m / day)</th>
-                    <th className="py-2 px-3">Z-Score (σ)</th>
-                    <th className="py-2 px-3">Adverse State</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-space-800 text-slate-300">
-                  {Object.entries(mathData).map(([key, d]: [string, any]) => (
-                    <tr key={key} className={d.is_adverse ? 'bg-red-950/20' : ''}>
-                      <td className="py-2 px-3 font-semibold text-white">{key}</td>
-                      <td className="py-2 px-3">{d.baseline_mean} ± {d.baseline_std}</td>
-                      <td className="py-2 px-3 text-white font-bold">{d.latest_value}</td>
-                      <td className="py-2 px-3 font-bold text-amber-300">
-                        {d.ols_slope > 0 ? `+${d.ols_slope}` : d.ols_slope}
-                      </td>
-                      <td className="py-2 px-3 font-bold text-red-400">
-                        {d.latest_z_score > 0 ? `+${d.latest_z_score}` : d.latest_z_score}σ
-                      </td>
-                      <td className="py-2 px-3">
-                        {d.is_adverse ? (
-                          <span className="text-red-400 font-bold">DRIFT DETECTED</span>
-                        ) : (
-                          <span className="text-emerald-400">NOMINAL</span>
-                        )}
-                      </td>
+            <div className="excel-grid-container mt-2">
+              <div className="excel-formula-bar">
+                <div className="bg-white border border-slate-300 px-2 py-0.5 text-[10px] font-bold text-slate-600 rounded">
+                  A1:F{Object.keys(mathData).length}
+                </div>
+                <div className="text-slate-400 font-serif italic text-xs font-bold">fx</div>
+                <div className="text-slate-700 text-[11px] truncate flex-1">
+                  =STAT_DEVIATION(METRICS=CURRENT_ROW, WINDOW="7_DAY_BASELINE", METHOD="OLS_REGRESSION")
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="excel-table">
+                  <thead>
+                    <tr>
+                      <th className="excel-col-letter w-9 min-w-9">#</th>
+                      <th className="excel-col-letter">A</th>
+                      <th className="excel-col-letter">B</th>
+                      <th className="excel-col-letter">C</th>
+                      <th className="excel-col-letter">D</th>
+                      <th className="excel-col-letter">E</th>
+                      <th className="excel-col-letter">F</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                    <tr>
+                      <th className="excel-th w-9 min-w-9 text-center">Row</th>
+                      <th className="excel-th">Clinical Indicator ▼</th>
+                      <th className="excel-th">7d Baseline (Mean ± SD) ▼</th>
+                      <th className="excel-th">Current Reading ▼</th>
+                      <th className="excel-th">Slope (Δ/day) ▼</th>
+                      <th className="excel-th">Z-Score ▼</th>
+                      <th className="excel-th">Status ▼</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(mathData).map(([key, d]: [string, any], idx) => (
+                      <tr key={key} className={`excel-row ${d.is_adverse ? 'bg-red-50/60' : idx % 2 === 1 ? 'bg-[#fcfdfd]' : 'bg-white'}`}>
+                        <td className="excel-row-num">{idx + 1}</td>
+                        <td className="excel-td font-bold text-slate-900">{key}</td>
+                        <td className="excel-td text-slate-600">{d.baseline_mean} ± {d.baseline_std}</td>
+                        <td className="excel-td text-slate-900 font-bold">{d.latest_value}</td>
+                        <td className="excel-td font-bold text-amber-700">
+                          {d.ols_slope > 0 ? `+${d.ols_slope}` : d.ols_slope}
+                        </td>
+                        <td className="excel-td font-bold text-red-600">
+                          {d.latest_z_score > 0 ? `+${d.latest_z_score}` : d.latest_z_score}σ
+                        </td>
+                        <td className="excel-td">
+                          {d.is_adverse ? (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-800 border border-red-300">
+                              Drift Warning
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              Nominal
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="excel-status-bar">
+                <span>READY | Sheet: Stats_Regression_Matrix</span>
+                <span>Indicators: <strong className="text-slate-800">{Object.keys(mathData).length}</strong></span>
+              </div>
             </div>
           </div>
 
           {/* Linked Raw Evidence Records */}
-          <div className="bg-space-850/80 border border-space-750 rounded-xl p-4">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-nasa-cyan flex items-center gap-1.5 mb-3">
-              <Activity className="w-4 h-4" /> Linked Biometric &amp; Environmental Evidence Records ({evidence_items.length})
+          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5 mb-2.5">
+              <Activity className="w-4 h-4 text-[#0b3d91]" /> Evidence Records ({evidence_items.length})
             </h4>
-            <div className="max-h-48 overflow-y-auto border border-space-800 rounded-lg">
-              <table className="w-full text-[11px] font-mono text-left">
-                <thead className="bg-space-950 text-slate-400 sticky top-0">
-                  <tr>
-                    <th className="py-2 px-3">Type</th>
-                    <th className="py-2 px-3">Metric</th>
-                    <th className="py-2 px-3">Observed</th>
-                    <th className="py-2 px-3">Baseline</th>
-                    <th className="py-2 px-3">Delta / Contribution</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-space-800 text-slate-300">
-                  {evidence_items.map((item) => (
-                    <tr key={item.id} className="hover:bg-space-800/40">
-                      <td className="py-1.5 px-3 text-[10px] text-slate-400">{item.evidence_type}</td>
-                      <td className="py-1.5 px-3 font-semibold text-white">{item.metric_name}</td>
-                      <td className="py-1.5 px-3 text-white font-bold">{item.observed_value}</td>
-                      <td className="py-1.5 px-3 text-slate-400">{item.baseline_mean ?? '—'}</td>
-                      <td className="py-1.5 px-3 text-slate-300">{item.contribution_summary}</td>
+            <div className="excel-grid-container">
+              <div className="excel-formula-bar">
+                <div className="bg-white border border-slate-300 px-2 py-0.5 text-[10px] font-bold text-slate-600 rounded">
+                  A1:E{Math.max(evidence_items.length, 1)}
+                </div>
+                <div className="text-slate-400 font-serif italic text-xs font-bold">fx</div>
+                <div className="text-slate-700 text-[11px] truncate flex-1">
+                  =SELECT(EVIDENCE_LOG, ALERT_ID="{alertData.id}")
+                </div>
+              </div>
+              <div className="max-h-48 overflow-y-auto overflow-x-auto">
+                <table className="excel-table">
+                  <thead>
+                    <tr>
+                      <th className="excel-col-letter w-9 min-w-9">#</th>
+                      <th className="excel-col-letter">A</th>
+                      <th className="excel-col-letter">B</th>
+                      <th className="excel-col-letter">C</th>
+                      <th className="excel-col-letter">D</th>
+                      <th className="excel-col-letter">E</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                    <tr>
+                      <th className="excel-th w-9 min-w-9 text-center">Row</th>
+                      <th className="excel-th">Type ▼</th>
+                      <th className="excel-th">Metric ▼</th>
+                      <th className="excel-th">Observed ▼</th>
+                      <th className="excel-th">Baseline ▼</th>
+                      <th className="excel-th">Clinical Contribution Summary ▼</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {evidence_items.map((item, idx) => (
+                      <tr key={item.id} className="excel-row">
+                        <td className="excel-row-num">{idx + 1}</td>
+                        <td className="excel-td text-slate-500 font-medium">{item.evidence_type}</td>
+                        <td className="excel-td font-semibold text-slate-900">{item.metric_name}</td>
+                        <td className="excel-td text-slate-900 font-bold">{item.observed_value}</td>
+                        <td className="excel-td text-slate-500">{item.baseline_mean ?? '—'}</td>
+                        <td className="excel-td text-slate-600">{item.contribution_summary}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="excel-status-bar">
+                <span>READY | Sheet: Evidence_Audit_Trail</span>
+                <span>Count: <strong className="text-slate-800">{evidence_items.length}</strong></span>
+              </div>
             </div>
           </div>
 
-          {/* NASA HRP Scientific Citation */}
-          <div className="bg-space-900 border border-nasa-blue/40 rounded-xl p-3.5 flex items-start gap-3 text-xs font-mono text-slate-300">
-            <ExternalLink className="w-4 h-4 text-nasa-cyan flex-shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold text-white">NASA Grounding &amp; Evidence Provenance:</span>
-              <p className="text-slate-400 mt-0.5">{alertData.scientific_ref}</p>
-            </div>
-          </div>
-
-          {/* CLINICAL COUNTERMEASURES PROTOCOL SECTION */}
-          <div className="bg-space-850/80 border border-space-750 rounded-xl p-4 flex flex-col gap-3">
+          {/* Clinical Countermeasures Section */}
+          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                <Pill className="w-4 h-4 text-amber-400" /> Clinical Countermeasures ({countermeasures.length})
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                <Pill className="w-4 h-4 text-[#0b3d91]" /> Countermeasures ({countermeasures.length})
               </h4>
               <button
                 type="button"
                 onClick={() => setShowCountermeasureForm(!showCountermeasureForm)}
-                className="flex items-center gap-1 text-xs font-mono text-nasa-cyan hover:text-white transition"
+                className="flex items-center gap-1 text-xs font-semibold text-[#0b3d91] hover:underline"
               >
                 <PlusCircle className="w-3.5 h-3.5" />
-                <span>{showCountermeasureForm ? 'Cancel' : '+ Prescribe Protocol'}</span>
+                <span>{showCountermeasureForm ? 'Cancel' : '+ Prescribe'}</span>
               </button>
             </div>
 
             {cmSuccessMsg && (
-              <div className="p-2.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 rounded text-xs font-mono flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-400" /> {cmSuccessMsg}
+              <div className="p-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded text-xs flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-600" /> {cmSuccessMsg}
               </div>
             )}
 
             {cmErrorMsg && (
-              <div className="p-2.5 bg-red-950/60 border border-red-500/40 text-red-300 rounded text-xs font-mono flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-red-400" /> {cmErrorMsg}
+              <div className="p-2 bg-red-50 border border-red-200 text-red-800 rounded text-xs flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-red-600" /> {cmErrorMsg}
               </div>
             )}
 
-            {/* Countermeasures List */}
             {countermeasures.length > 0 ? (
               <div className="space-y-2">
                 {countermeasures.map((c) => (
-                  <div key={c.id} className="p-3 rounded-lg bg-space-950 border border-space-800 font-mono text-xs flex flex-col gap-1.5">
+                  <div key={c.id} className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs flex flex-col gap-1">
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-white">{c.title}</span>
+                      <span className="font-bold text-slate-900">{c.title}</span>
                       <span className={`text-[10px] px-2 py-0.5 rounded font-bold border ${
                         c.outcome_status === 'ACTIVE'
-                          ? 'bg-amber-950/80 text-amber-400 border-amber-500/40 animate-pulse'
+                          ? 'bg-amber-50 text-amber-700 border-amber-200'
                           : c.outcome_status === 'COMPLETED'
-                            ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40'
-                            : 'bg-slate-800 text-slate-400 border-space-700'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            : 'bg-slate-100 text-slate-600 border-slate-200'
                       }`}>
                         {c.outcome_status}
                       </span>
                     </div>
-                    <p className="text-slate-300 text-[11px]">{c.prescription_details}</p>
-                    <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500 pt-1 border-t border-space-850">
+                    <p className="text-slate-700 text-xs">{c.prescription_details}</p>
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500 pt-1 border-t border-slate-200 mt-1">
                       <span>Type: {c.countermeasure_type}</span>
-                      <span>Target: {c.target_duration_hours}h · Prescribed by: {c.prescribed_by}</span>
+                      <span>Target: {c.target_duration_hours}h</span>
                       {c.outcome_status === 'ACTIVE' && (
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
                             onClick={() => handleUpdateCountermeasureStatus(c.id, 'COMPLETED')}
-                            className="px-2 py-0.5 rounded bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 transition"
+                            className="px-2 py-0.5 rounded bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition"
                           >
-                            ✓ Mark Completed
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleUpdateCountermeasureStatus(c.id, 'DISCONTINUED')}
-                            className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-space-700 transition"
-                          >
-                            Discontinue
+                            Mark Completed
                           </button>
                         </div>
                       )}
@@ -311,128 +347,104 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
                 ))}
               </div>
             ) : (
-              <p className="text-xs font-mono text-slate-500">
-                No clinical countermeasures prescribed yet. Click &quot;+ Prescribe Protocol&quot; to issue an intervention.
+              <p className="text-xs text-slate-400">
+                No countermeasures currently prescribed.
               </p>
             )}
 
-            {/* Interactive Prescription Form */}
             {showCountermeasureForm && (
-              <form onSubmit={handlePrescribeCountermeasure} className="bg-space-900 border border-space-700 rounded-xl p-4 flex flex-col gap-3 mt-2 animate-fade-in font-mono text-xs">
-                <div className="font-bold text-white flex items-center gap-1.5">
-                  <Pill className="w-3.5 h-3.5 text-nasa-cyan" /> New Countermeasure Prescription
-                </div>
-
+              <form onSubmit={handlePrescribeCountermeasure} className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3 text-xs">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-slate-400 block mb-1">Protocol Type</label>
+                    <label className="text-slate-600 font-semibold block mb-1">Type</label>
                     <select
                       value={cmType}
                       onChange={(e) => {
                         setCmType(e.target.value);
                         if (e.target.value === 'SLEEP_SCHEDULE_ADJUSTMENT') {
                           setCmTitle('Prescribe 60-Min Supplemental Sleep Cycle');
-                          setCmDetails('Provide 60-minute sleep extension prior to EVA prep. Modulate resistance load by -20%.');
-                        } else if (e.target.value === 'HYDRATION_ELECTROLYTE_PROTOCOL') {
-                          setCmTitle('Oral Electrolyte Rehydration Protocol');
-                          setCmDetails('Administer 500 mL balanced electrolyte solution with increased hydration checks.');
-                        } else if (e.target.value === 'EXERCISE_WORKLOAD_MODULATION') {
-                          setCmTitle('Reduced ARED Workload Modulation');
-                          setCmDetails('Temporarily reduce heavy deadlift/squat load on ARED by 30% for 48 hours.');
+                          setCmDetails('Provide 60-minute sleep extension prior to EVA prep.');
                         } else {
-                          setCmTitle('Active CMO 24h Observational Monitoring');
-                          setCmDetails('Scheduled follow-up vitals check at 12h and 24h marks.');
+                          setCmTitle('Workload & Activity Modulation');
+                          setCmDetails('Reduce heavy resistance workouts by 20% for 48 hours.');
                         }
                       }}
-                      className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-white focus:outline-none focus:border-nasa-cyan"
+                      className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-800"
                     >
                       <option value="SLEEP_SCHEDULE_ADJUSTMENT">Sleep Schedule Adjustment</option>
-                      <option value="HYDRATION_ELECTROLYTE_PROTOCOL">Hydration &amp; Electrolyte Protocol</option>
-                      <option value="EXERCISE_WORKLOAD_MODULATION">Exercise Workload Modulation</option>
-                      <option value="ACTIVE_MONITORING">Active Monitoring Protocol</option>
+                      <option value="HYDRATION_ELECTROLYTE_PROTOCOL">Hydration Protocol</option>
+                      <option value="EXERCISE_WORKLOAD_MODULATION">Exercise Modulation</option>
+                      <option value="ACTIVE_MONITORING">Active Monitoring</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="text-slate-400 block mb-1">Protocol Title</label>
+                    <label className="text-slate-600 font-semibold block mb-1">Title</label>
                     <input
                       type="text"
                       value={cmTitle}
                       onChange={(e) => setCmTitle(e.target.value)}
-                      className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-white focus:outline-none focus:border-nasa-cyan"
+                      className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-800"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="md:col-span-2">
-                    <label className="text-slate-400 block mb-1">Prescription Details</label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="text-slate-600 font-semibold block mb-1">Details</label>
                     <textarea
                       rows={2}
                       value={cmDetails}
                       onChange={(e) => setCmDetails(e.target.value)}
-                      className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-white focus:outline-none focus:border-nasa-cyan"
+                      className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-800"
                       required
                     />
                   </div>
-
                   <div>
-                    <label className="text-slate-400 block mb-1">Duration (Hours)</label>
+                    <label className="text-slate-600 font-semibold block mb-1">Duration (Hours)</label>
                     <input
                       type="number"
                       value={cmDuration}
                       onChange={(e) => setCmDuration(Number(e.target.value))}
-                      className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-white focus:outline-none focus:border-nasa-cyan"
+                      className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-800"
                       required
                     />
                   </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-2">
+                <div className="flex items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => setShowCountermeasureForm(false)}
-                    className="px-3 py-1.5 text-slate-400 hover:text-white transition"
+                    className="px-3 py-1.5 text-slate-600 hover:text-slate-900"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={cmSubmitting}
-                    className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition shadow flex items-center gap-2"
+                    className="px-4 py-1.5 bg-[#0b3d91] hover:bg-blue-800 text-white font-semibold rounded-lg shadow-sm"
                   >
-                    {cmSubmitting ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Prescribing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Pill className="w-3.5 h-3.5" />
-                        <span>Prescribe Protocol</span>
-                      </>
-                    )}
+                    {cmSubmitting ? 'Prescribing...' : 'Save Protocol'}
                   </button>
                 </div>
               </form>
             )}
           </div>
 
-          {/* Previous Follow-Ups History */}
+          {/* Review History */}
           {followups.length > 0 && (
-            <div className="bg-space-850/60 border border-space-750 rounded-xl p-4">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-nasa-cyan" /> CMO Review History
-              </h4>
-              <div className="space-y-2">
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs">
+              <div className="font-bold text-slate-700 mb-1 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-slate-500" />
+                <span>Review History</span>
+              </div>
+              <div className="space-y-1">
                 {followups.map((f) => (
-                  <div key={f.id} className="text-xs font-mono p-2.5 rounded bg-space-900 border border-space-800">
-                    <div className="flex items-center justify-between text-slate-400 text-[10px]">
-                      <span>Reviewer: {f.reviewer_callsign} · Transition: {f.status_transition}</span>
-                      <span>{f.recorded_at.slice(0, 19).replace('T', ' ')}</span>
-                    </div>
-                    <p className="text-slate-200 mt-1">{f.review_notes}</p>
+                  <div key={f.id} className="text-[11px] text-slate-600 flex justify-between">
+                    <span>{f.reviewer_callsign}: {f.review_notes}</span>
+                    <span className="text-slate-400">{f.recorded_at.slice(0, 10)}</span>
                   </div>
                 ))}
               </div>
@@ -440,65 +452,65 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
           )}
 
           {/* CMO Action Box */}
-          <form onSubmit={handleStatusSubmit} className="bg-space-900 border border-space-750 rounded-xl p-4 flex flex-col gap-3">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
-              <UserCheck className="w-4 h-4 text-nasa-cyan" /> Crew Medical Officer (CMO) Review Action
+          <form onSubmit={handleStatusSubmit} className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+              <UserCheck className="w-4 h-4 text-[#0b3d91]" /> Clinical Decision
             </h4>
 
             {successMsg && (
-              <div className="p-2.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 rounded text-xs font-mono flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-400" /> {successMsg}
+              <div className="p-2 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded text-xs flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-600" /> {successMsg}
               </div>
             )}
 
             {errorMsg && (
-              <div className="p-2.5 bg-red-950/60 border border-red-500/40 text-red-300 rounded text-xs font-mono flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-red-400" /> {errorMsg}
+              <div className="p-2 bg-red-50 border border-red-200 text-red-800 rounded text-xs flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-red-600" /> {errorMsg}
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="text-[11px] font-mono text-slate-400 block mb-1">Update Status</label>
+                <label className="text-slate-600 font-semibold block mb-1">Status</label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value)}
-                  className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-xs font-mono text-white focus:outline-none focus:border-nasa-cyan"
+                  className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-800"
                 >
-                  <option value="UNDER_REVIEW">UNDER_REVIEW (Clinical Review Active)</option>
-                  <option value="MONITORING">MONITORING (Countermeasures Prescribed)</option>
-                  <option value="RESOLVED">RESOLVED (Vitals Stabilized)</option>
-                  <option value="DISMISSED">DISMISSED (False Alarm / Known Operational Stress)</option>
+                  <option value="UNDER_REVIEW">UNDER_REVIEW</option>
+                  <option value="MONITORING">MONITORING</option>
+                  <option value="RESOLVED">RESOLVED</option>
+                  <option value="DISMISSED">DISMISSED</option>
                 </select>
               </div>
 
               <div>
-                <label className="text-[11px] font-mono text-slate-400 block mb-1">Reviewer Callsign</label>
+                <label className="text-slate-600 font-semibold block mb-1">Reviewer Callsign</label>
                 <input
                   type="text"
                   value={reviewerCallsign}
                   onChange={(e) => setReviewerCallsign(e.target.value)}
-                  className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-xs font-mono text-white focus:outline-none focus:border-nasa-cyan"
+                  className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-800"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-[11px] font-mono text-slate-400 block mb-1">Clinical Review Notes</label>
+              <label className="text-slate-600 font-semibold block mb-1 text-xs">Review Notes</label>
               <textarea
                 rows={2}
                 value={reviewNotes}
                 onChange={(e) => setReviewNotes(e.target.value)}
-                className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-xs font-mono text-white focus:outline-none focus:border-nasa-cyan"
+                className="w-full bg-white border border-slate-300 rounded-lg p-2 text-slate-800 text-xs"
               />
             </div>
 
             <button
               type="submit"
               disabled={submitting}
-              className="self-end px-5 py-2 bg-nasa-blue hover:bg-sky-600 text-white font-mono text-xs font-bold rounded-lg transition shadow flex items-center gap-2"
+              className="self-end px-4 py-2 bg-[#0b3d91] hover:bg-blue-800 text-white text-xs font-bold rounded-lg shadow-sm transition"
             >
-              {submitting ? 'Recording Action...' : 'Submit Clinical Decision →'}
+              {submitting ? 'Updating...' : 'Submit Decision'}
             </button>
           </form>
         </div>

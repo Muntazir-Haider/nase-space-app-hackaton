@@ -15,7 +15,7 @@ import {
   fetchAlertEvidence,
   fetchDataQualityAudit,
 } from './services/api';
-import { Navbar, ActiveView } from './components/layout/Navbar';
+import { Sidebar, ActiveView } from './components/layout/Sidebar';
 import { OfflineBanner } from './components/layout/OfflineBanner';
 import { FleetOverview } from './components/crew/FleetOverview';
 import { AstronautProfileDetail } from './components/crew/AstronautProfileDetail';
@@ -25,8 +25,26 @@ import { MLBenchmarkView } from './components/system/MLBenchmarkView';
 import { AlertInspectorModal } from './components/AlertInspectorModal';
 import { DataQualityModal } from './components/DataQualityModal';
 import { JudgeTourModal } from './components/JudgeTourModal';
+import { NASASpacecraftHologram } from './components/nasa/NASASpacecraftHologram';
+import { AnatomicalScanner } from './components/nasa/AnatomicalScanner';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { LoginPage } from './components/auth/LoginPage';
+import { HeartPulse } from 'lucide-react';
 
-export function App() {
+function StationBootScreen() {
+  return (
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center text-slate-800 font-sans">
+      <div className="w-12 h-12 rounded-xl bg-[#0b3d91] flex items-center justify-center shadow mb-3">
+        <HeartPulse className="w-6 h-6 text-white animate-heart-pulse" />
+      </div>
+      <h2 className="text-sm font-bold tracking-wider uppercase font-mono text-slate-800">Mission Sentinel</h2>
+    </div>
+  );
+}
+
+function StationDashboard() {
+  const { isAuthenticated, isLoading } = useAuth();
+
   const [health, setHealth] = useState<HealthCheckResponse | null>(null);
   const [isOffline, setIsOffline] = useState<boolean>(false);
   const [retrying, setRetrying] = useState<boolean>(false);
@@ -55,6 +73,14 @@ export function App() {
   }, []);
 
   useEffect(() => {
+    if (!isOffline) return;
+    const retryTimer = setInterval(() => {
+      loadInitialData();
+    }, 2500);
+    return () => clearInterval(retryTimer);
+  }, [isOffline]);
+
+  useEffect(() => {
     if (selectedAstronautId) {
       loadAstronautDetails(selectedAstronautId);
     }
@@ -74,7 +100,6 @@ export function App() {
       setRejectedAuditCount(auditLogs.length);
       setIsOffline(false);
       if (aData.length > 0 && !selectedAstronautId) {
-        // Default to Dr. Elena Vance (ARTEMIS-01) or first astronaut
         const heroAstro = aData.find(a => a.callsign === 'ARTEMIS-01') || aData[0];
         setSelectedAstronautId(heroAstro.id);
       }
@@ -119,7 +144,7 @@ export function App() {
   async function handleScenarioSwitch(scenarioKey: string) {
     setActiveScenario(scenarioKey);
     setScenarioLoading(true);
-    setStatusMessage(`Triggering ${scenarioKey}...`);
+    setStatusMessage(`Loaded: ${scenarioKey}`);
     try {
       const res = await loadDemoScenario(scenarioKey);
       setStatusMessage(res.message);
@@ -131,10 +156,10 @@ export function App() {
         setSelectedAstronautId(targetAstro.id);
         await loadAstronautDetails(targetAstro.id);
       }
-      setActiveView('review'); // Switch to review view to inspect the scenario effect immediately
+      setActiveView('review');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      setStatusMessage(`Scenario load failed: ${msg}`);
+      setStatusMessage(`Scenario failed: ${msg}`);
       setIsOffline(true);
     } finally {
       setScenarioLoading(false);
@@ -148,12 +173,20 @@ export function App() {
     });
   }
 
+  if (isLoading) {
+    return <StationBootScreen />;
+  }
+
+  if (!isAuthenticated) {
+    return <LoginPage />;
+  }
+
   const selectedAstro = astronauts.find(a => a.id === selectedAstronautId) || null;
 
   return (
-    <div className="min-h-screen bg-space-950 text-slate-100 flex flex-col font-sans selection:bg-nasa-blue selection:text-white">
-      {/* Top Mission Control Header with Navigation */}
-      <Navbar
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex font-sans">
+      {/* Left Navigation Sidebar */}
+      <Sidebar
         health={health}
         isOffline={isOffline}
         activeView={activeView}
@@ -170,28 +203,36 @@ export function App() {
         onScenarioSwitch={handleScenarioSwitch}
         rejectedAuditCount={rejectedAuditCount}
         onOpenJudgeTour={() => setShowJudgeTour(true)}
+        astronauts={astronauts}
+        selectedAstronautId={selectedAstronautId}
+        onSelectAstronaut={(id) => {
+          setSelectedAstronautId(id);
+          setActiveView('review');
+        }}
       />
 
-      {/* Offline Standalone Mode Warning Banner */}
-      {isOffline && (
-        <OfflineBanner
-          onRetry={loadInitialData}
-          retrying={retrying}
-        />
-      )}
+      {/* Main Right View Workspace */}
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+        {/* Offline Banner */}
+        {isOffline && (
+          <OfflineBanner
+            onRetry={loadInitialData}
+            retrying={retrying}
+          />
+        )}
 
-      {/* Dynamic Status / Feedback Bar */}
-      {statusMessage && (
-        <div className="bg-space-900 border-b border-space-800 px-6 py-2 text-xs font-mono text-nasa-cyan flex items-center justify-between">
-          <span className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-nasa-cyan animate-ping" /> {statusMessage}
-          </span>
-          <button onClick={() => setStatusMessage('')} className="text-slate-500 hover:text-slate-300">✕</button>
-        </div>
-      )}
+        {/* Status Alert Bar */}
+        {statusMessage && (
+          <div className="bg-blue-50 border-b border-blue-200 px-6 py-2 text-xs font-mono text-blue-800 flex items-center justify-between shrink-0">
+            <span className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-600" /> {statusMessage}
+            </span>
+            <button onClick={() => setStatusMessage('')} className="text-slate-400 hover:text-slate-700">✕</button>
+          </div>
+        )}
 
-      {/* Main Workspace Router */}
-      <main className="flex-1 p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+        {/* Main Content Area */}
+        <main className="flex-1 p-6 w-full flex flex-col gap-6">
         {activeView === 'fleet' && (
           <FleetOverview
             astronauts={astronauts}
@@ -226,6 +267,28 @@ export function App() {
           />
         )}
 
+        {activeView === 'spacecraft' && (
+          <div className="flex flex-col gap-6">
+            <NASASpacecraftHologram
+              activeMission={selectedAstro?.mission_code || 'ARTEMIS-III'}
+              flightDay={14}
+            />
+            {selectedAstro && (
+              <AnatomicalScanner
+                astronaut={selectedAstro}
+                activeAlert={activeAlert}
+                latestVitals={{
+                  rhr: activeAlert ? 68.9 : 62.4,
+                  sleep: activeAlert ? 5.2 : 7.6,
+                  hrr: activeAlert ? 24.5 : 34.0,
+                  spo2: 98.4,
+                  temp: 36.8,
+                }}
+              />
+            )}
+          </div>
+        )}
+
         {activeView === 'diagnostics' && (
           <SystemStatusView onRefreshHealth={loadInitialData} />
         )}
@@ -234,8 +297,9 @@ export function App() {
           <MLBenchmarkView />
         )}
       </main>
+      </div>
 
-      {/* Register New Crew Member Modal */}
+      {/* Modals */}
       {showRegisterModal && (
         <ProfileRegistrationModal
           onClose={() => setShowRegisterModal(false)}
@@ -243,7 +307,6 @@ export function App() {
         />
       )}
 
-      {/* Explainable Alert Evidence Modal */}
       {showEvidenceModal && (
         <AlertInspectorModal
           evidence={evidenceDetail}
@@ -262,7 +325,6 @@ export function App() {
         />
       )}
 
-      {/* Data Quality Rejection Audit Modal */}
       {showDataQualityModal && (
         <DataQualityModal 
           onClose={() => setShowDataQualityModal(false)} 
@@ -278,7 +340,6 @@ export function App() {
         />
       )}
 
-      {/* 6-Stage Interactive Hackathon Judge Tour Walkthrough Modal */}
       {showJudgeTour && (
         <JudgeTourModal
           onClose={() => setShowJudgeTour(false)}
@@ -296,6 +357,14 @@ export function App() {
         />
       )}
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <AuthProvider>
+      <StationDashboard />
+    </AuthProvider>
   );
 }
 

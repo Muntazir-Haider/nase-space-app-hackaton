@@ -8,6 +8,7 @@ from backend.app.api.scenarios import router as scenarios_router
 from backend.app.api.sync import router as sync_router
 from backend.app.api.analytics import router as analytics_router
 from backend.app.api.reports import router as reports_router
+from backend.app.api.auth import router as auth_router
 
 __all__ = [
     "astronauts_router",
@@ -22,5 +23,6 @@ __all__ = [
     "sync_router",
     "analytics_router",
     "reports_router",
+    "auth_router",
 ]
 

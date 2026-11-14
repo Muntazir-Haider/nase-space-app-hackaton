@@ -16,6 +16,13 @@ interface Props {
   timeline: AstronautTimelineResponse | null;
   onOpenAlert: () => void;
   hasActiveAlert: boolean;
+  liveVitals?: {
+    rhr?: number;
+    sleep?: number;
+    hrr?: number;
+    spo2?: number;
+    temp?: number;
+  };
 }
 
 interface CustomTooltipProps {
@@ -43,10 +50,9 @@ function CustomBiometricTooltip({
 
   if (val === null || val === undefined) {
     return (
-      <div className="bg-space-950/95 border border-amber-500/60 p-3 rounded-xl shadow-2xl text-xs font-mono">
-        <div className="text-amber-400 font-bold">{label} ({data.date})</div>
-        <div className="text-slate-300 mt-1">Status: <span className="text-amber-400 font-bold">MISSING OBSERVATION GAP</span></div>
-        <p className="text-[10px] text-slate-400 mt-1">No sensor packet recorded for this flight day.</p>
+      <div className="bg-white border border-amber-300 p-3 rounded-md shadow-lg text-xs font-mono">
+        <div className="text-amber-700 font-bold">{label} ({data.date})</div>
+        <div className="text-slate-600 mt-1">Status: <span className="text-amber-600 font-bold">No Data</span></div>
       </div>
     );
   }
@@ -61,61 +67,61 @@ function CustomBiometricTooltip({
     ((adverseDirection === 'high' && zScore >= 1.5) || (adverseDirection === 'low' && zScore <= -1.5));
 
   return (
-    <div className="bg-space-950/95 border border-space-700 p-3 rounded-xl shadow-2xl text-xs font-mono min-w-[210px]">
-      <div className="flex items-center justify-between border-b border-space-800 pb-1.5 mb-2">
-        <span className="text-nasa-cyan font-bold">{label}</span>
+    <div className="bg-white border border-slate-300 p-3 rounded-md shadow-lg text-xs font-mono min-w-[200px]">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-1 mb-2">
+        <span className="text-[#0b3d91] font-bold">{label}</span>
         <span className="text-slate-400 text-[10px]">{data.date}</span>
       </div>
-      <div className="flex items-center justify-between text-white font-bold">
+      <div className="flex items-center justify-between text-slate-800 font-bold">
         <span>{metricLabel}:</span>
-        <span className="text-sm text-nasa-cyan">{val.toFixed(1)} {unit}</span>
+        <span className="text-sm text-[#0b3d91]">{val.toFixed(1)} {unit}</span>
       </div>
       {baseline && (
-        <div className="mt-2 pt-1.5 border-t border-space-800/80 flex flex-col gap-1 text-[11px]">
-          <div className="flex justify-between text-slate-400">
+        <div className="mt-2 pt-1 border-t border-slate-100 flex flex-col gap-1 text-[11px]">
+          <div className="flex justify-between text-slate-500">
             <span>7d Baseline:</span>
-            <span>{baseline.mean.toFixed(1)} ± {baseline.std_dev.toFixed(1)} {unit}</span>
+            <span>{baseline.mean.toFixed(1)} ± {baseline.std_dev.toFixed(1)}</span>
           </div>
           {zScore !== null && (
             <div className="flex justify-between items-center font-bold">
-              <span>Deviation (z):</span>
+              <span className="text-slate-600">Deviation (z):</span>
               <span className={
                 Math.abs(zScore) >= 2.0 
-                  ? 'text-red-400 bg-red-950/60 px-1.5 py-0.5 rounded border border-red-500/40' 
+                  ? 'text-red-700 bg-red-50 px-1.5 py-0.5 rounded border border-red-200' 
                   : Math.abs(zScore) >= 1.5 
-                    ? 'text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-500/40' 
-                    : 'text-emerald-400'
+                    ? 'text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200' 
+                    : 'text-emerald-700'
               }>
                 {zScore > 0 ? `+${zScore.toFixed(2)}σ` : `${zScore.toFixed(2)}σ`}
               </span>
             </div>
           )}
           {isAdverse && (
-            <div className="text-[10px] text-red-400 font-bold bg-red-950/40 p-1 rounded border border-red-500/30 mt-1">
+            <div className="text-[10px] text-red-700 font-bold bg-red-50 p-1 rounded border border-red-200 mt-1">
               Adverse drift beyond ±1.5σ baseline
             </div>
           )}
         </div>
       )}
       {data.events && data.events.length > 0 && (
-        <div className="mt-2 pt-1.5 border-t border-space-800/80 text-[10px] text-amber-300">
-          <span className="font-bold">Mission Event: </span>{data.events[0]}
+        <div className="mt-2 pt-1 border-t border-slate-100 text-[10px] text-amber-700">
+          <span className="font-bold">Event: </span>{data.events[0]}
         </div>
       )}
       {data.co2 && data.co2 > 2500 && (
-        <div className="mt-1 text-[10px] text-amber-400">
-          <span className="font-bold">Cabin CO2: </span>{data.co2} ppm
+        <div className="mt-1 text-[10px] text-amber-700">
+          <span className="font-bold">CO2: </span>{data.co2} ppm
         </div>
       )}
     </div>
   );
 }
 
-export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert }: Props) {
+export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert, liveVitals }: Props) {
   if (!timeline || timeline.timeline_points.length === 0) {
     return (
-      <div className="p-12 border border-dashed border-space-800 rounded-2xl text-center text-slate-500 font-mono">
-        No biometric time-series telemetry available for this crew member.
+      <div className="p-12 border border-dashed border-slate-300 rounded-md text-center text-slate-400 font-mono text-xs bg-white">
+        No telemetry available for this crew member.
       </div>
     );
   }
@@ -125,68 +131,76 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert }: Pr
   const sleepBase = baselines['SLEEP_DURATION'];
   const hrrBase = baselines['HEART_RATE_RECOVERY_1MIN'];
 
-  // Format data for Recharts
-  const chartData = timeline_points.map((pt: TimelinePoint, idx: number) => ({
-    flightDay: `FD${idx + 1}`,
-    date: pt.date,
-    rhr: pt.rhr_value,
-    sleep: pt.sleep_value,
-    hrr: pt.hrr_value,
-    co2: pt.cabin_co2_ppm,
-    events: pt.mission_events,
-  }));
+  const chartData = timeline_points.map((pt: TimelinePoint, idx: number) => {
+    const isLatest = idx === timeline_points.length - 1;
+    return {
+      flightDay: `FD${idx + 1}`,
+      date: pt.date,
+      rhr: isLatest && liveVitals?.rhr !== undefined ? liveVitals.rhr : pt.rhr_value,
+      sleep: isLatest && liveVitals?.sleep !== undefined ? liveVitals.sleep : pt.sleep_value,
+      hrr: isLatest && liveVitals?.hrr !== undefined ? liveVitals.hrr : pt.hrr_value,
+      co2: pt.cabin_co2_ppm,
+      events: pt.mission_events,
+    };
+  });
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* Active Alert Banner if Present */}
+    <div className="flex flex-col gap-5">
+      {/* Active Alert Banner */}
       {hasActiveAlert && (
-        <div className="bg-red-950/40 border border-red-500/50 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-lg shadow-red-950/20">
+        <div className="bg-red-50 border border-red-300 rounded-md p-4 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-red-600/20 border border-red-500/50 flex items-center justify-center text-red-400">
-              <AlertCircle className="w-5 h-5 animate-pulse" />
+            <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center">
+              <AlertCircle className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold uppercase tracking-wider text-red-400 bg-red-900/60 px-2 py-0.5 rounded border border-red-500/30">
-                  HIGH PRIORITY ALERT ACTIVE
+                <span className="text-xs font-bold text-red-700 uppercase">
+                  Alert Active
                 </span>
-                <span className="text-xs text-slate-400 font-mono">Pattern: Silent Multi-Indicator Deterioration</span>
+                <span className="text-xs text-red-600">Multivariate Physiological Drift</span>
               </div>
-              <p className="text-xs text-slate-200 mt-1">
-                Sustained cardiovascular drift, sleep duration deficit, and autonomic recovery delay detected over consecutive cycles.
+              <p className="text-xs text-slate-700 mt-0.5">
+                Elevated resting heart rate, sleep deficit, and delayed cardiac recovery detected over consecutive days.
               </p>
             </div>
           </div>
           <button
             onClick={onOpenAlert}
-            className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-mono text-xs font-bold rounded-lg shadow-md transition flex items-center gap-2"
+            className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-sm transition"
           >
-            Inspect Evidence &amp; Math Breakdown →
+            Inspect Evidence →
           </button>
         </div>
       )}
 
-      {/* Visual Guide Bar for CMO Chart Interpretation */}
-      <div className="bg-space-950/80 border border-space-800 rounded-xl px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono text-slate-400">
-        <div className="flex items-center gap-2">
-          <Info className="w-3.5 h-3.5 text-nasa-cyan" />
-          <span className="text-slate-300 font-bold">Chart Interpretation Guide:</span>
-        </div>
-        <div className="flex flex-wrap items-center gap-4">
+      {/* Guide Bar with Live Streaming Pulse */}
+      <div className="bg-white border border-slate-300 rounded-md px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+        <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-2.5 rounded bg-emerald-500/20 border border-emerald-500/40 inline-block" />
+            <Info className="w-3.5 h-3.5 text-[#0b3d91]" />
+            <span className="font-semibold text-slate-800">Chart Guide:</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Continuous Telemetry Stream Active (0.45s Cadence · High-Rate)</span>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-4 text-[11px]">
+          <div className="flex items-center gap-1.5">
+            <span className="w-3.5 h-2.5 rounded bg-emerald-100 border border-emerald-300 inline-block" />
             <span>Normal Baseline Corridor (μ ± 1.5σ)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-4 h-0.5 border-t border-dashed border-emerald-400 inline-block" />
-            <span>7-Day Rolling Mean (μ)</span>
+            <span className="w-4 h-0.5 border-t border-dashed border-emerald-500 inline-block" />
+            <span>7-Day Mean (μ)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" />
-            <span>Flight Day Reading Point</span>
+            <span className="w-2 h-2 rounded-full bg-slate-700 inline-block" />
+            <span>Observation Point</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-amber-400 font-bold">Gaps = Missing Data</span>
+            <span className="text-amber-600 font-semibold">Gaps = Missing Data</span>
           </div>
         </div>
       </div>
@@ -194,24 +208,32 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert }: Pr
       {/* Grid of 3 Synchronized Physiological Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Chart 1: Resting Heart Rate */}
-        <div className="bg-space-900/90 border border-space-800 rounded-xl p-4 flex flex-col justify-between shadow">
+        <div className="bg-white border border-slate-300 rounded-md p-4 flex flex-col justify-between shadow-2xs">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Heart className="w-4 h-4 text-red-400" />
-              <h4 className="font-semibold text-xs tracking-wider text-slate-200 uppercase">Resting Heart Rate</h4>
+              <Heart className="w-4 h-4 text-red-500" />
+              <h4 className="font-bold text-xs tracking-wide text-slate-800 uppercase">Resting Heart Rate</h4>
             </div>
-            {rhrBase && (
-              <span className="text-[11px] font-mono text-slate-400">
-                Baseline: {rhrBase.mean.toFixed(1)} ± {rhrBase.std_dev.toFixed(1)} bpm
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {liveVitals?.rhr !== undefined && (
+                <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live: {liveVitals.rhr.toFixed(1)} bpm
+                </span>
+              )}
+              {rhrBase && (
+                <span className="text-[11px] font-mono text-slate-500">
+                  Base: {rhrBase.mean.toFixed(1)} ± {rhrBase.std_dev.toFixed(1)}
+                </span>
+              )}
+            </div>
           </div>
-          <div className="h-52 w-full">
+          <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="flightDay" stroke="#64748b" tick={{ fontSize: 10 }} />
-                <YAxis domain={['auto', 'auto']} stroke="#64748b" tick={{ fontSize: 10 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="flightDay" stroke="#94a3b8" tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis domain={['auto', 'auto']} stroke="#94a3b8" tick={{ fontSize: 10, fill: '#64748b' }} />
                 <Tooltip
                   content={
                     <CustomBiometricTooltip 
@@ -227,9 +249,9 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert }: Pr
                     y1={Math.max(0, rhrBase.mean - 1.5 * rhrBase.std_dev)}
                     y2={rhrBase.mean + 1.5 * rhrBase.std_dev}
                     fill="#10b981"
-                    fillOpacity={0.09}
+                    fillOpacity={0.12}
                     stroke="#10b981"
-                    strokeOpacity={0.25}
+                    strokeOpacity={0.3}
                     strokeDasharray="2 2"
                   />
                 )}
@@ -239,44 +261,63 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert }: Pr
                     stroke="#10b981" 
                     strokeDasharray="3 3" 
                     strokeWidth={1.5}
-                    label={{ value: 'Mean', fill: '#10b981', fontSize: 9, position: 'right' }} 
+                    label={{ value: 'Mean', fill: '#059669', fontSize: 9, position: 'right' }} 
                   />
                 )}
                 <Line
                   type="monotone"
                   dataKey="rhr"
                   name="RHR (bpm)"
-                  stroke="#f43f5e"
-                  strokeWidth={2.5}
+                  stroke="#ef4444"
+                  strokeWidth={2}
                   connectNulls={false}
-                  dot={{ r: 3.5, fill: '#f43f5e' }}
-                  activeDot={{ r: 5.5 }}
+                  isAnimationActive={false}
+                  dot={(props: any) => {
+                    const isLast = props.index === chartData.length - 1;
+                    if (isLast) {
+                      return (
+                        <g key={`rhr-dot-${props.index}`}>
+                          <circle cx={props.cx} cy={props.cy} r={7} fill="#ef4444" fillOpacity={0.25} className="animate-ping" />
+                          <circle cx={props.cx} cy={props.cy} r={4} fill="#ef4444" stroke="#ffffff" strokeWidth={1.5} />
+                        </g>
+                      );
+                    }
+                    return <circle key={`rhr-dot-${props.index}`} cx={props.cx} cy={props.cy} r={3} fill="#ef4444" />;
+                  }}
+                  activeDot={{ r: 5 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[10px] text-slate-500 font-mono mt-1 text-center">NASA HRP HRR-CV Risk · Cephalad fluid shift biomarker</p>
         </div>
 
         {/* Chart 2: Sleep Duration */}
-        <div className="bg-space-900/90 border border-space-800 rounded-xl p-4 flex flex-col justify-between shadow">
+        <div className="bg-white border border-slate-300 rounded-md p-4 flex flex-col justify-between shadow-2xs">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Moon className="w-4 h-4 text-sky-400" />
-              <h4 className="font-semibold text-xs tracking-wider text-slate-200 uppercase">Sleep Duration</h4>
+              <Moon className="w-4 h-4 text-sky-600" />
+              <h4 className="font-bold text-xs tracking-wide text-slate-800 uppercase">Sleep Duration</h4>
             </div>
-            {sleepBase && (
-              <span className="text-[11px] font-mono text-slate-400">
-                Baseline: {sleepBase.mean.toFixed(1)} ± {sleepBase.std_dev.toFixed(2)} hrs
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {liveVitals?.sleep !== undefined && (
+                <span className="text-[10px] font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200 flex items-center gap-1 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
+                  Live: {liveVitals.sleep.toFixed(1)}h
+                </span>
+              )}
+              {sleepBase && (
+                <span className="text-[11px] font-mono text-slate-500">
+                  Base: {sleepBase.mean.toFixed(1)} ± {sleepBase.std_dev.toFixed(2)}h
+                </span>
+              )}
+            </div>
           </div>
-          <div className="h-52 w-full">
+          <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="flightDay" stroke="#64748b" tick={{ fontSize: 10 }} />
-                <YAxis domain={[3.5, 9]} stroke="#64748b" tick={{ fontSize: 10 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="flightDay" stroke="#94a3b8" tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis domain={[3.5, 9]} stroke="#94a3b8" tick={{ fontSize: 10, fill: '#64748b' }} />
                 <Tooltip
                   content={
                     <CustomBiometricTooltip 
@@ -292,9 +333,9 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert }: Pr
                     y1={Math.max(0, sleepBase.mean - 1.5 * sleepBase.std_dev)}
                     y2={sleepBase.mean + 1.5 * sleepBase.std_dev}
                     fill="#10b981"
-                    fillOpacity={0.09}
+                    fillOpacity={0.12}
                     stroke="#10b981"
-                    strokeOpacity={0.25}
+                    strokeOpacity={0.3}
                     strokeDasharray="2 2"
                   />
                 )}
@@ -304,44 +345,52 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert }: Pr
                     stroke="#10b981" 
                     strokeDasharray="3 3" 
                     strokeWidth={1.5}
-                    label={{ value: 'Mean', fill: '#10b981', fontSize: 9, position: 'right' }} 
+                    label={{ value: 'Mean', fill: '#059669', fontSize: 9, position: 'right' }} 
                   />
                 )}
                 <Line
                   type="monotone"
                   dataKey="sleep"
                   name="Sleep (hrs)"
-                  stroke="#38bdf8"
-                  strokeWidth={2.5}
+                  stroke="#0284c7"
+                  strokeWidth={2}
                   connectNulls={false}
-                  dot={{ r: 3.5, fill: '#38bdf8' }}
-                  activeDot={{ r: 5.5 }}
+                  isAnimationActive={false}
+                  dot={{ r: 3, fill: '#0284c7' }}
+                  activeDot={{ r: 5 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[10px] text-slate-500 font-mono mt-1 text-center">NASA HRP Sleep Loss Risk · Cumulative sleep debt</p>
         </div>
 
         {/* Chart 3: Heart Rate Recovery */}
-        <div className="bg-space-900/90 border border-space-800 rounded-xl p-4 flex flex-col justify-between shadow">
+        <div className="bg-white border border-slate-300 rounded-md p-4 flex flex-col justify-between shadow-2xs">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Timer className="w-4 h-4 text-emerald-400" />
-              <h4 className="font-semibold text-xs tracking-wider text-slate-200 uppercase">HR Recovery (1-Min)</h4>
+              <Timer className="w-4 h-4 text-emerald-600" />
+              <h4 className="font-bold text-xs tracking-wide text-slate-800 uppercase">HR Recovery (1-Min)</h4>
             </div>
-            {hrrBase && (
-              <span className="text-[11px] font-mono text-slate-400">
-                Baseline: {hrrBase.mean.toFixed(1)} ± {hrrBase.std_dev.toFixed(1)} bpm
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {liveVitals?.hrr !== undefined && (
+                <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live: {liveVitals.hrr.toFixed(1)} bpm
+                </span>
+              )}
+              {hrrBase && (
+                <span className="text-[11px] font-mono text-slate-500">
+                  Base: {hrrBase.mean.toFixed(1)} ± {hrrBase.std_dev.toFixed(1)}
+                </span>
+              )}
+            </div>
           </div>
-          <div className="h-52 w-full">
+          <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="flightDay" stroke="#64748b" tick={{ fontSize: 10 }} />
-                <YAxis domain={['auto', 'auto']} stroke="#64748b" tick={{ fontSize: 10 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="flightDay" stroke="#94a3b8" tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis domain={['auto', 'auto']} stroke="#94a3b8" tick={{ fontSize: 10, fill: '#64748b' }} />
                 <Tooltip
                   content={
                     <CustomBiometricTooltip 
@@ -357,9 +406,9 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert }: Pr
                     y1={Math.max(0, hrrBase.mean - 1.5 * hrrBase.std_dev)}
                     y2={hrrBase.mean + 1.5 * hrrBase.std_dev}
                     fill="#10b981"
-                    fillOpacity={0.09}
+                    fillOpacity={0.12}
                     stroke="#10b981"
-                    strokeOpacity={0.25}
+                    strokeOpacity={0.3}
                     strokeDasharray="2 2"
                   />
                 )}
@@ -369,36 +418,46 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert }: Pr
                     stroke="#10b981" 
                     strokeDasharray="3 3" 
                     strokeWidth={1.5}
-                    label={{ value: 'Mean', fill: '#10b981', fontSize: 9, position: 'right' }} 
+                    label={{ value: 'Mean', fill: '#059669', fontSize: 9, position: 'right' }} 
                   />
                 )}
                 <Line
                   type="monotone"
                   dataKey="hrr"
                   name="HRR Drop (bpm)"
-                  stroke="#34d399"
-                  strokeWidth={2.5}
+                  stroke="#10b981"
+                  strokeWidth={2}
                   connectNulls={false}
-                  dot={{ r: 3.5, fill: '#34d399' }}
-                  activeDot={{ r: 5.5 }}
+                  isAnimationActive={false}
+                  dot={(props: any) => {
+                    const isLast = props.index === chartData.length - 1;
+                    if (isLast) {
+                      return (
+                        <g key={`hrr-dot-${props.index}`}>
+                          <circle cx={props.cx} cy={props.cy} r={7} fill="#10b981" fillOpacity={0.25} className="animate-ping" />
+                          <circle cx={props.cx} cy={props.cy} r={4} fill="#10b981" stroke="#ffffff" strokeWidth={1.5} />
+                        </g>
+                      );
+                    }
+                    return <circle key={`hrr-dot-${props.index}`} cx={props.cx} cy={props.cy} r={3} fill="#10b981" />;
+                  }}
+                  activeDot={{ r: 5 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[10px] text-slate-500 font-mono mt-1 text-center">NASA HRP Exercise Countermeasure · Autonomic tone</p>
         </div>
       </div>
 
-      {/* Synchronized Mission Events & Cabin Stressor Track */}
-      <div className="bg-space-900/60 border border-space-800 rounded-xl p-4 shadow">
+      {/* Synchronized Mission Events & Cabin Context */}
+      <div className="bg-white border border-slate-300 rounded-md p-4 shadow-2xs">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Wind className="w-4 h-4 text-nasa-cyan" />
-            <h4 className="font-semibold text-xs tracking-wider text-slate-300 uppercase">
-              Mission Events &amp; Habitat Stressors (Aligned Timeline)
+            <Wind className="w-4 h-4 text-[#0b3d91]" />
+            <h4 className="font-bold text-xs tracking-wide text-slate-800 uppercase">
+              Mission Events &amp; Habitat Stressors
             </h4>
           </div>
-          <span className="text-[11px] font-mono text-slate-500">Temporal cross-correlation without causal assertion</span>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
@@ -408,21 +467,21 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert }: Pr
             return (
               <div
                 key={pt.date}
-                className={`p-2.5 rounded-lg border text-xs font-mono transition ${
+                className={`p-2 rounded-lg border text-xs font-mono transition ${
                   hasCO2 || hasEvent
-                    ? 'bg-amber-950/30 border-amber-500/40 text-amber-200'
-                    : 'bg-space-850/60 border-space-800 text-slate-400'
+                    ? 'bg-amber-50 border-amber-300 text-amber-900'
+                    : 'bg-slate-50 border-slate-200 text-slate-600'
                 }`}
               >
-                <div className="font-bold text-[11px] text-white">FD{i + 1}</div>
+                <div className="font-bold text-[11px] text-slate-800">FD{i + 1}</div>
                 <div className="text-[10px] text-slate-500 mt-0.5">{pt.date.slice(5)}</div>
                 {hasCO2 && (
-                  <div className="mt-1 text-[10px] text-amber-300 font-bold">
+                  <div className="mt-1 text-[10px] text-amber-800 font-bold">
                     CO2: {pt.cabin_co2_ppm} ppm
                   </div>
                 )}
                 {hasEvent && (
-                  <div className="mt-1 text-[9px] text-slate-300 leading-tight">
+                  <div className="mt-1 text-[9px] text-slate-700 leading-tight">
                     {pt.mission_events[0]}
                   </div>
                 )}

@@ -50,66 +50,66 @@ export function BaselineInspectorModal({
     try {
       const updated = await recomputeAstronautBaselines(astronaut.id);
       setBaselines(updated);
-      setFeedbackMsg(`Baselines recalculated successfully across 7-day calendar window. Version counter incremented.`);
+      setFeedbackMsg(`Baselines recalculated successfully.`);
       if (onBaselineUpdated) onBaselineUpdated();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      setFeedbackMsg(`Recomputation failed: ${msg}`);
+      setFeedbackMsg(`Failed: ${msg}`);
     } finally {
       setRecomputing(false);
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-space-900 border border-space-750 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white border border-slate-200 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-space-800 bg-space-850 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-nasa-blue/30 border border-nasa-cyan/40 flex items-center justify-center text-nasa-cyan">
-              <Calculator className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0b3d91]">
+              <Calculator className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-base text-white">Personal Baseline Engine & Mathematical Audit</h3>
-                <span className="text-[10px] font-mono bg-space-950 text-nasa-cyan px-2 py-0.5 rounded border border-space-700">
+                <h3 className="font-bold text-base text-slate-800">Personal Baselines</h3>
+                <span className="text-xs font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
                   {astronaut.callsign}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-mono">
-                {astronaut.full_name} · 7-Day Rolling Calendar Window · Bessel&apos;s Correction (N-1)
+              <p className="text-xs text-slate-500 font-mono">
+                {astronaut.full_name} · 7-Day Window
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-space-800 hover:bg-space-700 text-slate-400 hover:text-white flex items-center justify-center transition"
+            className="w-8 h-8 rounded-lg bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition border border-slate-200"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Action / Recompute Bar */}
-        <div className="flex items-center justify-between px-6 py-3 border-b border-space-800 bg-space-950 text-xs font-mono">
-          <span className="text-slate-400 flex items-center gap-1.5">
-            <Sliders className="w-3.5 h-3.5 text-nasa-cyan" />
-            Minimum Valid Sample Threshold: <strong className="text-white">N ≥ 4 daily readings</strong>
+        <div className="flex items-center justify-between px-6 py-3 border-b border-slate-200 bg-white text-xs font-mono">
+          <span className="text-slate-600 flex items-center gap-1.5">
+            <Sliders className="w-3.5 h-3.5 text-[#0b3d91]" />
+            Minimum Valid Samples: <strong className="text-slate-900">4 daily readings</strong>
           </span>
 
           <button
             onClick={handleRecompute}
             disabled={recomputing || loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-nasa-blue hover:bg-nasa-blue/80 active:bg-nasa-blue/90 disabled:opacity-50 text-white font-bold transition shadow"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0b3d91] hover:bg-blue-800 disabled:opacity-50 text-white font-bold transition shadow-sm"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${recomputing ? 'animate-spin' : ''}`} />
-            <span>{recomputing ? 'Recalculating...' : 'Recompute 7d Baselines'}</span>
+            <span>{recomputing ? 'Recalculating...' : 'Recompute Baselines'}</span>
           </button>
         </div>
 
         {/* Feedback Banner */}
         {feedbackMsg && (
-          <div className="px-6 py-2.5 bg-space-850 border-b border-space-800 text-xs font-mono text-nasa-cyan flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div className="px-6 py-2.5 bg-blue-50 border-b border-blue-200 text-xs font-mono text-[#0b3d91] flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{feedbackMsg}</span>
           </div>
         )}
@@ -118,13 +118,13 @@ export function BaselineInspectorModal({
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
           {loading ? (
             <div className="p-16 text-center text-slate-400 font-mono text-xs flex items-center justify-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-nasa-cyan" /> Loading active personal baselines...
+              <Loader2 className="w-4 h-4 animate-spin text-[#0b3d91]" /> Loading baselines...
             </div>
           ) : baselines.length === 0 ? (
-            <div className="p-12 border border-dashed border-space-750 rounded-xl text-center text-slate-400 font-mono text-xs">
-              <Activity className="w-8 h-8 text-slate-500 mx-auto mb-2" />
-              <p className="text-white font-bold">No Baselines Initialized</p>
-              <p className="text-slate-500 mt-1">Click &quot;Recompute 7d Baselines&quot; to initialize statistical distribution.</p>
+            <div className="p-12 border border-dashed border-slate-200 rounded-xl text-center text-slate-400 font-mono text-xs">
+              <Activity className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-slate-800 font-bold">No Baselines Initialized</p>
+              <p className="text-slate-500 mt-1">Click &quot;Recompute Baselines&quot; to calculate.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -134,98 +134,71 @@ export function BaselineInspectorModal({
                 return (
                   <div 
                     key={b.id}
-                    className="bg-space-850 border border-space-750 rounded-2xl p-5 flex flex-col justify-between gap-4 font-mono text-xs shadow"
+                    className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between gap-3 font-mono text-xs shadow-sm"
                   >
                     <div>
                       <div className="flex items-start justify-between">
                         <div>
-                          <span className="text-[10px] text-nasa-cyan bg-space-950 px-2 py-0.5 rounded border border-space-700">
+                          <span className="text-[10px] text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-200">
                             Version {b.version}
                           </span>
-                          <h4 className="text-white font-bold text-sm mt-1.5">
+                          <h4 className="text-slate-900 font-bold text-sm mt-1.5">
                             {b.indicator_key.replace(/_/g, ' ')}
                           </h4>
                         </div>
 
                         {isActive ? (
-                          <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/40">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-400" /> ACTIVE
+                          <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" /> ACTIVE
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-amber-950/80 text-amber-400 border border-amber-500/40">
-                            <AlertTriangle className="w-3 h-3 text-amber-400" /> INSUFFICIENT DATA
+                          <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-semibold">
+                            <AlertTriangle className="w-3 h-3 text-amber-600" /> INSUFFICIENT
                           </span>
                         )}
                       </div>
 
                       {/* Statistical Distribution Parameters */}
-                      <div className="mt-4 space-y-2 bg-space-950 p-3.5 rounded-xl border border-space-800">
+                      <div className="mt-3 space-y-1.5 bg-white p-3 rounded-lg border border-slate-200">
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-400">Arithmetic Mean (μ):</span>
-                          <span className="text-white font-bold">
-                            {isActive ? `${b.mean.toFixed(2)} ${unit}` : '0.00 (Suppressed)'}
+                          <span className="text-slate-500">Mean (μ):</span>
+                          <span className="text-slate-900 font-bold">
+                            {isActive ? `${b.mean.toFixed(2)} ${unit}` : '0.00'}
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-400">50th Percentile Median (M):</span>
-                          <span className="text-white font-bold">
+                          <span className="text-slate-500">Median:</span>
+                          <span className="text-slate-900 font-bold">
                             {isActive ? `${b.median.toFixed(2)} ${unit}` : '0.00'}
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-400">Sample Std Dev (σ):</span>
-                          <span className="text-white font-bold">
+                          <span className="text-slate-500">Std Dev (σ):</span>
+                          <span className="text-slate-900 font-bold">
                             {isActive ? `±${b.std_dev.toFixed(2)} ${unit}` : '0.00'}
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between pt-1 border-t border-space-800/80 text-[11px]">
-                          <span className="text-slate-400">Valid Sample Count (N):</span>
-                          <span className={b.sample_count >= 4 ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+                        <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[11px]">
+                          <span className="text-slate-500">Sample Count (N):</span>
+                          <span className={b.sample_count >= 4 ? 'text-emerald-700 font-bold' : 'text-amber-700 font-bold'}>
                             {b.sample_count} / 7 days
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Window dates & audit */}
-                    <div className="pt-2 border-t border-space-800/80 text-[10px] text-slate-500 space-y-1">
-                      <div>Lookback: {b.window_start.slice(0, 10)} to {b.window_end.slice(0, 10)}</div>
-                      <div>Audit Log: {b.calculated_at.slice(0, 19).replace('T', ' ')} UTC</div>
+                    {/* Window dates */}
+                    <div className="pt-2 border-t border-slate-200 text-[10px] text-slate-400 space-y-0.5">
+                      <div>Window: {b.window_start.slice(0, 10)} to {b.window_end.slice(0, 10)}</div>
                     </div>
                   </div>
                 );
               })}
             </div>
           )}
-
-          {/* Mathematical Proof & Formulas Grounding Card */}
-          <div className="bg-space-950 border border-space-800 rounded-2xl p-5 font-mono text-xs text-slate-300 space-y-3">
-            <div className="flex items-center gap-2 text-nasa-cyan font-bold text-sm">
-              <Calculator className="w-4 h-4" /> Mathematical Grounding (NASA Evidence Specification)
-            </div>
-
-            <p className="text-slate-400 leading-relaxed">
-              Mission Sentinel evaluates rolling baselines strictly over a preceding 7 calendar-day window (W = [T₀ - 7d, T₀]).
-              To avoid false alarms from inadequate samples, baselines require a sample threshold of N ≥ 4 valid daily readings.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 text-[11px]">
-              <div className="bg-space-900 border border-space-800 p-3 rounded-xl">
-                <span className="text-indigo-400 font-bold block mb-1">1. Sample Standard Deviation (Bessel&apos;s Correction)</span>
-                <code>σ = sqrt( (1 / (N - 1)) * Σ (x_i - μ)^2 )</code>
-                <p className="text-slate-500 mt-1">Uses $N-1$ degrees of freedom to prevent sample bias on small spaceflight cohorts.</p>
-              </div>
-
-              <div className="bg-space-900 border border-space-800 p-3 rounded-xl">
-                <span className="text-emerald-400 font-bold block mb-1">2. Standardized Deviation Score</span>
-                <code>z = (x_t - μ) / σ</code>
-                <p className="text-slate-500 mt-1">Measures individual deviation magnitude against personal historical distribution.</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

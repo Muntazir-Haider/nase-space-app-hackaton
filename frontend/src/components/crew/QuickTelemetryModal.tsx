@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { 
   X, 
-  Activity, 
   CheckCircle2, 
   AlertTriangle, 
   Loader2, 
@@ -87,71 +86,71 @@ export function QuickTelemetryModal({
 
       if (res.rejected_count > 0) {
         const item = res.results.find((r) => r.quality_status === 'REJECTED');
-        setError(item?.quality_notes || 'Measurement was rejected by the 7-point Data Quality Audit engine.');
+        setError(item?.quality_notes || 'Measurement rejected by validation engine.');
       } else {
-        setSuccessMsg(`Logged ${value} ${currentConfig.unit} for ${astronaut.callsign}. Quality Audit: VALID.`);
+        setSuccessMsg(`Logged ${value} ${currentConfig.unit} for ${astronaut.callsign}.`);
         setTimeout(() => {
           onSuccess();
           onClose();
-        }, 1200);
+        }, 1000);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      setError(`Failed to log telemetry: ${msg}`);
+      setError(`Failed: ${msg}`);
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-space-900 border border-space-750 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col font-sans">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-space-800 bg-space-950">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
           <div className="flex items-center gap-2.5">
-            <PlusCircle className="w-5 h-5 text-nasa-cyan" />
+            <PlusCircle className="w-5 h-5 text-[#0b3d91]" />
             <div>
-              <h3 className="text-base font-bold text-white font-mono">
-                Log Bedside Clinical Telemetry
+              <h3 className="text-base font-bold text-slate-800">
+                Log Telemetry
               </h3>
-              <p className="text-xs text-slate-400 font-mono">
-                {astronaut.full_name} ({astronaut.callsign}) · Mission {astronaut.mission_code}
+              <p className="text-xs text-slate-500 font-mono">
+                {astronaut.full_name} ({astronaut.callsign})
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-space-800 transition"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 font-mono text-xs">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs font-mono">
           {error && (
-            <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/40 text-red-200 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{successMsg}</span>
             </div>
           )}
 
           {/* Indicator Select */}
           <div>
-            <label className="block text-slate-400 mb-1.5 uppercase tracking-wider text-[11px] font-bold">
+            <label className="block text-slate-600 mb-1 font-bold">
               Biometric Indicator
             </label>
             <select
               value={selectedKey}
               onChange={(e) => handleIndicatorChange(e.target.value)}
-              className="w-full bg-space-950 border border-space-700 rounded-xl px-3 py-2.5 text-white text-xs font-mono focus:outline-none focus:border-nasa-cyan"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs font-mono focus:outline-none focus:border-[#0b3d91]"
             >
               {INDICATORS.map((ind) => (
                 <option key={ind.key} value={ind.key}>
@@ -164,8 +163,8 @@ export function QuickTelemetryModal({
           {/* Value Input */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-slate-400 mb-1.5 uppercase tracking-wider text-[11px] font-bold">
-                Measured Value ({currentConfig.unit})
+              <label className="block text-slate-600 mb-1 font-bold">
+                Value ({currentConfig.unit})
               </label>
               <div className="relative">
                 <input
@@ -176,49 +175,37 @@ export function QuickTelemetryModal({
                   value={value}
                   onChange={(e) => setValue(parseFloat(e.target.value))}
                   required
-                  className="w-full bg-space-950 border border-space-700 rounded-xl px-3 py-2.5 text-white text-sm font-bold font-mono focus:outline-none focus:border-nasa-cyan"
+                  className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-900 text-sm font-bold font-mono focus:outline-none focus:border-[#0b3d91]"
                 />
-                <span className="absolute right-3 top-2.5 text-xs text-slate-500 font-mono">
-                  {currentConfig.unit}
-                </span>
               </div>
             </div>
 
             <div>
-              <label className="block text-slate-400 mb-1.5 uppercase tracking-wider text-[11px] font-bold">
-                Timestamp (Station Time)
+              <label className="block text-slate-600 mb-1 font-bold">
+                Timestamp
               </label>
               <input
                 type="datetime-local"
                 value={obsTime}
                 onChange={(e) => setObsTime(e.target.value)}
                 required
-                className="w-full bg-space-950 border border-space-700 rounded-xl px-3 py-2.5 text-slate-200 text-xs font-mono focus:outline-none focus:border-nasa-cyan"
+                className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs font-mono focus:outline-none focus:border-[#0b3d91]"
               />
             </div>
           </div>
 
           {/* Provenance Context */}
           <div>
-            <label className="block text-slate-400 mb-1.5 uppercase tracking-wider text-[11px] font-bold">
-              Clinical Context / Provenance Ref
+            <label className="block text-slate-600 mb-1 font-bold">
+              Provenance / Context
             </label>
             <input
               type="text"
               value={provenanceRef}
               onChange={(e) => setProvenanceRef(e.target.value)}
-              placeholder="e.g. CMO_POST_EXERCISE_ASSESSMENT"
-              className="w-full bg-space-950 border border-space-700 rounded-xl px-3 py-2 text-slate-200 text-xs font-mono focus:outline-none focus:border-nasa-cyan"
+              placeholder="e.g. CMO_POST_EXERCISE"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-slate-800 text-xs font-mono focus:outline-none focus:border-[#0b3d91]"
             />
-          </div>
-
-          {/* Audit Verification Note */}
-          <div className="p-3 bg-space-950/70 border border-space-800 rounded-xl text-[11px] text-slate-400 flex items-start gap-2">
-            <Activity className="w-4 h-4 text-nasa-cyan shrink-0 mt-0.5" />
-            <span>
-              Entry will undergo the 7-Point Data Quality Audit (range bounds [{currentConfig.min}–{currentConfig.max}],
-              future timestamp rejection, duplicate hash prevention) and immediately update personal baselines.
-            </span>
           </div>
 
           {/* Actions */}
@@ -226,17 +213,17 @@ export function QuickTelemetryModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-space-850 hover:bg-space-800 text-slate-300 font-mono text-xs transition"
+              className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-2 rounded-xl bg-nasa-blue hover:bg-nasa-blue/80 text-white font-mono text-xs font-bold transition flex items-center gap-1.5 shadow"
+              className="px-4 py-2 rounded-lg bg-[#0b3d91] hover:bg-blue-800 text-white font-mono text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
             >
               {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <PlusCircle className="w-3.5 h-3.5" />}
-              <span>{submitting ? 'Auditing & Ingesting...' : 'Record Telemetry'}</span>
+              <span>{submitting ? 'Recording...' : 'Record Telemetry'}</span>
             </button>
           </div>
         </form>

@@ -388,4 +388,36 @@ export interface DatabaseSnapshotResponse {
   data: Record<string, any[]>;
 }
 
+export interface OperatorProfile {
+  id: string;
+  callsign: string;
+  full_name: string;
+  role: string;
+  role_display: string;
+  rank: string;
+  security_clearance: string;
+  station_module: string;
+  avatar_color: string;
+  permissions: string[];
+}
+
+export interface LoginResponse {
+  success: boolean;
+  token: string;
+  operator: OperatorProfile;
+  expires_at: string;
+  message: string;
+}
+
+export interface OperatorRoleOut {
+  role_key: string;
+  title: string;
+  description: string;
+  default_callsign: string;
+  default_pin: string;
+  default_name: string;
+  clearance_level: string;
+  permissions: string[];
+}
+
 
