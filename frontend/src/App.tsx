@@ -12,7 +12,8 @@ import {
   loadDemoScenario, 
   fetchAstronautTimeline, 
   fetchAlerts, 
-  fetchAlertEvidence 
+  fetchAlertEvidence,
+  fetchDataQualityAudit,
 } from './services/api';
 import { Navbar, ActiveView } from './components/layout/Navbar';
 import { OfflineBanner } from './components/layout/OfflineBanner';
@@ -40,6 +41,7 @@ export function App() {
   const [activeScenario, setActiveScenario] = useState<string>('SCENARIO_C_SILENT_DETERIORATION');
   const [scenarioLoading, setScenarioLoading] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
+  const [rejectedAuditCount, setRejectedAuditCount] = useState<number>(0);
   
   const [showRegisterModal, setShowRegisterModal] = useState<boolean>(false);
   const [showEvidenceModal, setShowEvidenceModal] = useState<boolean>(false);
@@ -59,12 +61,14 @@ export function App() {
     setLoading(true);
     setRetrying(true);
     try {
-      const [hData, aData] = await Promise.all([
+      const [hData, aData, auditLogs] = await Promise.all([
         fetchHealth(),
         fetchAstronauts(),
+        fetchDataQualityAudit().catch(() => []),
       ]);
       setHealth(hData);
       setAstronauts(aData);
+      setRejectedAuditCount(auditLogs.length);
       setIsOffline(false);
       if (aData.length > 0 && !selectedAstronautId) {
         // Default to Dr. Elena Vance (ARTEMIS-01) or first astronaut
@@ -161,6 +165,7 @@ export function App() {
         activeScenario={activeScenario}
         scenarioLoading={scenarioLoading}
         onScenarioSwitch={handleScenarioSwitch}
+        rejectedAuditCount={rejectedAuditCount}
       />
 
       {/* Offline Standalone Mode Warning Banner */}
@@ -257,6 +262,8 @@ export function App() {
             }
             const aData = await fetchAstronauts();
             setAstronauts(aData);
+            const logs = await fetchDataQualityAudit().catch(() => []);
+            setRejectedAuditCount(logs.length);
           }}
         />
       )}

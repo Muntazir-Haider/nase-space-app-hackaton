@@ -18,6 +18,8 @@ from backend.app.schemas.schemas import (
     AlertEvidenceItemOut,
     AlertStatusUpdate,
     AnalysisRunOut,
+    ClinicalCountermeasureCreate,
+    ClinicalCountermeasureStatusUpdate,
     ClinicalCountermeasureOut,
     CMOFollowupOut,
 )
@@ -182,6 +184,51 @@ def list_countermeasures_for_alert(
     db: Session = Depends(get_db),
 ):
     return db.query(ClinicalCountermeasure).filter(ClinicalCountermeasure.alert_id == alert_id).all()
+
+
+@router.patch("/{alert_id}/countermeasures/{countermeasure_id}", response_model=ClinicalCountermeasureOut)
+def update_countermeasure_status(
+    alert_id: str,
+    countermeasure_id: str,
+    payload: ClinicalCountermeasureStatusUpdate,
+    db: Session = Depends(get_db),
+):
+    cm = db.query(ClinicalCountermeasure).filter(
+        ClinicalCountermeasure.id == countermeasure_id,
+        ClinicalCountermeasure.alert_id == alert_id,
+    ).first()
+    if not cm:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Clinical countermeasure with ID '{countermeasure_id}' not found for alert '{alert_id}'.",
+        )
+
+    valid_statuses = ["ACTIVE", "COMPLETED", "DISCONTINUED", "INEFFECTIVE"]
+    if payload.outcome_status not in valid_statuses:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid outcome_status '{payload.outcome_status}'. Allowed: {valid_statuses}",
+        )
+
+    old_status = cm.outcome_status
+    cm.outcome_status = payload.outcome_status
+    cm.updated_at = datetime.now(timezone.utc).isoformat()
+
+    # Record CMO Followup entry in permanent audit ledger
+    note = payload.resolution_notes or f"Protocol outcome updated to {payload.outcome_status}."
+    followup = CMOFollowup(
+        alert_id=alert_id,
+        astronaut_id=cm.astronaut_id,
+        reviewer_callsign=payload.resolved_by,
+        review_notes=f"Countermeasure '{cm.title}' status updated: {note}",
+        status_transition=f"{old_status} -> {payload.outcome_status}",
+        recorded_at=datetime.now(timezone.utc).isoformat(),
+    )
+    db.add(followup)
+
+    db.commit()
+    db.refresh(cm)
+    return cm
 
 
 # --- Analysis Runs Router ---

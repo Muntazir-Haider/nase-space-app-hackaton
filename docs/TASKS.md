@@ -193,32 +193,38 @@
 
 ---
 
-## Phase 5: CMO Dashboard, Clinical Countermeasures & User Interface
-*Objective: Build high-density medical review interface, Recharts data visualization, alert inspection, countermeasure logging, and scenario switcher.*
-*Approval Gate: Requires Phase 4 verification and user sign-off.*
+## Phase 5: CMO Dashboard, Clinical Countermeasures & User Interface — Enhancement & Hardening
+*Objective: Build high-density medical review interface, Recharts data visualization with shaded baseline bands (±1.5σ), real-time z-score tooltips, missing data gap handling, fleet search and filtering, sensor quality badges, countermeasure lifecycle tracking, and daily biometric flight log.*
+*Approval Gate: Approved by user for active execution.*
 
-- [x] **TASK-501: CMO Dashboard & Crew Status Overview**
-  - **Scope:** Build fleet cards, active alert banners, data quality counters, and 1-click Demo Scenario switcher.
-  - **Target Files:** `frontend/src/App.tsx`, `frontend/src/services/api.ts`
-  - **Verification:** Displays actual backend data with zero hardcoded metrics.
+- [x] **TASK-501: Fleet Overview Filtering, Search & Header Sensor Health Badge**
+  - **Scope:** Enhance `FleetOverview.tsx` with callsign/name search and status filtering (`ALL`, `ALERTS_ONLY`, `NOMINAL`, `OBSERVATION`); add active rejected/flagged packet warning counter badge to `Navbar.tsx` based on `data_quality_audit_log`; add informative hover tooltips for Demo Scenarios A, B, and C.
+  - **Target Files:** `frontend/src/components/crew/FleetOverview.tsx`, `frontend/src/components/layout/Navbar.tsx`, `frontend/src/App.tsx`
+  - **Verification:** Filtering works accurately; sensor error badge alerts CMO when rejected packets exist; search filters crew dynamically.
   - **Status:** `DONE`
 
-- [x] **TASK-502: Synchronized Multi-Indicator & Habitat Time-Series Charts**
-  - **Scope:** Implement Recharts visualizers with baseline bands ($\pm 1.5\sigma$), reading points, missing data gaps, cabin $CO_2$ overlay, and alert markers.
-  - **Target Files:** `frontend/src/components/SynchronizedCharts.tsx`, `backend/app/api/astronauts.py`
-  - **Verification:** Real stored data rendered accurately with crisp time-axis alignment.
+- [x] **TASK-502: Elevated Synchronized Charts with Shaded Baseline Bands, z-Score Tooltips & Gap Handling**
+  - **Scope:** Upgrade `SynchronizedCharts.tsx` with Recharts `<ReferenceArea>` rendering shaded baseline normal physiological bands ($\mu \pm 1.5\sigma$); configure `connectNulls={false}` for visual gap fidelity on missing telemetry days; build custom tooltip calculating exact standardized deviation $z$-score and baseline distance on hover; highlight alert observation window on timeline.
+  - **Target Files:** `frontend/src/components/SynchronizedCharts.tsx`
+  - **Verification:** Shaded baseline corridor visible across RHR, Sleep, and HRR-1 charts; tooltips display exact $z$-scores; gaps render without false interpolation.
   - **Status:** `DONE`
 
-- [x] **TASK-503: Alert Detail Drill-Down, Evidence Inspector & Data Quality Modal**
-  - **Scope:** Modal/view presenting detection narrative, baseline math breakdown, mission context, raw readings table, and Data Quality rejection audit inspector.
-  - **Target Files:** `frontend/src/components/AlertInspectorModal.tsx`, `frontend/src/components/DataQualityModal.tsx`
-  - **Verification:** CMO can drill directly from alert to underlying evidence records and inspect rejected sensor packets.
+- [x] **TASK-503: Clinical Countermeasure Lifecycle Management & Protocol Resolution API**
+  - **Scope:** Add `PATCH /api/v1/alerts/{alert_id}/countermeasures/{cm_id}` in `backend/app/api/alerts.py` to allow updating countermeasure outcome status (`ACTIVE` -> `COMPLETED`, `DISCONTINUED`); update `AlertInspectorModal.tsx` to display protocol completion toggles, elapsed duration badges, and NASA HRP clinical rationale cards.
+  - **Target Files:** `backend/app/api/alerts.py`, `frontend/src/components/AlertInspectorModal.tsx`, `frontend/src/services/api.ts`, `frontend/src/types/index.ts`
+  - **Verification:** CMO can mark countermeasure protocols completed or discontinued; status persists to SQLite and reflects in evidence inspector.
   - **Status:** `DONE`
 
-- [x] **TASK-504: Clinical Countermeasures & CMO Follow-Up Workflow**
-  - **Scope:** Enable CMO to prescribe clinical countermeasures (`SLEEP_SCHEDULE_ADJUSTMENT`, `HYDRATION_PROTOCOL`, etc.), append review notes, and transition alert states.
-  - **Target Files:** `frontend/src/components/AlertInspectorModal.tsx`, `backend/app/api/alerts.py`
-  - **Verification:** Countermeasures persist to `clinical_countermeasures` table and update outcome states.
+- [x] **TASK-504: Daily Biometric Flight Log & On-Demand Fleet Analysis Trigger**
+  - **Scope:** Add a structured Daily Biometric Flight Log table to `AstronautProfileDetail.tsx` displaying daily values, calculated $z$-scores, and status badges; add 1-click **"Run Deterioration Engine Analysis"** button hitting `POST /api/v1/alerts/run-analysis` and refreshing fleet state.
+  - **Target Files:** `frontend/src/components/crew/AstronautProfileDetail.tsx`, `frontend/src/services/api.ts`
+  - **Verification:** Flight log renders all daily readings with calculated $z$-scores; on-demand analysis triggers engine and updates alert cards immediately.
+  - **Status:** `DONE`
+
+- [x] **TASK-505: End-to-End Automated Testing & Production Verification for Phase 5**
+  - **Scope:** Author automated pytest tests for countermeasure status update endpoints; verify scenario switching; run full pytest suite; execute `npm run build` with zero TypeScript errors.
+  - **Target Files:** `tests/test_deterioration.py`, entire codebase
+  - **Verification:** 100% of tests pass (35/35); Vite production build succeeds (2015 modules transformed, 0 errors); live application verified in browser.
   - **Status:** `DONE`
 
 ---

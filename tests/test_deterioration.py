@@ -296,3 +296,41 @@ def test_acceptance_11_and_12_evidence_audit_and_status_transition(client_with_d
     assert len(ev_updated["followups"]) == 1
     assert ev_updated["followups"][0]["reviewer_callsign"] == "CMO-01"
     assert "NEW -> UNDER_REVIEW" in ev_updated["followups"][0]["status_transition"]
+
+    # 3. Prescribe Clinical Countermeasure
+    cm_res = client.post(
+        f"/api/v1/alerts/{alert_id}/countermeasures",
+        json={
+            "prescribed_by": "CMO-01",
+            "countermeasure_type": "SLEEP_SCHEDULE_ADJUSTMENT",
+            "title": "Mandatory 60-min Rest Extension",
+            "prescription_details": "Extend pre-EVA sleep block by 60 min; reduce ARED resistance loading by 15%.",
+            "target_duration_hours": 48,
+        },
+    )
+    assert cm_res.status_code == 201
+    cm_data = cm_res.json()
+    assert cm_data["outcome_status"] == "ACTIVE"
+    cm_id = cm_data["id"]
+
+    # Verify alert moved automatically to MONITORING
+    alert_after_cm = client.get(f"/api/v1/alerts/{alert_id}").json()
+    assert alert_after_cm["lifecycle_status"] == "MONITORING"
+
+    # 4. Resolve/Complete Countermeasure via PATCH
+    patch_cm_res = client.patch(
+        f"/api/v1/alerts/{alert_id}/countermeasures/{cm_id}",
+        json={
+            "outcome_status": "COMPLETED",
+            "resolved_by": "CMO-01",
+            "resolution_notes": "48h sleep extension completed. Autonomic recovery normalized.",
+        },
+    )
+    assert patch_cm_res.status_code == 200
+    assert patch_cm_res.json()["outcome_status"] == "COMPLETED"
+
+    # Verify followup audit recorded for countermeasure outcome update
+    ev_after_patch = client.get(f"/api/v1/alerts/{alert_id}/evidence").json()
+    assert len(ev_after_patch["countermeasures"]) == 1
+    assert ev_after_patch["countermeasures"][0]["outcome_status"] == "COMPLETED"
+    assert any("COMPLETED" in f["status_transition"] for f in ev_after_patch["followups"])

@@ -23,6 +23,7 @@ interface NavbarProps {
   activeScenario: string;
   scenarioLoading: boolean;
   onScenarioSwitch: (scenarioKey: string) => void;
+  rejectedAuditCount?: number;
 }
 
 export function Navbar({
@@ -34,6 +35,7 @@ export function Navbar({
   activeScenario,
   scenarioLoading,
   onScenarioSwitch,
+  rejectedAuditCount = 0,
 }: NavbarProps) {
   return (
     <header className="border-b border-space-800 bg-space-900/95 backdrop-blur sticky top-0 z-40 px-6 py-3 flex flex-wrap items-center justify-between gap-4">
@@ -129,9 +131,15 @@ export function Navbar({
         <button
           onClick={onOpenDataQuality}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-space-850 hover:bg-space-800 border border-space-700 hover:border-nasa-cyan text-slate-300 transition"
+          title="Inspect sensor data quality validation log and rejected packets"
         >
-          <FileSearch className="w-3.5 h-3.5 text-amber-400" />
+          <FileSearch className={`w-3.5 h-3.5 ${rejectedAuditCount > 0 ? 'text-amber-400 animate-pulse' : 'text-slate-400'}`} />
           <span className="hidden sm:inline">Data Quality Audit</span>
+          {rejectedAuditCount > 0 && (
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold border border-amber-500/30">
+              {rejectedAuditCount}
+            </span>
+          )}
         </button>
       </div>
 

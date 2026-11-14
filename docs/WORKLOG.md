@@ -571,5 +571,78 @@ Following user authorization to proceed with Phase 4, executed the core intellig
   - Test 12: CMO Alert Review & Status Transition (PASSED)
 
 ### Next Step
-- Present Phase 4 Completion Report to user and enforce Completeness Gate (Rule 12). Await explicit user approval before proceeding to Phase 5.
+- Phase 4 verified and approved. Proceeding with Phase 5: CMO Dashboard, Clinical Countermeasures & User Interface Polish.
+
+---
+
+## [2026-11-14] — Phase 5: CMO Dashboard, Clinical Countermeasures & User Interface Hardening Initiated
+
+### Background & Research
+Following explicit user directive, conducted a comprehensive pre-implementation review of the entire system (backend, frontend, database schemas, and test suites) before beginning Phase 5 coding. Researched and established technical design patterns for high-density aerospace clinical UI:
+
+1. **Recharts Physiological Corridors:**
+   - Evaluated Recharts `<ReferenceArea>` for rendering shaded normal baseline bands ($\mu \pm 1.5\sigma$). In cardiovascular and sleep telemetry, visual corridors allow instantaneous differentiation between benign stochastic fluctuation and systematic drift.
+   - Enforced `connectNulls={false}` across all line visualizers to ensure missing data gaps (Acceptance Test 4) are honestly displayed rather than interpolated.
+2. **Standardized Deviation Tooltips:**
+   - Designed real-time $z$-score calculation in hover tooltips: $z = \frac{x - \mu}{\sigma}$. Color-coded: green ($|z| < 1.5$), amber ($1.5 \le |z| < 2.0$), and red ($|z| \ge 2.0$).
+3. **Clinical Countermeasure Protocol Resolution:**
+   - Designed RESTful protocol outcome management: `PATCH /api/v1/alerts/{alert_id}/countermeasures/{cm_id}` supporting status updates (`ACTIVE` -> `COMPLETED`, `DISCONTINUED`) to close the clinical decision loop.
+4. **Fleet Situational Awareness & Quality Flagging:**
+   - Designed quick filtering for the CMO fleet roster (`ALL`, `ALERTS_ONLY`, `NOMINAL`, `OBSERVATION`) and real-time sensor health warning counters in the station navigation header.
+
+### Enhanced Phase 5 Task Plan & Implementation
+- `TASK-501`: Fleet Overview Filtering, Search & Header Sensor Health Badge (DONE)
+- `TASK-502`: Elevated Synchronized Charts with Shaded Baseline Bands, z-Score Tooltips & Gap Handling (DONE)
+- `TASK-503`: Clinical Countermeasure Lifecycle Management & Protocol Resolution API (DONE)
+- `TASK-504`: Daily Biometric Flight Log & On-Demand Fleet Analysis Trigger (DONE)
+- `TASK-505`: End-to-End Automated Testing & Production Verification for Phase 5 (DONE)
+
+### Work Performed & Verification
+1. **Fleet Overview Filtering & Header Sensor Counter (`FleetOverview.tsx`, `Navbar.tsx`, `App.tsx`):**
+   - Implemented real-time search box filtering crew cards by name, callsign, or mission role.
+   - Added interactive status filter tabs: `All Crew`, `Requires Review / Alerts`, `Nominal Flight Status`, `Observation`.
+   - Wired active rejected/flagged packet counter into the `Navbar.tsx` "Data Quality Audit" button (`{rejectedAuditCount} Rejected` amber badge) from `data_quality_audit_log`.
+
+2. **Physiological Baseline Corridors & Real-Time z-Scores (`SynchronizedCharts.tsx`):**
+   - Integrated Recharts `<ReferenceArea>` rendering shaded baseline normal corridors ($\mu \pm 1.5\sigma$) with translucent green styling (`#10b981`, opacity 0.09) and dashed boundaries across RHR, Sleep, and HRR-1 charts.
+   - Enforced `connectNulls={false}` to guarantee missing observation days render as honest gaps rather than artificial interpolated lines.
+   - Built custom tooltip (`CustomBiometricTooltip`) evaluating $z$-score distance ($z = \frac{x - \mu}{\sigma}$) and baseline parameters on hover, dynamically flagging adverse deviations.
+   - Added visual guide bar above charts with legend icons.
+
+3. **Clinical Countermeasure Protocol Resolution API & Modal Actions (`backend/app/api/alerts.py`, `AlertInspectorModal.tsx`, `api.ts`):**
+   - Added `PATCH /api/v1/alerts/{alert_id}/countermeasures/{countermeasure_id}` allowing CMO to transition protocol outcome status (`ACTIVE` -> `COMPLETED`, `DISCONTINUED`).
+   - Recorded auditable `CMOFollowup` entry on every countermeasure outcome transition.
+   - Added 1-click "Mark Completed" and "Discontinue" action buttons in the countermeasure cards within `AlertInspectorModal.tsx`.
+
+4. **Daily Biometric Flight Log & On-Demand Engine Trigger (`AstronautProfileDetail.tsx`, `api.ts`):**
+   - Built structured Daily Biometric Telemetry & Environmental Log table displaying flight day (FD), date, RHR, Sleep, HRR-1 with color-coded $z$-score badges, cabin $CO_2$ warning thresholds, and operational mission context.
+   - Added 1-click **"Run Engine Analysis"** button to execute on-demand OLS fleet analysis and immediately refresh UI state.
+
+5. **Automated Testing & Production Verification:**
+   - Extended `tests/test_deterioration.py` with full countermeasure lifecycle tests (prescribe -> verify -> patch status to `COMPLETED` -> verify audit trail).
+   - Automated Pytest Suite: **35/35 tests passing cleanly**.
+   - Frontend Production Build: `npm run build` compiled 2,015 modules in 8.24s with **0 errors and 0 warnings**.
+
+### Files Created / Modified
+- `backend/app/schemas/schemas.py` (Added `ClinicalCountermeasureStatusUpdate`)
+- `backend/app/api/alerts.py` (Added `PATCH /{alert_id}/countermeasures/{countermeasure_id}`)
+- `tests/test_deterioration.py` (Added countermeasure patch & lifecycle tests)
+- `frontend/src/services/api.ts` (Added `updateCountermeasureStatus`, `runDeteriorationAnalysis`)
+- `frontend/src/components/layout/Navbar.tsx` (Added rejected packet warning badge)
+- `frontend/src/components/crew/FleetOverview.tsx` (Added search and clickable status filter tabs)
+- `frontend/src/components/SynchronizedCharts.tsx` (Added shaded `<ReferenceArea>` bands, custom $z$-score tooltip, visual guide)
+- `frontend/src/components/crew/AstronautProfileDetail.tsx` (Added daily flight log table & on-demand analysis trigger)
+- `frontend/src/components/AlertInspectorModal.tsx` (Added countermeasure status update buttons)
+- `frontend/src/App.tsx` (Wired sensor audit counter to navbar)
+- `docs/TASKS.md` (Updated Phase 5 tasks to `DONE`)
+- `docs/WORKLOG.md` (Updated)
+
+### Verification Summary
+- **Backend automated tests:** 35/35 passed in 4.28s.
+- **Frontend production build:** `npm run build` succeeded with 0 errors.
+
+### Next Step
+- Present Phase 5 Completion Report to user and enforce Completeness Gate (Rule 12). Await explicit user approval before proceeding to Phase 6.
+
+
 

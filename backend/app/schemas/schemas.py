@@ -258,6 +258,11 @@ class ClinicalCountermeasureCreate(BaseModel):
     prescription_details: str = Field(..., examples=["Prescribe 60 min supplemental sleep cycle prior to EVA."])
     target_duration_hours: int = Field(default=24, ge=1)
 
+class ClinicalCountermeasureStatusUpdate(BaseModel):
+    outcome_status: str = Field(..., examples=["COMPLETED"])
+    resolved_by: str = Field(default="CMO-01", examples=["CMO-01"])
+    resolution_notes: Optional[str] = Field(None, examples=["Protocol completed with nominal vitals restored."])
+
 class ClinicalCountermeasureOut(ClinicalCountermeasureCreate):
     id: str
     alert_id: str

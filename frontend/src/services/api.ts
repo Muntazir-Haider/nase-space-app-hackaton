@@ -138,6 +138,31 @@ export async function prescribeCountermeasure(
   return handleResponse<ClinicalCountermeasure>(res, 'Failed to prescribe clinical countermeasure');
 }
 
+export async function updateCountermeasureStatus(
+  alertId: string,
+  countermeasureId: string,
+  payload: {
+    outcome_status: string;
+    resolved_by?: string;
+    resolution_notes?: string;
+  }
+): Promise<ClinicalCountermeasure> {
+  const res = await fetch(`${API_BASE}/alerts/${alertId}/countermeasures/${countermeasureId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<ClinicalCountermeasure>(res, 'Failed to update countermeasure status');
+}
+
+export async function runDeteriorationAnalysis(missionId?: string): Promise<any> {
+  const url = missionId ? `${API_BASE}/alerts/run-analysis?mission_id=${encodeURIComponent(missionId)}` : `${API_BASE}/alerts/run-analysis`;
+  const res = await fetch(url, {
+    method: 'POST',
+  });
+  return handleResponse<any>(res, 'Failed to execute deterioration analysis');
+}
+
 export async function fetchDataQualityAudit(): Promise<DataQualityAuditLog[]> {
   const res = await fetch(`${API_BASE}/data-quality/audit`);
   return handleResponse<DataQualityAuditLog[]>(res, 'Failed to fetch data quality audit log');

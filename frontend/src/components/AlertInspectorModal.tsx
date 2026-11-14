@@ -14,7 +14,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { AlertEvidenceDetail } from '../types';
-import { updateAlertStatus, prescribeCountermeasure } from '../services/api';
+import { updateAlertStatus, prescribeCountermeasure, updateCountermeasureStatus } from '../services/api';
 
 interface Props {
   evidence: AlertEvidenceDetail | null;
@@ -96,6 +96,21 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
       setCmErrorMsg(msg);
     } finally {
       setCmSubmitting(false);
+    }
+  }
+
+  async function handleUpdateCountermeasureStatus(cmId: string, outcome: string) {
+    try {
+      await updateCountermeasureStatus(alertData.id, cmId, {
+        outcome_status: outcome,
+        resolved_by: reviewerCallsign,
+        resolution_notes: `Protocol outcome transitioned to ${outcome} by ${reviewerCallsign}.`,
+      });
+      setCmSuccessMsg(`Countermeasure protocol updated to ${outcome}.`);
+      onStatusUpdated();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setCmErrorMsg(msg);
     }
   }
 
@@ -256,17 +271,41 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
             {countermeasures.length > 0 ? (
               <div className="space-y-2">
                 {countermeasures.map((c) => (
-                  <div key={c.id} className="p-3 rounded-lg bg-space-950 border border-space-800 font-mono text-xs flex flex-col gap-1">
+                  <div key={c.id} className="p-3 rounded-lg bg-space-950 border border-space-800 font-mono text-xs flex flex-col gap-1.5">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-white">{c.title}</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/40">
+                      <span className={`text-[10px] px-2 py-0.5 rounded font-bold border ${
+                        c.outcome_status === 'ACTIVE'
+                          ? 'bg-amber-950/80 text-amber-400 border-amber-500/40 animate-pulse'
+                          : c.outcome_status === 'COMPLETED'
+                            ? 'bg-emerald-950/80 text-emerald-400 border-emerald-500/40'
+                            : 'bg-slate-800 text-slate-400 border-space-700'
+                      }`}>
                         {c.outcome_status}
                       </span>
                     </div>
                     <p className="text-slate-300 text-[11px]">{c.prescription_details}</p>
-                    <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500 pt-1 border-t border-space-850">
                       <span>Type: {c.countermeasure_type}</span>
                       <span>Target: {c.target_duration_hours}h · Prescribed by: {c.prescribed_by}</span>
+                      {c.outcome_status === 'ACTIVE' && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateCountermeasureStatus(c.id, 'COMPLETED')}
+                            className="px-2 py-0.5 rounded bg-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 transition"
+                          >
+                            ✓ Mark Completed
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateCountermeasureStatus(c.id, 'DISCONTINUED')}
+                            className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-space-700 transition"
+                          >
+                            Discontinue
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

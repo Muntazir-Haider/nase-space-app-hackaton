@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { 
   Users, 
   ShieldCheck, 
@@ -6,7 +7,10 @@ import {
   ChevronRight, 
   AlertTriangle,
   Play,
-  Loader2
+  Loader2,
+  Search,
+  Filter,
+  X
 } from 'lucide-react';
 import { AstronautSummary } from '../../types';
 
@@ -30,17 +34,39 @@ export function FleetOverview({
   onLoadDemoScenario,
   scenarioLoading,
 }: FleetOverviewProps) {
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ALERTS_ONLY' | 'NOMINAL' | 'OBSERVATION'>('ALL');
+
   // Aggregate readiness statistics
   const totalCount = astronauts.length;
   const nominalCount = astronauts.filter(a => a.status_indicator === 'NOMINAL').length;
   const alertCount = astronauts.filter(a => a.status_indicator === 'REVIEW_ALERT').length;
   const observationCount = astronauts.filter(a => a.status_indicator === 'OBSERVATION').length;
 
+  // Filtered astronaut list
+  const filteredAstronauts = astronauts.filter((a) => {
+    const matchesSearch = 
+      a.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.callsign.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.mission_role.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (!matchesSearch) return false;
+    if (statusFilter === 'ALERTS_ONLY') return a.status_indicator === 'REVIEW_ALERT';
+    if (statusFilter === 'NOMINAL') return a.status_indicator === 'NOMINAL';
+    if (statusFilter === 'OBSERVATION') return a.status_indicator === 'OBSERVATION';
+    return true;
+  });
+
   return (
     <div className="flex flex-col gap-6">
-      {/* Fleet Readiness Summary KPI Cards */}
+      {/* Fleet Readiness Summary KPI Cards (Clickable Filters) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-space-900 border border-space-800 rounded-2xl p-4 shadow">
+        <div 
+          onClick={() => setStatusFilter('ALL')}
+          className={`bg-space-900 border rounded-2xl p-4 shadow cursor-pointer transition ${
+            statusFilter === 'ALL' ? 'border-nasa-cyan ring-1 ring-nasa-cyan/40 bg-space-850' : 'border-space-800 hover:border-space-700'
+          }`}
+        >
           <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
             <span>Total Crew</span>
             <Users className="w-4 h-4 text-nasa-cyan" />
@@ -49,7 +75,12 @@ export function FleetOverview({
           <p className="text-[11px] text-slate-500 font-mono mt-1">Active Spaceflight Roster</p>
         </div>
 
-        <div className="bg-space-900 border border-space-800 rounded-2xl p-4 shadow">
+        <div 
+          onClick={() => setStatusFilter('NOMINAL')}
+          className={`bg-space-900 border rounded-2xl p-4 shadow cursor-pointer transition ${
+            statusFilter === 'NOMINAL' ? 'border-emerald-500 ring-1 ring-emerald-500/40 bg-space-850' : 'border-space-800 hover:border-space-700'
+          }`}
+        >
           <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
             <span>Nominal Clearance</span>
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
@@ -58,7 +89,12 @@ export function FleetOverview({
           <p className="text-[11px] text-slate-500 font-mono mt-1">Full flight status</p>
         </div>
 
-        <div className="bg-space-900 border border-space-800 rounded-2xl p-4 shadow">
+        <div 
+          onClick={() => setStatusFilter('OBSERVATION')}
+          className={`bg-space-900 border rounded-2xl p-4 shadow cursor-pointer transition ${
+            statusFilter === 'OBSERVATION' ? 'border-amber-500 ring-1 ring-amber-500/40 bg-space-850' : 'border-space-800 hover:border-space-700'
+          }`}
+        >
           <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
             <span>Observation / Restricted</span>
             <AlertTriangle className="w-4 h-4 text-amber-400" />
@@ -67,7 +103,12 @@ export function FleetOverview({
           <p className="text-[11px] text-slate-500 font-mono mt-1">Restricted mission duties</p>
         </div>
 
-        <div className="bg-space-900 border border-space-800 rounded-2xl p-4 shadow">
+        <div 
+          onClick={() => setStatusFilter('ALERTS_ONLY')}
+          className={`bg-space-900 border rounded-2xl p-4 shadow cursor-pointer transition ${
+            statusFilter === 'ALERTS_ONLY' ? 'border-red-500 ring-1 ring-red-500/40 bg-space-850' : 'border-space-800 hover:border-space-700'
+          }`}
+        >
           <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
             <span>Active Review Alerts</span>
             <ShieldAlert className="w-4 h-4 text-red-400" />
@@ -77,24 +118,74 @@ export function FleetOverview({
         </div>
       </div>
 
-      {/* Fleet Roster Header & Action Controls */}
-      <div className="flex items-center justify-between">
+      {/* Fleet Roster Header & Search/Filter Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <Users className="w-4 h-4 text-nasa-cyan" /> Crew Fleet Roster & Operational Readiness
+            <Users className="w-4 h-4 text-nasa-cyan" /> Crew Fleet Roster &amp; Operational Readiness
           </h2>
           <p className="text-xs text-slate-400 font-mono">
             Deep-space crew vitals monitoring under 22m communication latency constraints
           </p>
         </div>
 
-        <button
-          onClick={onOpenRegisterModal}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-nasa-blue hover:bg-nasa-blue/80 text-white font-mono text-xs font-bold transition shadow-md"
-        >
-          <UserPlus className="w-3.5 h-3.5 text-nasa-cyan" />
-          <span>+ Register Crew Member</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Search Box */}
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search callsign, name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-space-900 border border-space-750 rounded-xl pl-8 pr-7 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-nasa-cyan w-48 sm:w-56"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
+          {/* Quick Filter Buttons */}
+          <div className="flex items-center gap-1 bg-space-900 p-1 rounded-xl border border-space-800 text-[11px] font-mono">
+            <button
+              onClick={() => setStatusFilter('ALL')}
+              className={`px-2.5 py-1 rounded-lg transition ${
+                statusFilter === 'ALL' ? 'bg-nasa-blue text-white font-bold' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              All ({totalCount})
+            </button>
+            <button
+              onClick={() => setStatusFilter('ALERTS_ONLY')}
+              className={`px-2.5 py-1 rounded-lg transition ${
+                statusFilter === 'ALERTS_ONLY' ? 'bg-red-600 text-white font-bold' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Alerts ({alertCount})
+            </button>
+            <button
+              onClick={() => setStatusFilter('NOMINAL')}
+              className={`px-2.5 py-1 rounded-lg transition ${
+                statusFilter === 'NOMINAL' ? 'bg-emerald-700 text-white font-bold' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Nominal ({nominalCount})
+            </button>
+          </div>
+
+          <button
+            onClick={onOpenRegisterModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-nasa-blue hover:bg-nasa-blue/80 text-white font-mono text-xs font-bold transition shadow-md"
+          >
+            <UserPlus className="w-3.5 h-3.5 text-nasa-cyan" />
+            <span>+ Register Crew</span>
+          </button>
+        </div>
       </div>
 
       {/* Roster Cards Grid */}
@@ -129,9 +220,23 @@ export function FleetOverview({
             </button>
           </div>
         </div>
+      ) : filteredAstronauts.length === 0 ? (
+        <div className="p-12 border border-dashed border-space-800 rounded-2xl text-center flex flex-col items-center justify-center gap-3 bg-space-900/40">
+          <Filter className="w-8 h-8 text-slate-500" />
+          <h3 className="text-sm font-bold text-white">No Astronauts Match Filter</h3>
+          <p className="text-xs text-slate-400 font-mono">
+            No crew records found for query &ldquo;{searchQuery || statusFilter}&rdquo;.
+          </p>
+          <button
+            onClick={() => { setSearchQuery(''); setStatusFilter('ALL'); }}
+            className="px-3 py-1.5 rounded-lg bg-space-800 text-nasa-cyan border border-space-700 font-mono text-xs hover:bg-space-750 transition"
+          >
+            Reset Filters
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {astronauts.map((astro) => {
+          {filteredAstronauts.map((astro) => {
             const isSelected = astro.id === selectedAstronautId;
             const hasAlert = astro.status_indicator === 'REVIEW_ALERT';
             return (
