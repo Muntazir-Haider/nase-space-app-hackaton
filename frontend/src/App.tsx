@@ -24,6 +24,7 @@ import { SystemStatusView } from './components/system/SystemStatusView';
 import { MLBenchmarkView } from './components/system/MLBenchmarkView';
 import { AlertInspectorModal } from './components/AlertInspectorModal';
 import { DataQualityModal } from './components/DataQualityModal';
+import { JudgeTourModal } from './components/JudgeTourModal';
 
 export function App() {
   const [health, setHealth] = useState<HealthCheckResponse | null>(null);
@@ -47,6 +48,7 @@ export function App() {
   const [showRegisterModal, setShowRegisterModal] = useState<boolean>(false);
   const [showEvidenceModal, setShowEvidenceModal] = useState<boolean>(false);
   const [showDataQualityModal, setShowDataQualityModal] = useState<boolean>(false);
+  const [showJudgeTour, setShowJudgeTour] = useState<boolean>(false);
 
   useEffect(() => {
     loadInitialData();
@@ -167,6 +169,7 @@ export function App() {
         scenarioLoading={scenarioLoading}
         onScenarioSwitch={handleScenarioSwitch}
         rejectedAuditCount={rejectedAuditCount}
+        onOpenJudgeTour={() => setShowJudgeTour(true)}
       />
 
       {/* Offline Standalone Mode Warning Banner */}
@@ -269,6 +272,24 @@ export function App() {
             setAstronauts(aData);
             const logs = await fetchDataQualityAudit().catch(() => []);
             setRejectedAuditCount(logs.length);
+          }}
+        />
+      )}
+
+      {/* 6-Stage Interactive Hackathon Judge Tour Walkthrough Modal */}
+      {showJudgeTour && (
+        <JudgeTourModal
+          onClose={() => setShowJudgeTour(false)}
+          onNavigateView={(v) => setActiveView(v)}
+          onScenarioLoaded={async (scenarioKey) => {
+            setActiveScenario(scenarioKey);
+            const aData = await fetchAstronauts();
+            setAstronauts(aData);
+            if (aData.length > 0) {
+              const target = aData.find(a => a.callsign === 'ARTEMIS-01') || aData[0];
+              setSelectedAstronautId(target.id);
+              await loadAstronautDetails(target.id);
+            }
           }}
         />
       )}

@@ -10,6 +10,7 @@ import {
   UserPlus, 
   HardDrive,
   BrainCircuit,
+  Compass,
 } from 'lucide-react';
 import { HealthCheckResponse } from '../../types';
 
@@ -25,6 +26,7 @@ interface NavbarProps {
   scenarioLoading: boolean;
   onScenarioSwitch: (scenarioKey: string) => void;
   rejectedAuditCount?: number;
+  onOpenJudgeTour?: () => void;
 }
 
 export function Navbar({
@@ -37,6 +39,7 @@ export function Navbar({
   scenarioLoading,
   onScenarioSwitch,
   rejectedAuditCount = 0,
+  onOpenJudgeTour,
 }: NavbarProps) {
   return (
     <header className="border-b border-space-800 bg-space-900/95 backdrop-blur sticky top-0 z-40 px-6 py-3 flex flex-wrap items-center justify-between gap-4">
@@ -154,6 +157,17 @@ export function Navbar({
             </span>
           )}
         </button>
+        {/* 1-Click Judge Tour Walkthrough */}
+        {onOpenJudgeTour && (
+          <button
+            onClick={onOpenJudgeTour}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-600/30 to-indigo-600/30 hover:from-purple-600/50 hover:to-indigo-600/50 border border-purple-500/40 text-purple-200 text-xs font-mono font-semibold transition shadow-sm hover:scale-105 active:scale-95"
+            title="Open interactive 6-step hackathon judge demonstration walkthrough"
+          >
+            <Compass className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
+            <span className="hidden sm:inline">Judge Tour</span>
+          </button>
+        )}
       </div>
 
       {/* 1-Click Demo Scenario Switcher for Hackathon Judges */}

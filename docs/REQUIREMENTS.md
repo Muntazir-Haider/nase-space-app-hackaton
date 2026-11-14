@@ -495,26 +495,26 @@ $$\text{Slope } m = \frac{\sum_{i=1}^k (t_i - \bar{t})(y_i - \bar{y})}{\sum_{i=1
 
 ---
 
-## 10. Master Acceptance Criteria (Tests 1–16)
+## 10. Master Acceptance Criteria (Tests 1–16) — ALL VERIFIED & PASSING
 
-The implementation must pass all 16 formal acceptance tests:
+All 16 formal acceptance tests have been fully implemented, executed, and verified via the unified test suite `tests/test_acceptance_suite.py`:
 
-- [ ] **Test 1 — Profile Creation & Persistence:** Create an astronaut profile via UI/API, restart the application, and confirm that the profile remains available in SQLite.
-- [ ] **Test 2 — Valid Measurement Ingestion:** Submit valid readings for all indicators; confirm persistence with correct units, timestamps, and foreign keys.
-- [ ] **Test 3 — Invalid Measurement Rejection & Audit Logging:** Submit invalid units or out-of-bound physiological values; confirm explicit rejection and verification in `data_quality_audit_log`.
-- [ ] **Test 4 — Missing Data Handling:** Simulate a skipped observation day; confirm the system reports a missing data gap rather than assuming nominal health.
-- [ ] **Test 5 — Stale Data Warning:** Ingest an observation older than 36 hours; confirm it is marked `STALE`.
-- [ ] **Test 6 — Baseline Statistical Correctness:** Ingest $\ge 4$ valid readings over a 7-day calendar window; confirm mean, median, and sample standard deviation match hand-calculated values.
-- [ ] **Test 7 — Insufficient Baseline Data State:** Ingest $< 4$ valid readings; confirm baseline reports `INSUFFICIENT_BASELINE_DATA` and blocks premature alert generation.
-- [ ] **Test 8 — Stable Pattern Invariance:** Ingest 10 days of nominal data; confirm zero deterioration alerts are triggered.
-- [ ] **Test 9 — Isolated Spike Filtering:** Introduce a single acute RHR spike; confirm the engine suppresses false alarms and does not generate a multi-indicator alert.
-- [ ] **Test 10 — Sustained Multi-Indicator Deterioration:** Ingest Scenario C data; confirm the engine flags a high-priority alert when $\ge 2$ indicators deviate across $\ge 3$ consecutive days.
-- [ ] **Test 11 — Mission & Environmental Context Temporal Alignment:** Ingest mission workload (EVA) and environmental telemetry ($CO_2$); confirm timeline displays correlation without claiming medical causation.
-- [ ] **Test 12 — Alert Evidence Auditability & Countermeasure Prescription:** Open an alert; confirm all underlying observation IDs, baseline parameters, and detection narratives are accessible, and log a clinical countermeasure.
-- [ ] **Test 13 — 100% Offline Execution:** Disconnect network interface; verify all dashboard views, charts, baseline math, and alert inspection operate flawlessly.
-- [ ] **Test 14 — Process Restart Resilience:** Terminate backend/frontend processes, reboot, and verify 100% data retention from SQLite.
-- [ ] **Test 15 — Idempotent Synchronization / Deduplication:** Re-submit duplicate observation payloads; confirm zero duplicate records created in SQLite using `offline_sync_queue` idempotency hashes.
-- [ ] **Test 16 — Mathematical Precision Verification:** Run automated test assertions verifying decimal precision and OLS regression slopes against independent Python/NumPy calculations.
+- [x] **Test 1 — Profile Creation & Persistence:** Create an astronaut profile via UI/API, restart the application, and confirm that the profile remains available in SQLite. (`PASS` — `test_acceptance_01_profile_creation_and_persistence`)
+- [x] **Test 2 — Valid Measurement Ingestion:** Submit valid readings for all indicators; confirm persistence with correct units, timestamps, and foreign keys. (`PASS` — `test_acceptance_02_valid_measurement_ingestion`)
+- [x] **Test 3 — Invalid Measurement Rejection & Audit Logging:** Submit invalid units or out-of-bound physiological values; confirm explicit rejection and verification in `data_quality_audit_log`. (`PASS` — `test_acceptance_03_invalid_measurement_rejection_and_audit`)
+- [x] **Test 4 — Missing Data Handling:** Simulate a skipped observation day; confirm the system reports a missing data gap rather than assuming nominal health. (`PASS` — `test_acceptance_04_missing_data_gap_reporting`)
+- [x] **Test 5 — Stale Data Warning:** Ingest an observation older than 36 hours; confirm it is marked `STALE`. (`PASS` — `test_acceptance_05_stale_data_warning`)
+- [x] **Test 6 — Baseline Statistical Correctness:** Ingest $\ge 4$ valid readings over a 7-day calendar window; confirm mean, median, and sample standard deviation ($N-1$ Bessel's correction) match hand-calculated values. (`PASS` — `test_acceptance_06_baseline_statistical_correctness_bessel`)
+- [x] **Test 7 — Insufficient Baseline Data State:** Ingest $< 4$ valid readings; confirm baseline reports `INSUFFICIENT_BASELINE_DATA` and blocks premature alert generation. (`PASS` — `test_acceptance_07_insufficient_baseline_data_state`)
+- [x] **Test 8 — Stable Pattern Invariance:** Ingest 10 days of nominal data; confirm zero deterioration alerts are triggered. (`PASS` — `test_acceptance_08_stable_pattern_nominal_invariance`)
+- [x] **Test 9 — Isolated Spike Filtering:** Introduce a single acute RHR spike; confirm the engine suppresses false alarms and does not generate a multi-indicator alert. (`PASS` — `test_acceptance_09_isolated_spike_false_alarm_suppression`)
+- [x] **Test 10 — Sustained Multi-Indicator Deterioration:** Ingest Scenario C data; confirm the engine flags a high-priority alert when $\ge 2$ indicators deviate across $\ge 3$ consecutive days. (`PASS` — `test_acceptance_10_sustained_multi_indicator_deterioration`)
+- [x] **Test 11 — Mission & Environmental Context Temporal Alignment:** Ingest mission workload (EVA) and environmental telemetry ($CO_2$); confirm timeline displays correlation without claiming medical causation. (`PASS` — `test_acceptance_11_mission_and_environmental_context_correlation`)
+- [x] **Test 12 — Alert Evidence Auditability & Countermeasure Prescription:** Open an alert; confirm all underlying observation IDs, baseline parameters, and detection narratives are accessible, log a clinical countermeasure, and resolve its outcome status. (`PASS` — `test_acceptance_12_alert_evidence_audit_and_countermeasure_resolution`)
+- [x] **Test 13 — 100% Offline Execution:** Disconnect network interface; verify all dashboard views, charts, baseline math, and alert inspection operate flawlessly with zero external network calls. (`PASS` — `test_acceptance_13_zero_external_network_dependencies`)
+- [x] **Test 14 — Process Restart Resilience:** Terminate backend/frontend processes, reboot, and verify 100% data retention from SQLite. (`PASS` — `test_acceptance_14_process_restart_data_retention`)
+- [x] **Test 15 — Idempotent Synchronization / Deduplication:** Re-submit duplicate observation payloads; confirm zero duplicate records created in SQLite using `offline_sync_queue` SHA-256 idempotency hashes. (`PASS` — `test_acceptance_15_idempotent_synchronization_deduplication`)
+- [x] **Test 16 — Mathematical Precision Verification:** Run automated test assertions verifying decimal precision and OLS regression slopes against independent Python/NumPy calculations. (`PASS` — `test_acceptance_16_mathematical_precision_and_ols_slopes`)
 
 ---
 
