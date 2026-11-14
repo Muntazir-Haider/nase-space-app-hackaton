@@ -47,33 +47,47 @@
 
 ---
 
-## Phase 1: Foundation (Backend, Database & Frontend Scaffolding)
-*Objective: Establish local FastAPI backend, 13-table SQLite database models, API contracts, and React+Vite frontend skeleton.*
-*Approval Gate: Requires explicit user approval before execution.*
+## Phase 1: Foundation (Backend, Database & Frontend Scaffolding) — Rework & Completion
+*Objective: Build an uncompromising, production-grade foundation: 14-table SQLite WAL database with foreign key enforcement, centralized error handling and structured logging, full Pydantic v2 validation, an astronaut profile creation flow satisfying Acceptance Test 1, modular CMO frontend architecture with tab navigation, comprehensive loading/empty/offline states, and verifiable offline persistence.*
+*Approval Gate: Requires complete verification and user sign-off before Phase 2.*
 
-- [x] **TASK-101: Backend Environment & Dependency Configuration**
-  - **Scope:** Set up Python virtual environment and configure backend dependencies (`fastapi`, `uvicorn`, `pydantic>=2.0`, `sqlalchemy>=2.0`, `pandas`, `numpy`, `scipy`, `pytest`, `httpx`).
-  - **Target Files:** `backend/requirements.txt`, `backend/app/main.py`
-  - **Verification:** `python -m pytest --version` and FastAPI starts on `http://127.0.0.1:8000/docs`.
+- [x] **TASK-110: NASA Challenge & Dataset Research Incorporation**
+  - **Scope:** Synthesize authoritative NASA challenge scope, HRP evidence reports (Sleep, Cardiovascular, Recovery), RIDGE framework, and OSDR/LSDA data governance reality into master specification; consolidate and maintain strictly 4 documentation files.
+  - **Target Files:** `docs/REQUIREMENTS.md`, `docs/TASKS.md`, `docs/WORKLOG.md`
+  - **Verification:** Single comprehensive specification in `docs/REQUIREMENTS.md`; redundant documentation files safely removed.
   - **Status:** `DONE`
 
-- [x] **TASK-102: Relational Database Models & Persistence Schema (13 Tables)**
-  - **Scope:** Implement SQLAlchemy 2.0 models matching the full 13-table SQLite DDL in `docs/ARCHITECTURE.md` (`missions`, `astronaut_profiles`, `indicator_definitions`, `health_observations`, `environmental_telemetry`, `data_quality_audit_log`, `personal_baselines`, `mission_events`, `analysis_runs`, `deterioration_alerts`, `alert_evidence_links`, `clinical_countermeasures`, `offline_sync_queue`).
-  - **Target Files:** `backend/app/models/entities.py`, `backend/app/database.py`
-  - **Verification:** `pytest tests/test_database.py -v` verifies creation of all 13 tables, foreign key constraints, cascade rules, and indexes.
+- [x] **TASK-111: Backend Foundation Hardening — Centralized Error Handling & Structured Logging**
+  - **Scope:** Implement standardized exception hierarchy (`AppError`, `NotFoundError`, `ConflictError`, `ValidationError`), uniform JSON error envelope (`{"status": "error", "error_code": "...", "message": "...", "details": ...}`), exception handlers in FastAPI, and structured logging in `backend/app/core/logging.py`.
+  - **Target Files:** `backend/app/core/errors.py`, `backend/app/core/logging.py`, `backend/app/main.py`
+  - **Verification:** Unit tests confirm consistent JSON error envelopes for 400, 404, 409, 422, and 500 status codes.
   - **Status:** `DONE`
 
-- [x] **TASK-103: Core Pydantic Schemas & Health Check Contract**
-  - **Scope:** Implement Pydantic v2 validation models for all 13 entities; implement `/api/v1/health` and `/api/v1/astronauts` roster endpoints.
-  - **Target Files:** `backend/app/schemas/`, `backend/app/api/astronauts.py`
-  - **Verification:** `pytest tests/test_api_astronauts.py -v` returns valid JSON schemas.
+- [x] **TASK-112: Astronaut Profile Registration & Persistence Flow (Acceptance Test 1)**
+  - **Scope:** Verify and harden `POST /api/v1/astronauts` and `GET /api/v1/missions` API endpoints; ensure strict callsign uniqueness, foreign key validation, and mission mapping; write automated persistence test `tests/test_profile_persistence.py` satisfying Acceptance Test 1.
+  - **Target Files:** `backend/app/api/astronauts.py`, `tests/test_profile_persistence.py`
+  - **Verification:** Test creates profile, verifies SQLite persistence across simulated session reboots, and blocks duplicate callsigns.
   - **Status:** `DONE`
 
-- [x] **TASK-104: Frontend Application Scaffolding (React + Vite + TypeScript)**
-  - **Scope:** Initialize React 18+ Vite project with TypeScript, Tailwind CSS, Lucide Icons, and Recharts.
-  - **Target Files:** `frontend/package.json`, `frontend/src/App.tsx`, `frontend/tailwind.config.js`
-  - **Verification:** `npm run build` succeeds; local Vite server renders dark-mode Mission Control shell.
+- [x] **TASK-113: Modular Frontend Architecture & Clean Navigation Layout**
+  - **Scope:** Refactor monolithic `App.tsx` into modular components: `Navbar` (with MET clock, comms latency, and view tabs), `FleetOverview` (crew cards and readiness counts), `AstronautProfileDetail` (synchronized charts, baseline cards, active alerts), `ProfileRegistrationModal` (CMO form to register astronauts), and `SystemStatusView` (SQLite storage diagnostics and table row counts).
+  - **Target Files:** `frontend/src/components/layout/Navbar.tsx`, `frontend/src/components/crew/ProfileRegistrationModal.tsx`, `frontend/src/components/crew/FleetOverview.tsx`, `frontend/src/components/crew/AstronautProfileDetail.tsx`, `frontend/src/components/system/SystemStatusView.tsx`, `frontend/src/App.tsx`
+  - **Verification:** Clean UI with active tab switching, profile creation modal, responsive styling, and modular component hierarchy.
   - **Status:** `DONE`
+
+- [x] **TASK-114: Comprehensive Loading, Empty, Error & Offline States**
+  - **Scope:** Implement high-visibility offline banner when backend workstation is unreachable, actionable empty states when no profiles are loaded, informative loading skeletons, and interactive retry controls.
+  - **Target Files:** `frontend/src/components/layout/OfflineBanner.tsx`, `frontend/src/App.tsx`
+  - **Verification:** UI displays clear offline instructions when backend is stopped; displays empty states with direct CTA to register crew or load scenarios.
+  - **Status:** `DONE`
+
+- [x] **TASK-115: Full End-to-End Phase 1 Automated & Manual Verification**
+  - **Scope:** Execute full pytest suite, run TypeScript compilation build, verify zero console errors, verify profile registration and SQLite persistence, verify demo scenario switching.
+  - **Target Files:** Entire repository
+  - **Verification:** All 34 tests pass; `npm run build` succeeds; application verified in browser.
+  - **Status:** `DONE`
+
+---
 
 ---
 

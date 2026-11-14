@@ -16,7 +16,44 @@ export interface HealthCheckResponse {
   version: string;
   offline_storage_ready: boolean;
   database_file: string;
+  database_path?: string;
+  database_size_bytes?: number;
+  sqlite_mode?: string;
+  foreign_keys_enforced?: boolean;
+  comms_latency?: string;
   active_role: string;
+  server_time_utc?: string;
+}
+
+export interface MissionOut {
+  id: string;
+  mission_code: string;
+  name: string;
+  target_destination: string;
+  spacecraft_module: string;
+  flight_day: number;
+  comms_latency_seconds: number;
+  status: string;
+  start_date: string;
+  created_at: string;
+}
+
+export interface AstronautCreateInput {
+  mission_id: string;
+  callsign: string;
+  full_name: string;
+  flight_role: string;
+  medical_clearance_status: string;
+}
+
+export interface StationDiagnosticsResponse {
+  station_status: string;
+  database_file: string;
+  database_size_bytes: number;
+  table_counts: Record<string, number | string>;
+  total_records: number;
+  sqlite_journal_mode: string;
+  timestamp_utc: string;
 }
 
 export interface ScenarioLoadResponse {
@@ -118,6 +155,8 @@ export interface AlertEvidenceDetail {
   alert: DeteriorationAlert;
   astronaut_callsign: string;
   astronaut_full_name: string;
+  flight_role: string;
+  medical_clearance_status: string;
   evidence_items: AlertEvidenceItem[];
   countermeasures: ClinicalCountermeasure[];
   followups: CMOFollowup[];

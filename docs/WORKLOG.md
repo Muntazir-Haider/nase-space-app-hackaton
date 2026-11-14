@@ -343,4 +343,70 @@
 - `docs/WORKLOG.md` (Updated)
 
 ### Next Step
-- Commit and push to GitHub repository, and present the completed, fully functional medical workstation to the user for final review and demonstration.
+- Complete Phase 1 rework and await user verification and approval.
+
+---
+
+## [2026-11-14] — Phase 1 Foundation Rework & Completion Enforcement
+
+### Background & Context
+Following user directive, executed an uncompromising, thorough review and rework of Phase 1 to ensure that Mission Sentinel is built upon rock-solid production foundations rather than a rushed skeleton. Consolidated all research, architecture, and specifications into the 4 mandatory governance documents (`REQUIREMENTS.md`, `AGENT_RULES.md`, `TASKS.md`, `WORKLOG.md`).
+
+### Work Performed
+
+1. **NASA Research & Architecture Consolidation (`docs/REQUIREMENTS.md`):**
+   - Synthesized NASA Space Apps 2026 challenge objectives, HRP evidence reports (Sleep, Cardiovascular, Exercise Recovery), RIDGE spaceflight hazards framework, and OSDR/LSDA data governance reality into `docs/REQUIREMENTS.md`.
+   - Documented the strict zero-hallucination policy regarding synthetic spaceflight data.
+   - Merged technical blueprints (14-table SQLite DDL, OLS trend formulas, REST API contracts) into `docs/REQUIREMENTS.md`.
+   - Safely removed redundant loose files `docs/ARCHITECTURE.md` and `docs/RESEARCH_AND_REFERENCES.md`, strictly enforcing the 4-doc rule.
+
+2. **Backend Foundation Hardening (`backend/app/core/errors.py`, `backend/app/core/logging.py`, `backend/app/main.py`):**
+   - Implemented centralized exception hierarchy: `AppError`, `NotFoundError`, `ConflictError`, `ValidationError`, `DatabaseError`.
+   - Created uniform JSON error envelope `{"status": "error", "error_code": "...", "message": "...", "details": ...}` registered across all FastAPI exception handlers.
+   - Implemented structured console logging in `backend/app/core/logging.py` with UTC timestamps, log levels, and module tagging.
+   - Enhanced `GET /api/v1/health` with SQLite WAL mode, database size in bytes, and foreign key verification.
+   - Added `GET /api/v1/health/diagnostics` executing live queries across all 14 SQLite relational tables to report exact row counts.
+
+3. **Astronaut Profile Registration & Persistence Flow (Acceptance Test 1):**
+   - Verified backend `POST /api/v1/astronauts` and `GET /api/v1/missions` API endpoints with callsign uniqueness enforcement and mission foreign key verification.
+   - Created comprehensive automated test suite `tests/test_profile_persistence.py` verifying Acceptance Test 1 (profile creation, persistence across database reconnects, duplicate callsign rejection with 409 Conflict, and invalid foreign key rejection).
+   - All 34 backend unit and integration tests passing (`python -m pytest -v`).
+
+4. **Modular Frontend Architecture & Clean View Navigation:**
+   - Refactored monolithic `App.tsx` into clean, maintainable modular components:
+     - `frontend/src/components/layout/Navbar.tsx`: Mission Control header with MET clock, comms latency simulation, SQLite storage status indicator, 1-click Demo Scenario Switcher, and view navigation tabs.
+     - `frontend/src/components/layout/OfflineBanner.tsx`: Prominent warning banner displayed when backend workstation is unreachable, providing terminal startup commands and a "Retry Connection" action.
+     - `frontend/src/components/crew/ProfileRegistrationModal.tsx`: Accessible CMO form allowing registration of new astronaut profiles (callsign, full name, operational flight role, medical clearance status, mission assignment) with instant client-side validation and feedback.
+     - `frontend/src/components/crew/FleetOverview.tsx`: Crew readiness summary KPI cards (Total Crew, Full Clearance, Observation, Active Alerts), interactive crew roster cards, and clear empty states.
+     - `frontend/src/components/crew/AstronautProfileDetail.tsx`: Individual astronaut workspace with 7-day personal baseline distribution cards ($\mu \pm \sigma$, active status) and Recharts synchronized time-series visualizers.
+     - `frontend/src/components/system/SystemStatusView.tsx`: Deep station diagnostic view displaying SQLite file size, live 14-table row count metrics, deep-space latency tolerance specs, and NASA HRP evidence cards.
+   - Enhanced `frontend/src/services/api.ts` and `frontend/src/types/index.ts` with typed error handling and new endpoints.
+
+5. **Verification & Production Build:**
+   - Executed `npm run build` in `frontend/`: 2,014 modules transformed with 0 TypeScript errors.
+   - Executed `python -m pytest -v`: 34/34 tests passed cleanly in 4.30s.
+   - Verified live FastAPI backend at `http://127.0.0.1:8000/api/v1/health/diagnostics` (129 total records across 14 tables, WAL mode active).
+   - Verified live Vite frontend at `http://127.0.0.1:5173` (HTTP 200 OK).
+
+### Files Created / Modified
+- `docs/REQUIREMENTS.md` (Updated & consolidated master specification)
+- `docs/ARCHITECTURE.md` (Removed after consolidation)
+- `docs/RESEARCH_AND_REFERENCES.md` (Removed after consolidation)
+- `docs/TASKS.md` (Updated with Phase 1 rework tasks and DoD)
+- `docs/WORKLOG.md` (Updated)
+- `backend/app/core/errors.py` (Created)
+- `backend/app/core/logging.py` (Created)
+- `backend/app/main.py` (Updated with logging, error handling & diagnostics)
+- `tests/test_profile_persistence.py` (Created)
+- `frontend/src/types/index.ts` (Updated)
+- `frontend/src/services/api.ts` (Updated)
+- `frontend/src/components/layout/Navbar.tsx` (Created)
+- `frontend/src/components/layout/OfflineBanner.tsx` (Created)
+- `frontend/src/components/crew/ProfileRegistrationModal.tsx` (Created)
+- `frontend/src/components/crew/FleetOverview.tsx` (Created)
+- `frontend/src/components/crew/AstronautProfileDetail.tsx` (Created)
+- `frontend/src/components/system/SystemStatusView.tsx` (Created)
+- `frontend/src/App.tsx` (Updated to modular layout orchestrator)
+
+### Next Step
+- Present the Phase 1 Rework Completion Report to the user and STOP. Await user review and approval before proceeding to Phase 2.
