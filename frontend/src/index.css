@@ -8,7 +8,7 @@
 
 body {
   margin: 0;
-  background-color: #f8fafc;
+  background-color: #ebedf2;
   color: #0f172a;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   letter-spacing: -0.011em;
@@ -65,31 +65,75 @@ code, kbd, samp, pre, .font-mono {
   background: #94a3b8;
 }
 
-/* Crisp Solid White Card & Panel */
-.nasa-card {
+/* ─── APPLE HUMAN INTERFACE DESIGN SYSTEM (BOLD SOLID CARDS & DEPTH) ─── */
+.nasa-card,
+.apple-card {
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.08), 0 3px 10px -1px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.nasa-card:hover {
-  border-color: #94a3b8;
+.nasa-card:hover,
+.apple-card:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 16px 40px -6px rgba(0, 0, 0, 0.11), 0 6px 16px -2px rgba(0, 0, 0, 0.05);
 }
 
-.nasa-panel {
+.apple-card-interactive {
   background: #ffffff;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.08), 0 3px 10px -1px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.apple-card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(11, 61, 145, 0.3);
+  box-shadow: 0 18px 44px -6px rgba(0, 0, 0, 0.13), 0 8px 20px -2px rgba(0, 0, 0, 0.06);
+}
+
+.nasa-panel,
+.apple-box {
+  background: #f4f5f8;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 14px;
+}
+
+.apple-box-white {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.apple-btn {
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apple-btn:active {
+  transform: scale(0.97);
+}
+
+.apple-pill {
+  border-radius: 9999px;
+  padding: 3px 10px;
+  font-weight: 600;
+  font-size: 11px;
 }
 
 /* ─── PROFESSIONAL EXCEL DATA GRID & SPREADSHEET STYLING ─── */
 .excel-grid-container {
-  border: 1px solid #cbd5e1;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   background-color: #ffffff;
-  border-radius: 6px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
 }
 
 .excel-formula-bar {

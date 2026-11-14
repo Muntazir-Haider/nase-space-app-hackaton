@@ -15,7 +15,12 @@ import {
   FileText, 
   PlusCircle, 
   UserCheck,
-  Stethoscope
+  Stethoscope,
+  Orbit,
+  Cpu,
+  Wind,
+  Thermometer,
+  ShieldCheck
 } from 'lucide-react';
 import { 
   AstronautSummary, 
@@ -29,6 +34,7 @@ import { QuickTelemetryModal } from './QuickTelemetryModal';
 import { ClearanceUpdateModal } from './ClearanceUpdateModal';
 import { LiveTelemetryTester } from './LiveTelemetryTester';
 import { AnatomicalScanner } from '../nasa/AnatomicalScanner';
+import { NASASpacecraftHologram } from '../nasa/NASASpacecraftHologram';
 import { runDeteriorationAnalysis } from '../../services/api';
 
 interface AstronautProfileDetailProps {
@@ -62,6 +68,7 @@ export function AstronautProfileDetail({
   const [showQuickTelemetry, setShowQuickTelemetry] = useState<boolean>(false);
   const [showClearanceModal, setShowClearanceModal] = useState<boolean>(false);
   const [showScanner, setShowScanner] = useState<boolean>(true);
+  const [visualizerMode, setVisualizerMode] = useState<'anatomy' | 'spacecraft' | 'dual'>('anatomy');
 
   if (!astronaut) {
     return (
@@ -171,13 +178,13 @@ export function AstronautProfileDetail({
   }, [baseLatestRhr, baseLatestSleep, baseLatestHrr, baseLatestSpo2, baseLatestTemp]);
 
   return (
-    <section className="bg-white border border-slate-300 rounded-md p-6 shadow-2xs flex flex-col gap-6 font-sans">
+    <section className="bg-white border border-black/[0.09] rounded-2xl p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col gap-8 font-sans">
       {/* Header Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-5">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-black/[0.06] pb-5">
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
             <h2 className="font-bold text-2xl text-slate-900 tracking-tight">{astronaut.full_name}</h2>
-            <span className="text-xs font-mono font-bold text-[#0b3d91] bg-blue-50 px-2.5 py-1 rounded border border-blue-200">
+            <span className="text-xs font-mono font-bold text-[#0b3d91] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200/80">
               {astronaut.callsign}
             </span>
             <span className="text-xs text-slate-600">
@@ -185,12 +192,12 @@ export function AstronautProfileDetail({
             </span>
             <button
               onClick={() => setShowClearanceModal(true)}
-              className={`text-xs font-semibold px-3 py-1 rounded border transition flex items-center gap-1.5 cursor-pointer ${
+              className={`text-xs font-semibold px-3 py-1 rounded-full border transition flex items-center gap-1.5 cursor-pointer active:scale-[0.98] ${
                 astronaut.medical_clearance_status === 'FULL_FLIGHT_CLEARANCE'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
                   : astronaut.medical_clearance_status === 'TEMPORARY_MEDICAL_HOLD'
-                  ? 'bg-red-50 text-red-800 border-red-200 hover:bg-red-100'
-                  : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'
+                  ? 'bg-red-50 text-red-800 border-red-300 hover:bg-red-100'
+                  : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'
               }`}
             >
               <UserCheck className="w-3.5 h-3.5" />
@@ -204,7 +211,7 @@ export function AstronautProfileDetail({
             </button>
           </div>
           {analysisFeedback && (
-            <div className="mt-2 text-xs text-[#0b3d91] flex items-center gap-1.5 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">
+            <div className="mt-2 text-xs text-[#0b3d91] flex items-center gap-1.5 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>{analysisFeedback}</span>
             </div>
@@ -214,19 +221,19 @@ export function AstronautProfileDetail({
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setShowScanner(!showScanner)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold transition shadow-sm ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-semibold transition active:scale-[0.98] shadow-2xs ${
               showScanner
                 ? 'bg-blue-50 border-blue-300 text-[#0b3d91]'
-                : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
+                : 'bg-white hover:bg-slate-50 border-black/[0.08] text-slate-700'
             }`}
           >
             <Stethoscope className="w-3.5 h-3.5 text-[#0b3d91]" />
-            <span>{showScanner ? '3D Biometrics: Visible' : 'Show 3D Biometrics'}</span>
+            <span>{showScanner ? '3D Biometrics: On' : '3D Biometrics'}</span>
           </button>
 
           <button
             onClick={() => setShowQuickTelemetry(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 transition shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-black/[0.08] text-xs font-semibold text-slate-700 transition active:scale-[0.98] shadow-2xs"
           >
             <PlusCircle className="w-3.5 h-3.5 text-[#0b3d91]" />
             <span>+ Log Vitals</span>
@@ -234,7 +241,7 @@ export function AstronautProfileDetail({
 
           <button
             onClick={() => setShowHandoverModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 transition shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-black/[0.08] text-xs font-semibold text-slate-700 transition active:scale-[0.98] shadow-2xs"
           >
             <FileText className="w-3.5 h-3.5 text-[#0b3d91]" />
             <span>Handover Report</span>
@@ -243,7 +250,7 @@ export function AstronautProfileDetail({
           <button
             onClick={handleTriggerAnalysis}
             disabled={runningAnalysis}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 transition shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-black/[0.08] text-xs font-semibold text-slate-700 transition active:scale-[0.98] shadow-2xs"
           >
             {runningAnalysis ? (
               <Loader2 className="w-3.5 h-3.5 text-amber-600 animate-spin" />
@@ -255,7 +262,7 @@ export function AstronautProfileDetail({
 
           <button
             onClick={() => setShowBaselineModal(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 transition shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-black/[0.08] text-xs font-semibold text-slate-700 transition active:scale-[0.98] shadow-2xs"
           >
             <Calculator className="w-3.5 h-3.5 text-[#0b3d91]" />
             <span>Baselines</span>
@@ -264,13 +271,13 @@ export function AstronautProfileDetail({
           {activeAlert ? (
             <button
               onClick={() => onOpenEvidence(activeAlert.id)}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center gap-2"
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-[0.98] flex items-center gap-2"
             >
               <ShieldAlert className="w-4 h-4 text-white" />
               <span>Review Alert ({activeAlert.review_priority})</span>
             </button>
           ) : (
-            <div className="px-3 py-2 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-1.5">
+            <div className="px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs font-semibold flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-600" />
               <span>Nominal</span>
             </div>
@@ -291,29 +298,29 @@ export function AstronautProfileDetail({
         scenarioLoading={scenarioLoading}
       />
 
-      {/* Baseline & Live Telemetry Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Baseline & Live Telemetry Metric Cards (Apple Solid Cards) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* Card 1: Resting Heart Rate */}
         <div 
           onClick={() => setShowBaselineModal(true)}
-          className="bg-white border border-slate-300 hover:border-slate-400 rounded-md p-4 flex flex-col justify-between cursor-pointer transition shadow-2xs group"
+          className="bg-white border border-black/[0.09] hover:border-black/[0.16] rounded-2xl p-5 flex flex-col justify-between cursor-pointer transition-all duration-200 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 group"
         >
           <div className="flex items-center justify-between text-slate-500 text-xs">
             <span className="flex items-center gap-1.5 font-semibold text-slate-700">
               <Activity className="w-4 h-4 text-red-500" />
               <span>Resting Heart Rate</span>
             </span>
-            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-semibold flex items-center gap-1">
+            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 font-semibold flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Live Telemetry
             </span>
           </div>
 
-          <div className="my-2.5">
-            <div className="text-2xl font-bold font-mono text-slate-900 tracking-tight flex items-baseline justify-between">
+          <div className="my-3">
+            <div className="text-3xl font-bold font-mono text-slate-900 tracking-tight flex items-baseline justify-between">
               <span>{liveVitals.rhr.toFixed(1)} <span className="text-sm font-normal text-slate-500">bpm</span></span>
               {rhrBaseline && (
-                <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
+                <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-full ${
                   Math.abs((liveVitals.rhr - rhrBaseline.mean) / rhrBaseline.std_dev) >= 1.5 
                     ? 'bg-rose-50 text-rose-700 border border-rose-200' 
                     : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
@@ -328,10 +335,10 @@ export function AstronautProfileDetail({
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px]">
-            <span className="text-emerald-700 font-semibold flex items-center gap-1">
+          <div className="flex items-center justify-between pt-3 border-t border-black/[0.04] text-[11px]">
+            <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-              Continuous Stream Active
+              Live Stream
             </span>
             <span className="text-[#0b3d91] font-semibold flex items-center gap-0.5">
               Inspect <ChevronRight className="w-3 h-3" />
@@ -342,23 +349,23 @@ export function AstronautProfileDetail({
         {/* Card 2: Sleep Duration */}
         <div 
           onClick={() => setShowBaselineModal(true)}
-          className="bg-white border border-slate-300 hover:border-slate-400 rounded-md p-4 flex flex-col justify-between cursor-pointer transition shadow-2xs group"
+          className="bg-white border border-black/[0.09] hover:border-black/[0.16] rounded-2xl p-5 flex flex-col justify-between cursor-pointer transition-all duration-200 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 group"
         >
           <div className="flex items-center justify-between text-slate-500 text-xs">
             <span className="flex items-center gap-1.5 font-semibold text-slate-700">
               <Moon className="w-4 h-4 text-sky-600" />
               <span>Sleep Duration</span>
             </span>
-            <span className="text-[10px] font-mono text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">
-              Circadian Phase
+            <span className="text-[10px] font-mono text-slate-500 bg-slate-50 px-2.5 py-0.5 rounded-full border border-slate-200">
+              Circadian
             </span>
           </div>
 
-          <div className="my-2.5">
-            <div className="text-2xl font-bold font-mono text-slate-900 tracking-tight flex items-baseline justify-between">
+          <div className="my-3">
+            <div className="text-3xl font-bold font-mono text-slate-900 tracking-tight flex items-baseline justify-between">
               <span>{liveVitals.sleep.toFixed(1)} <span className="text-sm font-normal text-slate-500">hrs</span></span>
               {sleepBaseline && (
-                <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
+                <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-full ${
                   (liveVitals.sleep - sleepBaseline.mean) / sleepBaseline.std_dev <= -1.5 
                     ? 'bg-rose-50 text-rose-700 border border-rose-200' 
                     : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
@@ -372,10 +379,10 @@ export function AstronautProfileDetail({
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px]">
-            <span className="text-emerald-700 font-semibold flex items-center gap-1">
+          <div className="flex items-center justify-between pt-3 border-t border-black/[0.04] text-[11px]">
+            <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-              7-Day Baseline Active
+              Baseline Active
             </span>
             <span className="text-[#0b3d91] font-semibold flex items-center gap-0.5">
               Inspect <ChevronRight className="w-3 h-3" />
@@ -386,24 +393,24 @@ export function AstronautProfileDetail({
         {/* Card 3: Recovery HRR */}
         <div 
           onClick={() => setShowBaselineModal(true)}
-          className="bg-white border border-slate-300 hover:border-slate-400 rounded-md p-4 flex flex-col justify-between cursor-pointer transition shadow-2xs group"
+          className="bg-white border border-black/[0.09] hover:border-black/[0.16] rounded-2xl p-5 flex flex-col justify-between cursor-pointer transition-all duration-200 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 group"
         >
           <div className="flex items-center justify-between text-slate-500 text-xs">
             <span className="flex items-center gap-1.5 font-semibold text-slate-700">
               <Zap className="w-4 h-4 text-emerald-600" />
               <span>Recovery (HRR-1)</span>
             </span>
-            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-semibold flex items-center gap-1">
+            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 font-semibold flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Autonomic
             </span>
           </div>
 
-          <div className="my-2.5">
-            <div className="text-2xl font-bold font-mono text-slate-900 tracking-tight flex items-baseline justify-between">
+          <div className="my-3">
+            <div className="text-3xl font-bold font-mono text-slate-900 tracking-tight flex items-baseline justify-between">
               <span>{liveVitals.hrr.toFixed(1)} <span className="text-sm font-normal text-slate-500">bpm</span></span>
               {hrrBaseline && (
-                <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
+                <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-full ${
                   (liveVitals.hrr - hrrBaseline.mean) / hrrBaseline.std_dev <= -1.5 
                     ? 'bg-rose-50 text-rose-700 border border-rose-200' 
                     : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
@@ -418,10 +425,10 @@ export function AstronautProfileDetail({
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px]">
-            <span className="text-emerald-700 font-semibold flex items-center gap-1">
+          <div className="flex items-center justify-between pt-3 border-t border-black/[0.04] text-[11px]">
+            <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-              Continuous Stream Active
+              Live Stream
             </span>
             <span className="text-[#0b3d91] font-semibold flex items-center gap-0.5">
               Inspect <ChevronRight className="w-3 h-3" />
@@ -430,13 +437,88 @@ export function AstronautProfileDetail({
         </div>
       </div>
 
-      {/* 3D Anatomical Biometric Hologram */}
+      {/* ── 3D HOLOGRAPHIC MISSION VISUALIZERS (Anatomy + Spacecraft) ── */}
       {showScanner && (
-        <AnatomicalScanner
-          astronaut={astronaut}
-          activeAlert={activeAlert}
-          latestVitals={liveVitals}
-        />
+        <div className="flex flex-col gap-4">
+          {/* Visualizer Mode Switcher Toolbar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-[#f4f5f8] border border-black/[0.05] p-2.5 rounded-xl shadow-2xs">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="font-bold text-slate-700 font-mono text-[11px] uppercase">
+                3D View:
+              </span>
+              <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-black/[0.06] shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => setVisualizerMode('anatomy')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer active:scale-[0.98] ${
+                    visualizerMode === 'anatomy'
+                      ? 'bg-[#0b3d91] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Stethoscope className="w-3.5 h-3.5" />
+                  <span>360° Anatomy</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setVisualizerMode('spacecraft')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer active:scale-[0.98] ${
+                    visualizerMode === 'spacecraft'
+                      ? 'bg-[#0b3d91] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Orbit className="w-3.5 h-3.5" />
+                  <span>360° Orion Spacecraft</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setVisualizerMode('dual')}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer active:scale-[0.98] ${
+                    visualizerMode === 'dual'
+                      ? 'bg-[#0b3d91] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Cpu className="w-3.5 h-3.5" />
+                  <span>Dual View</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Visualizer Display Area */}
+          {visualizerMode === 'anatomy' && (
+            <AnatomicalScanner
+              astronaut={astronaut}
+              activeAlert={activeAlert}
+              latestVitals={liveVitals}
+            />
+          )}
+
+          {visualizerMode === 'spacecraft' && (
+            <NASASpacecraftHologram
+              activeMission={astronaut.mission_code || 'ARTEMIS-III'}
+              flightDay={14}
+            />
+          )}
+
+          {visualizerMode === 'dual' && (
+            <div className="flex flex-col gap-6">
+              <AnatomicalScanner
+                astronaut={astronaut}
+                activeAlert={activeAlert}
+                latestVitals={liveVitals}
+              />
+              <NASASpacecraftHologram
+                activeMission={astronaut.mission_code || 'ARTEMIS-III'}
+                flightDay={14}
+              />
+            </div>
+          )}
+        </div>
       )}
 
       {/* Synchronized Multi-Indicator Charts */}
@@ -455,37 +537,186 @@ export function AstronautProfileDetail({
         />
       )}
 
+      {/* ── Multi-System Clinical Condition Assessment Matrix ── */}
+      <div className="bg-white border border-black/[0.09] rounded-2xl p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)]">
+        <div className="flex items-center justify-between mb-4 border-b border-black/[0.05] pb-3.5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs">
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-bold text-xs uppercase tracking-wider text-slate-900 font-mono">
+                Multi-System Clinical Matrix · {astronaut.callsign}
+              </h3>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold">
+            6/6 CLINICAL SYSTEMS MONITORED
+          </span>
+        </div>
+
+        <div className="overflow-x-auto rounded-xl border border-black/[0.06]">
+          <table className="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-200 bg-[#f5f5f7] text-[10px] font-mono uppercase text-slate-600">
+                <th className="py-2.5 px-3.5 font-bold">Physiological System</th>
+                <th className="py-2.5 px-3.5 font-bold">Primary Wearable Device</th>
+                <th className="py-2.5 px-3.5 font-bold">Live Value</th>
+                <th className="py-2.5 px-3.5 font-bold">7-Day Baseline</th>
+                <th className="py-2.5 px-3.5 font-bold">Deviation (z)</th>
+                <th className="py-2.5 px-3.5 font-bold">Condition Status</th>
+                <th className="py-2.5 px-3.5 font-bold">Clinical Directive</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-[11px]">
+              {/* Row 1: Cardiovascular */}
+              <tr className="hover:bg-slate-50/50">
+                <td className="py-2.5 px-3 font-semibold text-slate-900 flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5 text-red-500" /> Cardiovascular (Myocardium)
+                </td>
+                <td className="py-2.5 px-3 font-mono text-slate-600">Astroskin Bio-Vest (Lead II)</td>
+                <td className="py-2.5 px-3 font-mono font-bold text-slate-900">{liveVitals.rhr.toFixed(1)} bpm</td>
+                <td className="py-2.5 px-3 font-mono text-slate-500">{rhrBaseline ? `${rhrBaseline.mean.toFixed(1)} ± ${rhrBaseline.std_dev.toFixed(1)}` : '62.0 ± 2.5'}</td>
+                <td className="py-2.5 px-3 font-mono font-bold">
+                  {rhrBaseline ? (
+                    <span className={Math.abs((liveVitals.rhr - rhrBaseline.mean)/rhrBaseline.std_dev) >= 1.5 ? 'text-rose-600' : 'text-emerald-700'}>
+                      {((liveVitals.rhr - rhrBaseline.mean)/rhrBaseline.std_dev) > 0 ? '+' : ''}{((liveVitals.rhr - rhrBaseline.mean)/rhrBaseline.std_dev).toFixed(2)}σ
+                    </span>
+                  ) : '0.0σ'}
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className={`px-2 py-0.5 rounded-xs font-mono font-bold text-[10px] ${activeAlert ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                    {activeAlert ? 'MYOCARDIAL DRIFT' : 'HOMEOSTATIC'}
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-slate-600 text-[10px]">
+                  {activeAlert ? 'Assess for hypercapnia & post-EVA cardiac strain' : 'Continue nominal exercise countermeasure protocol'}
+                </td>
+              </tr>
+
+              {/* Row 2: Circadian / Neurological */}
+              <tr className="hover:bg-slate-50/50">
+                <td className="py-2.5 px-3 font-semibold text-slate-900 flex items-center gap-1.5">
+                  <Moon className="w-3.5 h-3.5 text-sky-600" /> Circadian & Cerebral Cortex
+                </td>
+                <td className="py-2.5 px-3 font-mono text-slate-600">Somna Neuro-Band EEG</td>
+                <td className="py-2.5 px-3 font-mono font-bold text-slate-900">{liveVitals.sleep.toFixed(1)} hrs</td>
+                <td className="py-2.5 px-3 font-mono text-slate-500">{sleepBaseline ? `${sleepBaseline.mean.toFixed(1)} ± ${sleepBaseline.std_dev.toFixed(2)}` : '7.4 ± 0.45'}</td>
+                <td className="py-2.5 px-3 font-mono font-bold">
+                  {sleepBaseline ? (
+                    <span className={(liveVitals.sleep - sleepBaseline.mean)/sleepBaseline.std_dev <= -1.5 ? 'text-rose-600' : 'text-emerald-700'}>
+                      {((liveVitals.sleep - sleepBaseline.mean)/sleepBaseline.std_dev).toFixed(2)}σ
+                    </span>
+                  ) : '0.0σ'}
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className={`px-2 py-0.5 rounded-xs font-mono font-bold text-[10px] ${liveVitals.sleep < 6 ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                    {liveVitals.sleep < 6 ? 'SWS SLEEP DEFICIT' : 'OPTIMAL NREM/REM'}
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-slate-600 text-[10px]">
+                  {liveVitals.sleep < 6 ? 'Prescribe 45-min sleep opportunity & low cabin lighting' : 'Circadian phase locked to UTC flight schedule'}
+                </td>
+              </tr>
+
+              {/* Row 3: Autonomic Nervous Recovery */}
+              <tr className="hover:bg-slate-50/50">
+                <td className="py-2.5 px-3 font-semibold text-slate-900 flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 text-emerald-600" /> Autonomic Vagus Reactivity
+                </td>
+                <td className="py-2.5 px-3 font-mono text-slate-600">Hexoskin Smart Pod</td>
+                <td className="py-2.5 px-3 font-mono font-bold text-slate-900">{liveVitals.hrr.toFixed(1)} bpm/min</td>
+                <td className="py-2.5 px-3 font-mono text-slate-500">{hrrBaseline ? `${hrrBaseline.mean.toFixed(1)} ± ${hrrBaseline.std_dev.toFixed(1)}` : '28.0 ± 3.0'}</td>
+                <td className="py-2.5 px-3 font-mono font-bold">
+                  {hrrBaseline ? (
+                    <span className={(liveVitals.hrr - hrrBaseline.mean)/hrrBaseline.std_dev <= -1.5 ? 'text-rose-600' : 'text-emerald-700'}>
+                      {((liveVitals.hrr - hrrBaseline.mean)/hrrBaseline.std_dev) > 0 ? '+' : ''}{((liveVitals.hrr - hrrBaseline.mean)/hrrBaseline.std_dev).toFixed(2)}σ
+                    </span>
+                  ) : '0.0σ'}
+                </td>
+                <td className="py-2.5 px-3">
+                  <span className={`px-2 py-0.5 rounded-xs font-mono font-bold text-[10px] ${activeAlert ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                    {activeAlert ? 'DELAYED RECOVERY' : 'VAGAL TONE STABLE'}
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-slate-600 text-[10px]">
+                  Parasympathetic reactivation rate: evaluates autonomic recovery velocity post exercise
+                </td>
+              </tr>
+
+              {/* Row 4: Pulmonary SpO2 */}
+              <tr className="hover:bg-slate-50/50">
+                <td className="py-2.5 px-3 font-semibold text-slate-900 flex items-center gap-1.5">
+                  <Wind className="w-3.5 h-3.5 text-teal-600" /> Pulmonary & Blood Gas
+                </td>
+                <td className="py-2.5 px-3 font-mono text-slate-600">Astroskin Pulse Oximeter</td>
+                <td className="py-2.5 px-3 font-mono font-bold text-slate-900">{liveVitals.spo2.toFixed(1)}%</td>
+                <td className="py-2.5 px-3 font-mono text-slate-500">98.0 ± 0.5%</td>
+                <td className="py-2.5 px-3 font-mono font-bold text-emerald-700">+0.8σ</td>
+                <td className="py-2.5 px-3">
+                  <span className="px-2 py-0.5 rounded-xs font-mono font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    EUMOXIA NOMINAL
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-slate-600 text-[10px]">
+                  Arterial micro-saturation stable. Normal pulmonary perfusion in microgravity.
+                </td>
+              </tr>
+
+              {/* Row 5: Core Temperature */}
+              <tr className="hover:bg-slate-50/50">
+                <td className="py-2.5 px-3 font-semibold text-slate-900 flex items-center gap-1.5">
+                  <Thermometer className="w-3.5 h-3.5 text-amber-500" /> Thermoregulatory & Metabolic
+                </td>
+                <td className="py-2.5 px-3 font-mono text-slate-600">VitalSense Ingestible Pill</td>
+                <td className="py-2.5 px-3 font-mono font-bold text-slate-900">{liveVitals.temp.toFixed(2)} °C</td>
+                <td className="py-2.5 px-3 font-mono text-slate-500">36.80 ± 0.15 °C</td>
+                <td className="py-2.5 px-3 font-mono font-bold text-emerald-700">+0.1σ</td>
+                <td className="py-2.5 px-3">
+                  <span className="px-2 py-0.5 rounded-xs font-mono font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    THERMAL HOMEOSTASIS
+                  </span>
+                </td>
+                <td className="py-2.5 px-3 text-slate-600 text-[10px]">
+                  Visceral core metabolic heat stable; no space flight-associated fever detected.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* Flight Log Excel Sheet */}
-      <div className="bg-white border border-slate-300 rounded-md p-5 shadow-2xs">
-        <div className="flex items-center justify-between mb-3">
+      <div className="bg-white border border-black/[0.09] rounded-2xl p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)]">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-black/[0.05]">
           <div className="flex items-center gap-2">
             <Table className="w-4 h-4 text-[#0b3d91]" />
-            <h3 className="font-bold text-sm text-slate-800 font-mono uppercase tracking-wider">
-              Telemetry Data Worksheet
+            <h3 className="font-bold text-xs text-slate-900 font-mono uppercase tracking-wider">
+              Telemetry Worksheet
             </h3>
-            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-semibold">
-              .XLSX View · {points.length} Records
+            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 font-bold">
+              {points.length} Records
             </span>
           </div>
 
           <button
             onClick={() => setShowFlightLog(!showFlightLog)}
-            className="flex items-center gap-1 text-xs font-mono text-slate-500 hover:text-slate-800 transition"
+            className="flex items-center gap-1.5 text-xs font-mono text-slate-600 hover:text-slate-900 transition px-3 py-1.5 rounded-lg bg-[#f4f5f8] border border-black/[0.05] active:scale-[0.98]"
           >
-            <span>{showFlightLog ? 'Collapse Sheet' : 'Expand Sheet'}</span>
+            <span>{showFlightLog ? 'Collapse' : 'Expand'}</span>
             {showFlightLog ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
         </div>
 
         {showFlightLog && (
-          <div className="excel-grid-container">
+          <div className="excel-grid-container rounded-xl overflow-hidden border border-black/[0.08] shadow-xs">
             {/* Excel Formula Bar */}
-            <div className="excel-formula-bar">
-              <div className="bg-white border border-slate-300 px-2 py-0.5 text-[10px] font-bold text-slate-600 rounded">
+            <div className="excel-formula-bar bg-slate-50/80 border-b border-black/[0.06] px-3.5 py-2 flex items-center gap-2">
+              <div className="bg-white border border-black/[0.08] px-2.5 py-0.5 text-[10px] font-bold text-slate-600 rounded shadow-2xs">
                 A1:G{Math.max(points.length, 1)}
               </div>
               <div className="text-slate-400 font-serif italic text-xs font-bold">fx</div>
-              <div className="text-slate-700 text-[11px] truncate flex-1">
+              <div className="text-slate-700 text-[11px] truncate flex-1 font-mono">
                 =TELEMETRY_LOG(CALLSIGN="{astronaut.callsign}", RANGE=FD1..FD{points.length}, METRICS=["RHR", "SLEEP", "HRR", "CO2"])
               </div>
             </div>

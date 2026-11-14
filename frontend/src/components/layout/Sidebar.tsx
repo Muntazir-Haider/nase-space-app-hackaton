@@ -19,11 +19,12 @@ import {
   ChevronRight,
   ShieldCheck,
   Sparkles,
+  LayoutDashboard
 } from 'lucide-react';
 import { HealthCheckResponse, AstronautSummary } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 
-export type ActiveView = 'fleet' | 'review' | 'register' | 'diagnostics' | 'benchmark' | 'spacecraft';
+export type ActiveView = 'dashboard' | 'review' | 'fleet' | 'spacecraft' | 'benchmark' | 'diagnostics' | 'register';
 
 interface SidebarProps {
   health: HealthCheckResponse | null;
@@ -70,6 +71,7 @@ export function Sidebar({
   }, []);
 
   const NAV_ITEMS = [
+    { key: 'dashboard' as ActiveView,  label: 'Mission Dashboard',Icon: LayoutDashboard, desc: 'Whole Station Operations' },
     { key: 'review' as ActiveView,     label: 'Crew Telemetry',   Icon: Activity, desc: 'Real-time Vitals & Alerts' },
     { key: 'fleet' as ActiveView,      label: 'Fleet Roster',     Icon: Users,    desc: 'Excel Grid & Clearances' },
     { key: 'spacecraft' as ActiveView, label: '3D Spacecraft HUD',Icon: Orbit,    desc: 'Cabin Systems & Sensor Mesh' },
@@ -214,16 +216,16 @@ export function Sidebar({
           </div>
         </div>
 
-        {/* SECTION 3: Demo Scenarios Switcher */}
+        {/* SECTION 3: Flight Physiological Conditions */}
         <div>
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1.5 block mb-1 font-mono">
-            Clinical Scenarios
+            Flight Physiological States
           </span>
           <div className="space-y-1">
             {[
-              { key: 'SCENARIO_A_NOMINAL',              label: '1. Nominal Cruise',       color: 'bg-emerald-600 border-emerald-700' },
-              { key: 'SCENARIO_B_ACUTE_SPIKE',          label: '2. Acute Spacewalk',      color: 'bg-amber-600 border-amber-700'   },
-              { key: 'SCENARIO_C_SILENT_DETERIORATION',  label: '3. Hero Deterioration',   color: 'bg-rose-600 border-rose-700'    },
+              { key: 'SCENARIO_A_NOMINAL',              label: '1. Nominal Baseline Transit',   color: 'bg-emerald-600 border-emerald-700' },
+              { key: 'SCENARIO_B_ACUTE_SPIKE',          label: '2. Acute Spacewalk Exertion',  color: 'bg-amber-600 border-amber-700'   },
+              { key: 'SCENARIO_C_SILENT_DETERIORATION',  label: '3. Multi-Day EVA Deterioration', color: 'bg-rose-600 border-rose-700'    },
             ].map(({ key, label, color }) => {
               const active = activeScenario === key;
               return (

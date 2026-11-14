@@ -6,11 +6,11 @@ import {
   Sun, 
   Activity, 
   Compass, 
-  Cpu,
-  RotateCcw,
-  Play,
-  Pause,
-  Layers
+  RotateCcw, 
+  Play, 
+  Pause, 
+  Layers, 
+  Gauge
 } from 'lucide-react';
 import { EnvironmentalTelemetryItem } from '../../types';
 
@@ -26,7 +26,7 @@ export function NASASpacecraftHologram({
   flightDay = 14,
 }: NASASpacecraftHologramProps) {
   const [activeTab, setActiveTab] = useState<'schematic' | 'orbit'>('schematic');
-  const [selectedZone, setSelectedZone] = useState<string>('airlock');
+  const [selectedZone, setSelectedZone] = useState<'airlock' | 'cabin' | 'radiation' | 'propulsion'>('airlock');
 
   // ── 360-Degree 3D Rotation State ──
   const [rotationAngle, setRotationAngle] = useState<number>(0);
@@ -82,15 +82,12 @@ export function NASASpacecraftHologram({
     let tick = 0;
     const interval = setInterval(() => {
       tick += 1;
-      // CO2 scrubber micro-drift
       const co2Drift = Math.sin(tick * 0.25) * 12 + (Math.random() - 0.5) * 8;
       setLiveCo2(Math.round(baseCo2 + co2Drift));
 
-      // Cabin barometric micro-variation
       const presDrift = Math.sin(tick * 0.15) * 0.04 + (Math.random() - 0.5) * 0.02;
       setLivePressure(Math.round((basePressure + presDrift) * 10) / 10);
 
-      // Deep space ionizing radiation detector jitter
       const radDrift = Math.sin(tick * 0.3) * 3 + (Math.random() - 0.5) * 2;
       setLiveRad(Math.round(baseRad + radDrift));
     }, 450);
@@ -102,110 +99,124 @@ export function NASASpacecraftHologram({
   const displayAngle = Math.round(rotationAngle);
 
   return (
-    <div className="bg-white rounded-md border border-slate-300 shadow-2xs overflow-hidden flex flex-col font-sans select-none">
+    <div className="bg-white rounded-2xl border border-black/[0.09] shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col font-sans select-none">
       
-      {/* ── Header Bar ── */}
-      <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-md bg-[#0b3d91] flex items-center justify-center text-white shadow-xs">
-            <Orbit className="w-4 h-4 animate-radar-sweep" />
+      {/* ── Apple-Grade Hardware Card Header ── */}
+      <div className="px-6 py-4 bg-slate-50/80 border-b border-black/[0.06] flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs">
+            <Orbit className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-xs text-slate-900 tracking-wider uppercase">
-                360° Real 3D NASA Orion MPC-V · {activeMission} HUD
+            <div className="flex items-center gap-2.5">
+              <span className="font-extrabold text-sm text-slate-950 tracking-tight uppercase">
+                NASA Orion MPC-V · 3D Flight Telemetry
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-sm bg-blue-50 text-[#0b3d91] font-bold border border-blue-200">
-                FLIGHT DAY {flightDay}
+              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] font-bold border border-blue-200">
+                {activeMission} · DAY {flightDay}
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 font-sans">
-              Autonomous deep-space life support telemetry & Deep Space Network (DSN) uplink
-            </p>
+            <div className="text-xs text-slate-600 font-semibold mt-0.5">
+              Deep Space Vehicle Systems & Cabin Environmental Telemetry
+            </div>
           </div>
         </div>
 
-        {/* View Toggle */}
-        <div className="flex items-center bg-white p-1 rounded-md border border-slate-200 text-xs">
-          <button
-            onClick={() => setActiveTab('schematic')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-semibold transition cursor-pointer ${
-              activeTab === 'schematic'
-                ? 'bg-[#0b3d91] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Cpu className="w-3.5 h-3.5" />
-            <span>3D Spacecraft Schematic</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('orbit')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-semibold transition cursor-pointer ${
-              activeTab === 'orbit'
-                ? 'bg-[#0b3d91] text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Compass className="w-3.5 h-3.5" />
-            <span>Lunar Orbit Trajectory</span>
-          </button>
+        {/* Status Pill & Mode Toggle */}
+        <div className="flex items-center gap-3">
+          {/* Real DSN Carrier Status */}
+          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-full text-xs font-mono font-bold shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+            <span>DSN: CANBERRA 70M ACTIVE</span>
+          </div>
+
+          {/* Mode Switcher */}
+          <div className="flex items-center bg-[#f4f5f8] p-1 rounded-xl border border-black/[0.05] text-xs">
+            <button
+              onClick={() => setActiveTab('schematic')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer active:scale-[0.98] ${
+                activeTab === 'schematic'
+                  ? 'bg-white text-slate-950 shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-slate-950'
+              }`}
+            >
+              <Gauge className="w-3.5 h-3.5 text-[#0b3d91]" />
+              <span>3D Vehicle</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('orbit')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer active:scale-[0.98] ${
+                activeTab === 'orbit'
+                  ? 'bg-white text-slate-950 shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-slate-950'
+              }`}
+            >
+              <Compass className="w-3.5 h-3.5 text-[#0b3d91]" />
+              <span>Lunar Trajectory</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* ── Main HUD Display Area ── */}
-      <div className="p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch bg-slate-950">
+      {/* ── Main Display Grid ── */}
+      <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch bg-[#fbfbfd]">
         
-        {/* Left Interactive 3D Canvas / Hologram (8 cols) */}
-        <div className="lg:col-span-8 bg-slate-900/90 rounded-md p-4 relative overflow-hidden flex flex-col items-center justify-between min-h-[460px] border border-slate-800 shadow-inner">
+        {/* Left Column: 360-Degree 3D CAD Stage (8 cols) */}
+        <div className="lg:col-span-8 bg-[#090d16] rounded-2xl p-5 relative overflow-hidden flex flex-col items-center justify-between min-h-[480px] border border-black/[0.15] shadow-lg">
           
-          {/* Subtle Grid and Radar Rings */}
-          <div 
-            className="absolute inset-0 opacity-15 pointer-events-none"
-            style={{
-              backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(56,189,248,0.4) 1px, transparent 0)',
-              backgroundSize: '24px 24px',
-            }}
-          />
-
-          {/* DSN Comms Telemetry Bar */}
-          <div className="w-full flex items-center justify-between z-10 bg-slate-950/80 px-3 py-1.5 rounded-md border border-slate-800 text-[11px] font-mono">
+          {/* Stage Header Info Bar */}
+          <div className="w-full flex items-center justify-between z-10 bg-slate-900/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 text-xs font-mono text-slate-300">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span className="text-emerald-400 font-bold tracking-wider">
-                DSN DOWNLINK: ACTIVE · CANBERRA ANTENNA 70M
+              <span className="w-2 h-2 rounded-full bg-cyan-400" />
+              <span className="text-white font-bold tracking-wider">
+                3D CAD MODEL · YAW: {displayAngle}°
               </span>
             </div>
-            <div className="text-slate-400">
-              LATENCY: 22m 14s (STORE & FORWARD)
+            
+            {/* Subsystem Focus Pills */}
+            <div className="hidden sm:flex items-center gap-1.5">
+              {[
+                { id: 'airlock', label: 'ECLSS Hatch', angle: 0 },
+                { id: 'cabin', label: 'Crew Module', angle: 90 },
+                { id: 'radiation', label: 'Service Module', angle: 180 },
+                { id: 'propulsion', label: 'Solar Arrays', angle: 270 },
+              ].map((sub) => (
+                <button
+                  key={sub.id}
+                  onClick={() => {
+                    setSelectedZone(sub.id as any);
+                    setIsAutoRotating(false);
+                    setRotationAngle(sub.angle);
+                  }}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer ${
+                    selectedZone === sub.id
+                      ? 'bg-blue-600 text-white font-bold'
+                      : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
+                  }`}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="text-slate-400 text-[11px]">
+              LATENCY: 22m 14s
             </div>
           </div>
 
           {activeTab === 'schematic' ? (
             /* ── 360-DEGREE REAL 3D ORION MPC-V STAGE ── */
             <div 
-              className="relative w-full max-w-2xl my-auto flex items-center justify-center z-10 cursor-grab active:cursor-grabbing"
+              className="relative w-full my-auto flex items-center justify-center z-10 cursor-grab active:cursor-grabbing select-none"
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
               onPointerLeave={handlePointerUp}
               title="Click and drag horizontally to spin NASA Orion spacecraft 360 degrees"
             >
-              {/* Stationary Box Frame (Remains stable with solid corners; does NOT rotate) */}
-              <div 
-                className="relative w-full h-[330px] flex items-center justify-center overflow-hidden rounded-md border border-cyan-500/25 bg-black/75 shadow-[0_0_35px_rgba(6,182,212,0.15)]"
-              >
-                {/* 3D Depth Orbit Platform Glow */}
-                <div 
-                  className="absolute bottom-2 inset-x-12 h-8 rounded-full bg-cyan-500/20 blur-md pointer-events-none"
-                />
-
-                {/* Radar Tracking Ellipses */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-25">
-                  <ellipse cx="50%" cy="50%" rx="45%" ry="22%" fill="none" stroke="#38bdf8" strokeWidth="1" strokeDasharray="4 4" />
-                  <ellipse cx="50%" cy="50%" rx="30%" ry="14%" fill="none" stroke="#38bdf8" strokeWidth="1" />
-                </svg>
-
-                {/* 3D Rotational Spacecraft Wrapper (ONLY the Orion spacecraft rotates) */}
+              {/* Stationary Viewport Frame */}
+              <div className="relative w-full h-[360px] flex items-center justify-center overflow-hidden">
+                {/* 3D Rotational Spacecraft Wrapper */}
                 <div
                   className="w-full h-full flex items-center justify-center pointer-events-none"
                   style={{
@@ -214,101 +225,84 @@ export function NASASpacecraftHologram({
                     transformStyle: 'preserve-3d',
                   }}
                 >
-                  {/* Authentic Real 3D NASA Orion MPC-V Spacecraft Transparent Render */}
+                  {/* Authentic Real 3D NASA Orion Spacecraft Render */}
                   <img
                     src="/real_orion_spacecraft_transparent.png"
-                    alt="Real 3D NASA Orion MPC-V Deep Space Spacecraft"
-                    className="h-[310px] w-auto max-w-[95%] object-contain filter contrast-120 brightness-110 pointer-events-none select-none drop-shadow-[0_0_20px_rgba(56,189,248,0.4)]"
+                    alt="NASA Orion MPC-V 3D Deep Space Spacecraft"
+                    className="h-[320px] w-auto max-w-[95%] object-contain filter contrast-115 brightness-105 pointer-events-none select-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]"
                   />
                 </div>
 
-                {/* ── Continuous Laser Radar Scanner Sweep across the Hull ── */}
-                <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md">
-                  <div className="absolute inset-x-0 animate-scanner-laser">
-                    <div className="h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_20px_#22d3ee,0_0_8px_#38bdf8]" />
-                    <div className="h-12 bg-gradient-to-b from-cyan-400/20 via-cyan-500/5 to-transparent" />
-                    <div className="absolute -top-1 left-2 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
-                    <div className="absolute -top-1 right-2 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
-                    <div className="absolute -top-5 right-3 px-1.5 py-0.5 rounded-xs bg-slate-900/90 border border-cyan-500/50 text-[9px] font-mono text-cyan-300 font-bold shadow-md">
-                      HULL RADAR SCANNER ACTIVE
-                    </div>
+                {/* Precision Interactive Subsystem Pins (Clean, Solid Apple Hardware Style) */}
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+                  {/* Pin 1: ECLSS Hatch / CO2 */}
+                  <div 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedZone('airlock');
+                    }}
+                    className={`absolute top-[28%] left-[52%] pointer-events-auto cursor-pointer transition-all duration-200 group flex items-center gap-1.5 ${
+                      selectedZone === 'airlock' ? 'scale-110 z-20' : 'opacity-85 hover:opacity-100 hover:scale-105'
+                    }`}
+                  >
+                    <span className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[9px] font-bold text-white shadow-md ${
+                      isCo2Elevated ? 'bg-rose-500 ring-4 ring-rose-500/30' : 'bg-emerald-500 ring-4 ring-emerald-500/30'
+                    }`}>
+                      1
+                    </span>
+                    <span className="bg-slate-900/95 text-white text-[11px] font-mono font-bold px-2.5 py-1 rounded-md border border-white/20 shadow-md backdrop-blur-sm">
+                      ECLSS Hatch: {liveCo2} ppm
+                    </span>
+                  </div>
+
+                  {/* Pin 2: Service Module Radiation */}
+                  <div 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedZone('radiation');
+                    }}
+                    className={`absolute bottom-[28%] left-[40%] pointer-events-auto cursor-pointer transition-all duration-200 group flex items-center gap-1.5 ${
+                      selectedZone === 'radiation' ? 'scale-110 z-20' : 'opacity-85 hover:opacity-100 hover:scale-105'
+                    }`}
+                  >
+                    <span className="w-3.5 h-3.5 rounded-full bg-blue-500 ring-4 ring-blue-500/30 flex items-center justify-center text-[9px] font-bold text-white shadow-md">
+                      2
+                    </span>
+                    <span className="bg-slate-900/95 text-white text-[11px] font-mono font-bold px-2.5 py-1 rounded-md border border-white/20 shadow-md backdrop-blur-sm">
+                      ESM Shield: {liveRad} μSv/d
+                    </span>
+                  </div>
+
+                  {/* Pin 3: Crew Cabin Pressure */}
+                  <div 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedZone('cabin');
+                    }}
+                    className={`absolute bottom-[28%] right-[32%] pointer-events-auto cursor-pointer transition-all duration-200 group flex items-center gap-1.5 ${
+                      selectedZone === 'cabin' ? 'scale-110 z-20' : 'opacity-85 hover:opacity-100 hover:scale-105'
+                    }`}
+                  >
+                    <span className="w-3.5 h-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-500/30 flex items-center justify-center text-[9px] font-bold text-white shadow-md">
+                      3
+                    </span>
+                    <span className="bg-slate-900/95 text-white text-[11px] font-mono font-bold px-2.5 py-1 rounded-md border border-white/20 shadow-md backdrop-blur-sm">
+                      Cabin: {livePressure.toFixed(1)} kPa
+                    </span>
                   </div>
                 </div>
               </div>
-
-              {/* Interactive Telemetry Overlay (SVG Leader Lines & Hotspots) */}
-              <svg 
-                viewBox="0 0 540 330" 
-                className="absolute inset-0 w-full h-full pointer-events-auto"
-              >
-                {/* 1. AIRLOCK & LIFE SUPPORT // CO2 HOTSPOT */}
-                <g className="cursor-pointer group" onClick={() => setSelectedZone('airlock')}>
-                  <circle 
-                    cx="300" cy="90" r="7" 
-                    fill={isCo2Elevated ? '#ef4444' : '#10b981'} 
-                    className="transition-transform group-hover:scale-125"
-                  />
-                  <circle cx="300" cy="90" r="14" fill="none" stroke={isCo2Elevated ? '#ef4444' : '#10b981'} strokeWidth="1.2" className="animate-ping" />
-                  <polyline points="300,83 300,48 240,48" fill="none" stroke={isCo2Elevated ? '#ef4444' : '#10b981'} strokeWidth="1.2" />
-                  <rect x="70" y="34" width="165" height="26" rx="3" fill="#0f172a" stroke={isCo2Elevated ? '#ef4444' : '#059669'} strokeWidth="1" />
-                  <text x="76" y="45" fill={isCo2Elevated ? '#f87171' : '#34d399'} fontSize="9" fontFamily="monospace" fontWeight="bold">
-                    AIRLOCK // CO₂ SCRUBBER
-                  </text>
-                  <text x="76" y="55" fill="#ffffff" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                    CO₂: {liveCo2} ppm {isCo2Elevated ? '· ADVISORY' : '· NOMINAL'}
-                  </text>
-                </g>
-
-                {/* 2. CREW COMMAND MODULE // CABIN PRESSURE HOTSPOT */}
-                <g className="cursor-pointer group" onClick={() => setSelectedZone('cabin')}>
-                  <circle cx="380" cy="140" r="6" fill="#38bdf8" className="transition-transform group-hover:scale-125" />
-                  <polyline points="386,140 450,140 470,125" fill="none" stroke="#38bdf8" strokeWidth="1.2" />
-                  <rect x="375" y="105" width="155" height="26" rx="3" fill="#0f172a" stroke="#0284c7" strokeWidth="1" />
-                  <text x="381" y="116" fill="#38bdf8" fontSize="9" fontFamily="monospace" fontWeight="bold">
-                    CABIN // COMMAND MODULE
-                  </text>
-                  <text x="381" y="126" fill="#ffffff" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                    CABIN: {livePressure} kPa · O₂/N₂
-                  </text>
-                </g>
-
-                {/* 3. RADIATION SHIELDING // DOSIMETRY HOTSPOT */}
-                <g className="cursor-pointer group" onClick={() => setSelectedZone('radiation')}>
-                  <circle cx="220" cy="200" r="6" fill="#a855f7" className="transition-transform group-hover:scale-125" />
-                  <polyline points="220,206 220,245 280,245" fill="none" stroke="#a855f7" strokeWidth="1.2" />
-                  <rect x="285" y="232" width="160" height="26" rx="3" fill="#0f172a" stroke="#7e22ce" strokeWidth="1" />
-                  <text x="291" y="243" fill="#c084fc" fontSize="9" fontFamily="monospace" fontWeight="bold">
-                    DOSIMETRY // IONIZING RAD
-                  </text>
-                  <text x="291" y="253" fill="#ffffff" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                    RAD: {liveRad} μSv/day · ALARA
-                  </text>
-                </g>
-
-                {/* 4. PROPULSION // OMS ENGINE BELL */}
-                <g className="cursor-pointer group">
-                  <circle cx="120" cy="165" r="5" fill="#f59e0b" className="transition-transform group-hover:scale-125" />
-                  <polyline points="120,170 120,210 60,210" fill="none" stroke="#f59e0b" strokeWidth="1.2" />
-                  <rect x="10" y="197" width="145" height="26" rx="3" fill="#0f172a" stroke="#d97706" strokeWidth="1" />
-                  <text x="16" y="208" fill="#fbbf24" fontSize="9" fontFamily="monospace" fontWeight="bold">
-                    PROPULSION // OMS ENGINE
-                  </text>
-                  <text x="16" y="218" fill="#ffffff" fontSize="10" fontFamily="monospace" fontWeight="bold">
-                    26.7 kN · 316s ISP READY
-                  </text>
-                </g>
-              </svg>
             </div>
           ) : (
-            /* Lunar Transfer Orbit (Earth to Moon Trajectory) */
-            <div className="relative w-full max-w-lg my-auto flex flex-col items-center justify-center">
+            /* Lunar Orbit Trajectory View */
+            <div className="relative w-full max-w-lg my-auto flex flex-col items-center justify-center p-4">
               <svg viewBox="0 0 540 280" className="w-full h-auto">
                 {/* Earth at Left */}
                 <g>
                   <circle cx="80" cy="140" r="42" fill="#1e3a8a" stroke="#60a5fa" strokeWidth="2" />
                   <circle cx="80" cy="140" r="42" fill="none" stroke="rgba(96, 165, 250, 0.3)" strokeWidth="6" className="animate-pulse" />
                   <path d="M 65 125 Q 75 115 85 130 Q 95 145 75 160 Z" fill="#10b981" opacity="0.6" />
-                  <text x="80" y="195" fill="#94a3b8" fontSize="11" fontFamily="monospace" textAnchor="middle" fontWeight="bold">
+                  <text x="80" y="198" fill="#cbd5e1" fontSize="11" fontFamily="sans-serif" textAnchor="middle" fontWeight="bold">
                     EARTH (DSN Uplink)
                   </text>
                 </g>
@@ -320,12 +314,12 @@ export function NASASpacecraftHologram({
                   <circle cx="458" cy="146" r="4" fill="#334155" />
                   <circle cx="446" cy="152" r="5" fill="#334155" />
                   <circle cx="450" cy="164" r="3" fill="#ef4444" className="animate-ping" />
-                  <text x="450" y="185" fill="#94a3b8" fontSize="11" fontFamily="monospace" textAnchor="middle" fontWeight="bold">
+                  <text x="450" y="188" fill="#cbd5e1" fontSize="11" fontFamily="sans-serif" textAnchor="middle" fontWeight="bold">
                     LUNAR SOUTH POLE
                   </text>
                 </g>
 
-                {/* Trans-Lunar Injection (TLI) Trajectory Arc */}
+                {/* Trajectory Arc */}
                 <path 
                   d="M 122 140 C 200 40, 360 40, 435 125 C 475 170, 435 220, 380 200 C 260 160, 180 220, 118 160" 
                   fill="none" 
@@ -334,12 +328,11 @@ export function NASASpacecraftHologram({
                   strokeDasharray="6 4"
                 />
 
-                {/* Spacecraft Active Position on Trajectory */}
+                {/* Spacecraft Marker */}
                 <g transform="translate(350, 68)">
                   <circle cx="0" cy="0" r="12" fill="none" stroke="#ef4444" strokeWidth="1.5" className="animate-ping-ring" />
                   <polygon points="0,-8 10,8 -10,8" fill="#f8fafc" stroke="#0b3d91" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="-270" y2="72" stroke="#60a5fa" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
-                  <rect x="15" y="-14" width="130" height="22" rx="3" fill="rgba(15, 23, 42, 0.9)" stroke="#38bdf8" strokeWidth="1" />
+                  <rect x="15" y="-14" width="130" height="22" rx="6" fill="rgba(15, 23, 42, 0.95)" stroke="#38bdf8" strokeWidth="1" />
                   <text x="80" y="1" fill="#38bdf8" fontSize="10" fontFamily="monospace" textAnchor="middle" fontWeight="bold">
                     ORION: DAY {flightDay} OF 14
                   </text>
@@ -348,42 +341,42 @@ export function NASASpacecraftHologram({
             </div>
           )}
 
-          {/* ── 360° ROTATION & SCANNER CONTROLS BAR ── */}
+          {/* ── Rotation Controls Toolbar ── */}
           {activeTab === 'schematic' && (
-            <div className="w-full flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono bg-slate-950 p-2 rounded-md border border-slate-800 text-slate-400 z-10">
-              {/* Auto Spin Toggle */}
+            <div className="w-full flex flex-wrap items-center justify-between gap-3 text-xs font-mono bg-slate-900/90 backdrop-blur-md p-3 rounded-xl border border-white/10 text-slate-300 z-10">
+              {/* Play / Pause Rotation */}
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setIsAutoRotating(!isAutoRotating)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm border font-semibold transition cursor-pointer ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border font-semibold transition cursor-pointer active:scale-[0.98] ${
                     isAutoRotating
-                      ? 'bg-blue-600/90 text-white border-blue-500'
+                      ? 'bg-blue-600 text-white border-blue-500 shadow-xs'
                       : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
                   }`}
-                  title="Toggle continuous 360 degree spacecraft rotation"
+                  title="Toggle continuous 360 degree rotation"
                 >
-                  {isAutoRotating ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-                  <span>{isAutoRotating ? 'Auto 360° Spin: ON' : 'Auto 360° Spin: OFF'}</span>
+                  {isAutoRotating ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                  <span>{isAutoRotating ? 'Auto Spin: ON' : 'Auto Spin: OFF'}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setRotationAngle(0)}
-                  className="p-1 rounded-sm bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer"
-                  title="Reset angle to 0°"
+                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer active:scale-[0.98]"
+                  title="Reset Yaw angle to 0°"
                 >
-                  <RotateCcw className="w-3 h-3" />
+                  <RotateCcw className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              {/* Quick Angle Snap Buttons */}
-              <div className="flex items-center gap-1">
+              {/* Angle Presets */}
+              <div className="flex items-center gap-1.5">
                 {[
-                  { angle: 0,   label: '0° (Profile)' },
-                  { angle: 90,  label: '90° (Command Nose)' },
-                  { angle: 180, label: '180° (Port Wings)' },
-                  { angle: 270, label: '270° (Aft Thruster)' },
+                  { angle: 0,   label: '0° Profile' },
+                  { angle: 90,  label: '90° Nose' },
+                  { angle: 180, label: '180° Port' },
+                  { angle: 270, label: '270° Aft' },
                 ].map((preset) => (
                   <button
                     key={preset.angle}
@@ -391,10 +384,10 @@ export function NASASpacecraftHologram({
                       setIsAutoRotating(false);
                       setRotationAngle(preset.angle);
                     }}
-                    className={`px-2 py-0.5 rounded-sm border cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-lg border text-xs cursor-pointer active:scale-[0.98] transition font-semibold ${
                       Math.abs(displayAngle - preset.angle) < 10
-                        ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50'
-                        : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-slate-200'
+                        ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 font-bold'
+                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
                     }`}
                   >
                     {preset.label}
@@ -402,58 +395,56 @@ export function NASASpacecraftHologram({
                 ))}
               </div>
 
-              {/* Real-time Angle & Radar Status */}
-              <div className="flex items-center gap-2">
-                <span className="text-cyan-400 font-bold flex items-center gap-1">
-                  <Compass className="w-3 h-3 animate-spin" style={{ animationDuration: '8s' }} />
-                  <span>YAW: {displayAngle}°</span>
+              {/* Status */}
+              <div className="flex items-center gap-2 font-bold">
+                <span className="text-cyan-400 flex items-center gap-1">
+                  <Compass className="w-3.5 h-3.5" />
+                  <span>YAW {displayAngle}°</span>
                 </span>
-                <span className="text-emerald-400 font-bold">RADAR: ACTIVE</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Right Info Box / Live Habitat Zone Breakdown (4 cols) */}
-        <div className="lg:col-span-4 flex flex-col justify-between gap-3">
-          <div className="border border-slate-200 rounded-md p-4 bg-white shadow-2xs">
-            <div className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5 flex items-center justify-between border-b border-slate-100 pb-2">
-              <span className="flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-[#0b3d91]" />
-                <span>Life Support Telemetry</span>
+        {/* Right Column: Solid Physical Telemetry Breakdown Cards (4 cols) */}
+        <div className="lg:col-span-4 flex flex-col justify-between gap-4">
+          <div className="bg-white border border-black/[0.08] rounded-2xl p-5 shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex flex-col gap-4">
+            <div className="flex items-center justify-between border-b border-black/[0.05] pb-3">
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <Layers className="w-4 h-4 text-[#0b3d91]" />
+                <span>Life Support Subsystems</span>
               </span>
-              <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono ${
                 isCo2Elevated 
-                  ? 'bg-rose-50 text-rose-700 border border-rose-200' 
-                  : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  ? 'bg-rose-50 text-rose-800 border border-rose-200' 
+                  : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
               }`}>
-                {isCo2Elevated ? 'ADVISORY ELEVATED' : 'NOMINAL FLIGHT'}
+                {isCo2Elevated ? 'ADVISORY' : 'NOMINAL'}
               </span>
             </div>
 
-            <div className="space-y-2.5">
-              {/* CO2 metric */}
+            <div className="space-y-3.5">
+              {/* Card 1: CO2 */}
               <div 
                 onClick={() => setSelectedZone('airlock')}
-                className={`p-3 rounded-md border transition cursor-pointer ${
+                className={`p-4 rounded-xl border transition cursor-pointer active:scale-[0.99] ${
                   selectedZone === 'airlock' 
-                    ? 'bg-blue-50/60 border-blue-500 shadow-2xs' 
-                    : 'bg-white border-slate-200 hover:border-slate-300'
+                    ? 'bg-blue-50/80 border-blue-500 shadow-xs ring-1 ring-blue-500/20' 
+                    : 'bg-[#f4f5f8] border-black/[0.06] hover:border-black/[0.12]'
                 }`}
               >
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5 uppercase text-[11px]">
                     <Wind className="w-3.5 h-3.5 text-blue-600" />
                     Airlock CO₂ Concentration
                   </span>
-                  <span className={`font-mono font-bold flex items-center gap-1 ${
-                    isCo2Elevated ? 'text-rose-600' : 'text-slate-900'
+                  <span className={`font-mono font-extrabold text-sm flex items-center gap-1 ${
+                    isCo2Elevated ? 'text-rose-600' : 'text-slate-950'
                   }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${isCo2Elevated ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse'}`} />
                     {liveCo2} ppm
                   </span>
                 </div>
-                <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-200/80 h-2 rounded-full overflow-hidden mt-2">
                   <div 
                     className={`h-full rounded-full transition-all duration-300 ${
                       isCo2Elevated ? 'bg-rose-500' : 'bg-emerald-500'
@@ -461,67 +452,81 @@ export function NASASpacecraftHologram({
                     style={{ width: `${Math.min(100, (liveCo2 / 5000) * 100)}%` }}
                   />
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1">
-                  NASA flight limit: 2,500 ppm · Active scrubber cycling post-EVA
-                </p>
+                <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold mt-2">
+                  <span>Limit: 2,500 ppm</span>
+                  <span>Scrubber Bed: Active</span>
+                </div>
               </div>
 
-              {/* Cabin Pressure */}
+              {/* Card 2: Cabin Atmospheric Pressure */}
               <div 
                 onClick={() => setSelectedZone('cabin')}
-                className={`p-3 rounded-md border transition cursor-pointer ${
+                className={`p-4 rounded-xl border transition cursor-pointer active:scale-[0.99] ${
                   selectedZone === 'cabin' 
-                    ? 'bg-blue-50/60 border-blue-500 shadow-2xs' 
-                    : 'bg-white border-slate-200 hover:border-slate-300'
+                    ? 'bg-blue-50/80 border-blue-500 shadow-xs ring-1 ring-blue-500/20' 
+                    : 'bg-[#f4f5f8] border-black/[0.06] hover:border-black/[0.12]'
                 }`}
               >
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5 uppercase text-[11px]">
                     <Activity className="w-3.5 h-3.5 text-emerald-600" />
-                    Atmospheric Pressure
+                    Cabin Atmospheric Pressure
                   </span>
-                  <span className="font-mono font-bold text-slate-900 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse" />
-                    {livePressure} kPa
+                  <span className="font-mono font-extrabold text-sm text-slate-950">
+                    {livePressure.toFixed(1)} kPa
                   </span>
                 </div>
-                <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-200/80 h-2 rounded-full overflow-hidden mt-2">
                   <div className="h-full rounded-full bg-emerald-500" style={{ width: '99%' }} />
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1">Nominal sea-level oxygen-nitrogen mix (101.3 kPa)</p>
+                <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold mt-2">
+                  <span>Nominal: 101.3 kPa</span>
+                  <span>O₂: 21.2 kPa</span>
+                </div>
               </div>
 
-              {/* Radiation Dosimetry */}
+              {/* Card 3: Radiation Dosimetry */}
               <div 
                 onClick={() => setSelectedZone('radiation')}
-                className={`p-3 rounded-md border transition cursor-pointer ${
+                className={`p-4 rounded-xl border transition cursor-pointer active:scale-[0.99] ${
                   selectedZone === 'radiation' 
-                    ? 'bg-blue-50/60 border-blue-500 shadow-2xs' 
-                    : 'bg-white border-slate-200 hover:border-slate-300'
+                    ? 'bg-blue-50/80 border-blue-500 shadow-xs ring-1 ring-blue-500/20' 
+                    : 'bg-[#f4f5f8] border-black/[0.06] hover:border-black/[0.12]'
                 }`}
               >
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5 uppercase text-[11px]">
                     <Sun className="w-3.5 h-3.5 text-purple-600" />
                     Galactic Cosmic Radiation
                   </span>
-                  <span className="font-mono font-bold text-slate-900 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+                  <span className="font-mono font-extrabold text-sm text-slate-950">
                     {liveRad} μSv/day
                   </span>
                 </div>
-                <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                <div className="w-full bg-slate-200/80 h-2 rounded-full overflow-hidden mt-2">
                   <div className="h-full rounded-full bg-purple-500" style={{ width: '42%' }} />
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1">Safe within NASA ALARA 30-day cumulative limits</p>
+                <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold mt-2">
+                  <span>NASA ALARA Limit: Safe</span>
+                  <span>Dose: 14.2 mSv</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="p-3 bg-white border border-slate-200 rounded-md flex items-center gap-2.5 text-xs text-slate-700 shadow-2xs">
-            <Radio className="w-4 h-4 text-[#0b3d91] shrink-0" />
-            <span className="text-[11px] text-slate-600">
-              Orion MPC-V operates in deep space store-and-forward mode. Drag horizontally to rotate the 3D spacecraft 360°.
+          {/* DSN Downlink Solid Box */}
+          <div className="p-4 bg-[#f4f5f8] border border-black/[0.06] rounded-2xl flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
+                <Radio className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-slate-900">DSN Telemetry Downlink</div>
+                <div className="text-[11px] text-slate-600 font-semibold">Store & Forward Mode · 360° Drag Supported</div>
+              </div>
+            </div>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              LOCKED
             </span>
           </div>
         </div>

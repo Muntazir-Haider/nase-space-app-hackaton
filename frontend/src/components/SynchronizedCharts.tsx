@@ -145,29 +145,29 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert, live
   });
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
       {/* Active Alert Banner */}
       {hasActiveAlert && (
-        <div className="bg-red-50 border border-red-300 rounded-md p-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center">
+        <div className="bg-rose-50/90 border border-rose-300 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-red-700 uppercase">
-                  Alert Active
+                <span className="text-xs font-extrabold text-rose-900 uppercase tracking-wide">
+                  Clinical Alert Active
                 </span>
-                <span className="text-xs text-red-600">Multivariate Physiological Drift</span>
+                <span className="text-xs font-semibold text-rose-800">· Multivariate Physiological Drift</span>
               </div>
-              <p className="text-xs text-slate-700 mt-0.5">
-                Elevated resting heart rate, sleep deficit, and delayed cardiac recovery detected over consecutive days.
+              <p className="text-xs text-slate-700 font-medium mt-0.5">
+                Elevated resting heart rate, sleep deficit, and delayed cardiac recovery detected across consecutive flight days.
               </p>
             </div>
           </div>
           <button
             onClick={onOpenAlert}
-            className="px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-lg shadow-sm transition"
+            className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-xs transition active:scale-[0.98] cursor-pointer"
           >
             Inspect Evidence →
           </button>
@@ -175,60 +175,52 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert, live
       )}
 
       {/* Guide Bar with Live Streaming Pulse */}
-      <div className="bg-white border border-slate-300 rounded-md px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+      <div className="bg-[#f4f5f8] border border-black/[0.06] rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-700">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <Info className="w-3.5 h-3.5 text-[#0b3d91]" />
-            <span className="font-semibold text-slate-800">Chart Guide:</span>
+            <span className="font-bold text-slate-900">Baseline Guide:</span>
           </div>
-          <div className="flex items-center gap-1.5 text-emerald-700 font-semibold text-[11px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Continuous Telemetry Stream Active (0.45s Cadence · High-Rate)</span>
+          <div className="flex items-center gap-1.5 text-emerald-800 font-bold text-[11px] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+            <span>Live Stream (0.45s Cadence)</span>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-4 text-[11px]">
+        <div className="flex flex-wrap items-center gap-4 text-[11px] font-semibold text-slate-700">
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-2.5 rounded bg-emerald-100 border border-emerald-300 inline-block" />
-            <span>Normal Baseline Corridor (μ ± 1.5σ)</span>
+            <span className="w-3.5 h-2.5 rounded bg-emerald-100 border border-emerald-400 inline-block" />
+            <span>Normal Corridor (μ ± 1.5σ)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-4 h-0.5 border-t border-dashed border-emerald-500 inline-block" />
+            <span className="w-4 h-0.5 border-t-2 border-dashed border-emerald-600 inline-block" />
             <span>7-Day Mean (μ)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-slate-700 inline-block" />
-            <span>Observation Point</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-amber-600 font-semibold">Gaps = Missing Data</span>
+            <span className="w-2 h-2 rounded-full bg-slate-900 inline-block" />
+            <span>Telemetry Point</span>
           </div>
         </div>
       </div>
 
       {/* Grid of 3 Synchronized Physiological Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart 1: Resting Heart Rate */}
-        <div className="bg-white border border-slate-300 rounded-md p-4 flex flex-col justify-between shadow-2xs">
-          <div className="flex items-center justify-between mb-2">
+        <div className="bg-white border border-black/[0.09] rounded-2xl p-5 flex flex-col justify-between shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] transition-shadow">
+          <div className="flex items-center justify-between mb-3 border-b border-black/[0.05] pb-2.5">
             <div className="flex items-center gap-2">
-              <Heart className="w-4 h-4 text-red-500" />
-              <h4 className="font-bold text-xs tracking-wide text-slate-800 uppercase">Resting Heart Rate</h4>
+              <Heart className="w-4 h-4 text-red-600" />
+              <h4 className="font-extrabold text-xs tracking-wider text-slate-950 uppercase font-mono">Resting Heart Rate</h4>
             </div>
             <div className="flex items-center gap-2">
               {liveVitals?.rhr !== undefined && (
-                <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1 font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live: {liveVitals.rhr.toFixed(1)} bpm
-                </span>
-              )}
-              {rhrBase && (
-                <span className="text-[11px] font-mono text-slate-500">
-                  Base: {rhrBase.mean.toFixed(1)} ± {rhrBase.std_dev.toFixed(1)}
+                <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1 font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                  {liveVitals.rhr.toFixed(1)} bpm
                 </span>
               )}
             </div>
           </div>
-          <div className="h-48 w-full">
+          <div className="h-52 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />

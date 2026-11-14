@@ -210,8 +210,17 @@ export function AnatomicalScanner({
           >
             {/* Stationary Box Frame (Remains stable with solid corners; does NOT rotate) */}
             <div
-              className="relative w-full h-[395px] flex items-center justify-center overflow-hidden rounded-md border border-cyan-500/25 bg-black/75 shadow-[0_0_35px_rgba(6,182,212,0.15)]"
+              className="relative w-full h-[395px] flex items-center justify-center overflow-hidden rounded-md border border-slate-700 bg-slate-950 shadow-sm"
             >
+              {/* Subtle Medical Coordinate Grid */}
+              <div 
+                className="absolute inset-0 opacity-10 pointer-events-none"
+                style={{
+                  backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(148,163,184,0.5) 1px, transparent 0)',
+                  backgroundSize: '20px 20px',
+                }}
+              />
+
               {/* 3D Rotational Human Body Wrapper (ONLY the anatomy rotates) */}
               <div
                 className="w-full h-full flex items-center justify-center pointer-events-none"
@@ -221,37 +230,18 @@ export function AnatomicalScanner({
                   transformStyle: 'preserve-3d',
                 }}
               >
-                {/* Authentic Real Anatomy Skeleton & Organs Transparent Image */}
+                {/* Authentic Clinical Anatomy Skeleton & Organs Transparent Image */}
                 <img
                   src="/real_human_anatomy_transparent.png"
-                  alt="Real Human Skeleton and Internal Anatomical Organs"
-                  className="h-[385px] w-auto max-w-[90%] object-contain filter contrast-115 brightness-105 pointer-events-none select-none drop-shadow-[0_0_12px_rgba(6,182,212,0.35)]"
+                  alt="Clinical Anatomical Reference Model"
+                  className="h-[380px] w-auto max-w-[90%] object-contain filter contrast-110 brightness-105 pointer-events-none select-none"
                 />
               </div>
 
-              {/* 3D Depth Floor Platform Glow */}
-              <div
-                className="absolute bottom-1 inset-x-8 h-6 rounded-full bg-cyan-500/20 blur-md pointer-events-none"
-              />
-
-              {/* ── SCANNER MOVING UP AND DOWN (Continuous Vertical Laser Beam) ── */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md">
-                <div className="absolute inset-x-0 animate-scanner-laser">
-                  {/* Horizontal Intense Laser Bar */}
-                  <div className="h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_20px_#22d3ee,0_0_8px_#38bdf8]" />
-                  
-                  {/* Volumetric Downward Light Field */}
-                  <div className="h-14 bg-gradient-to-b from-cyan-400/25 via-cyan-500/8 to-transparent" />
-
-                  {/* Left & Right Scanner Emitter Nodes */}
-                  <div className="absolute -top-1 left-1 w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
-                  <div className="absolute -top-1 right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
-
-                  {/* Live Scanner Altitude Tag */}
-                  <div className="absolute -top-5 right-3 px-1.5 py-0.5 rounded-xs bg-slate-900/90 border border-cyan-500/50 text-[9px] font-mono text-cyan-300 font-bold shadow-md">
-                    LASER SCANNER · Z-AXIS SWEEP
-                  </div>
-                </div>
+              {/* Subtle Anatomical Calibration Marks */}
+              <div className="absolute top-2 left-2 text-[9px] font-mono text-slate-500 pointer-events-none flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-slate-500 rounded-full" />
+                <span>CORONAL PLANE · {displayAngle}°</span>
               </div>
             </div>
 

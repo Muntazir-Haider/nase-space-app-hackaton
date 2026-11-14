@@ -27,6 +27,7 @@ import { DataQualityModal } from './components/DataQualityModal';
 import { JudgeTourModal } from './components/JudgeTourModal';
 import { NASASpacecraftHologram } from './components/nasa/NASASpacecraftHologram';
 import { AnatomicalScanner } from './components/nasa/AnatomicalScanner';
+import { StationUnifiedDashboard } from './components/dashboard/StationUnifiedDashboard';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginPage } from './components/auth/LoginPage';
 import { HeartPulse } from 'lucide-react';
@@ -49,7 +50,7 @@ function StationDashboard() {
   const [isOffline, setIsOffline] = useState<boolean>(false);
   const [retrying, setRetrying] = useState<boolean>(false);
 
-  const [activeView, setActiveView] = useState<ActiveView>('review');
+  const [activeView, setActiveView] = useState<ActiveView>('dashboard');
   const [astronauts, setAstronauts] = useState<AstronautSummary[]>([]);
   const [selectedAstronautId, setSelectedAstronautId] = useState<string | null>(null);
   const [timeline, setTimeline] = useState<AstronautTimelineResponse | null>(null);
@@ -184,7 +185,7 @@ function StationDashboard() {
   const selectedAstro = astronauts.find(a => a.id === selectedAstronautId) || null;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex font-sans">
+    <div className="min-h-screen bg-[#ebedf2] text-slate-900 flex font-sans">
       {/* Left Navigation Sidebar */}
       <Sidebar
         health={health}
@@ -233,6 +234,34 @@ function StationDashboard() {
 
         {/* Main Content Area */}
         <main className="flex-1 p-6 w-full flex flex-col gap-6">
+        {activeView === 'dashboard' && (
+          <StationUnifiedDashboard
+            astronauts={astronauts}
+            selectedAstronaut={selectedAstro}
+            onSelectAstronaut={(id) => {
+              setSelectedAstronautId(id);
+            }}
+            timeline={timeline}
+            activeAlert={activeAlert}
+            onOpenEvidence={handleOpenEvidence}
+            onOpenRegisterModal={() => setShowRegisterModal(true)}
+            onOpenDataQuality={() => setShowDataQualityModal(true)}
+            onOpenJudgeTour={() => setShowJudgeTour(true)}
+            onLoadScenario={handleScenarioSwitch}
+            scenarioLoading={scenarioLoading}
+            activeScenario={activeScenario}
+            onRefreshTimeline={() => {
+              if (selectedAstronautId) {
+                loadAstronautDetails(selectedAstronautId);
+              }
+            }}
+            onNavigateToTelemetry={(astroId) => {
+              if (astroId) setSelectedAstronautId(astroId);
+              setActiveView('review');
+            }}
+          />
+        )}
+
         {activeView === 'fleet' && (
           <FleetOverview
             astronauts={astronauts}
