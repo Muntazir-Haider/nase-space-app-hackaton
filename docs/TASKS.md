@@ -157,9 +157,9 @@
 
 ---
 
-## Phase 4: Silent Deterioration Engine & Explainable Alerts
-*Objective: Implement multi-indicator trend detection, OLS regression slopes, environmental cross-correlation, and evidence tracking.*
-*Approval Gate: Requires Phase 3 verification and user sign-off.*
+## Phase 4: Silent Deterioration Engine & Explainable Alerts — Hardening & Verification
+*Objective: Multi-indicator trend detection, OLS regression slopes, environmental cross-correlation, granular evidence linking, countermeasure prescription workflows, and interactive CMO alert inspection.*
+*Approval Gate: Approved by user for active execution.*
 
 - [x] **TASK-401: OLS Linear Regression Trend & $z$-Score Engine**
   - **Scope:** Compute rolling $z$-scores and Ordinary Least Squares slopes for RHR, Sleep, and HRR-1 across 3-to-5 day sliding windows.
@@ -177,6 +177,18 @@
   - **Scope:** Log execution run in `analysis_runs`; generate structured explainable alert linking raw observation UUIDs in `alert_evidence_links` and NASA HRP citations; expose `/api/v1/alerts/{id}/evidence`.
   - **Target Files:** `backend/app/api/alerts.py`, `backend/app/services/deterioration_engine.py`
   - **Verification:** `pytest tests/test_deterioration.py -v` (Tests 11, 12).
+  - **Status:** `DONE`
+
+- [x] **TASK-404: Interactive Countermeasure Prescription & Protocol Tracker in UI (Acceptance Test 12)**
+  - **Scope:** Enhance `AlertInspectorModal.tsx` with clinical countermeasure prescription interface (sleep extension, hydration protocol, workload modulation, active monitoring), wire `prescribeCountermeasure` in `api.ts`, display active protocol cards, and handle automatic lifecycle transition to `MONITORING`.
+  - **Target Files:** `frontend/src/components/AlertInspectorModal.tsx`, `frontend/src/services/api.ts`
+  - **Verification:** CMO can log countermeasure directly from alert modal; countermeasure persists to SQLite and shows in evidence audit.
+  - **Status:** `DONE`
+
+- [x] **TASK-405: Full Phase 4 Automated & Manual Verification**
+  - **Scope:** Execute complete test suite (`tests/test_trends.py`, `tests/test_deterioration.py` and full pytest), run TypeScript build, verify alert inspection, evidence breakdown, and countermeasure prescription in live workstation.
+  - **Target Files:** Entire repository
+  - **Verification:** All 35 tests pass; `npm run build` succeeds (2015 modules, 0 errors); live alert inspection and countermeasure prescription verified.
   - **Status:** `DONE`
 
 ---

@@ -13,6 +13,7 @@ import {
   IngestionResponse,
   MissingDataGapsResponse,
   PersonalBaselineOut,
+  ClinicalCountermeasure,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -117,6 +118,24 @@ export async function updateAlertStatus(
     }),
   });
   return handleResponse<DeteriorationAlert>(res, 'Failed to update alert status');
+}
+
+export async function prescribeCountermeasure(
+  alertId: string,
+  payload: {
+    prescribed_by: string;
+    countermeasure_type: string;
+    title: string;
+    prescription_details: string;
+    target_duration_hours: number;
+  }
+): Promise<ClinicalCountermeasure> {
+  const res = await fetch(`${API_BASE}/alerts/${alertId}/countermeasures`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<ClinicalCountermeasure>(res, 'Failed to prescribe clinical countermeasure');
 }
 
 export async function fetchDataQualityAudit(): Promise<DataQualityAuditLog[]> {

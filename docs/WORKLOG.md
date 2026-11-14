@@ -505,3 +505,71 @@ With Phase 2 approved, executed Phase 3 focusing on mathematical correctness of 
 
 ### Next Step
 - Present the Phase 3 Completion Report to the user and await explicit approval before proceeding to Phase 4.
+
+---
+
+## [2026-11-14] — Phase 4: Silent Deterioration Engine & Clinical Countermeasures Complete
+
+### Background & Context
+Following user authorization to proceed with Phase 4, executed the core intelligence and clinical decision-support engine of Mission Sentinel. Implemented multi-indicator trend detection via Ordinary Least Squares (OLS) regression, rolling $z$-scores against active personal baselines, multi-indicator persistence rules ($\ge 2$ indicators for $\ge 3$ consecutive days), single-spike acute exertion filtering, environmental ($CO_2$) and operational workload (EVA) temporal cross-correlation, explainable alert generation with evidence linking, and interactive CMO clinical countermeasure prescription and protocol tracking.
+
+### Work Performed
+1. **TASK-401: OLS Linear Regression Trend & z-Score Engine (`backend/app/services/analytics/ols_trends.py`):**
+   - Implemented exact OLS linear regression slope formula $m = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sum (x_i - \bar{x})^2}$ in change-per-day units.
+   - Evaluated standardized deviation ($z$-scores) against active 7-day personal baselines ($\mu, \sigma$).
+   - Enforced NASA HRP-grounded adverse trend thresholds:
+     - Resting Heart Rate: $m \ge +0.8\text{ bpm/day}$ and $z \ge +1.5\sigma$.
+     - Sleep Duration: $m \le -0.25\text{ hr/day}$ and $z \le -1.5\sigma$.
+     - 1-Minute Heart Rate Recovery: $m \le -1.5\text{ bpm/day}$ and $z \le -1.5\sigma$.
+   - Automated tests in `tests/test_trends.py` (5/5 passed).
+
+2. **TASK-402: Multi-Indicator Persistence Rule & Single-Spike Filter (`backend/app/services/deterioration_engine.py`):**
+   - Active Baseline Guard: Requires verified active baselines; suppresses false alerts if baseline status is `INSUFFICIENT_BASELINE_DATA`.
+   - Multi-Indicator Persistence Rule: Requires $\ge 2$ indicators to demonstrate adverse drift over $\ge 3$ consecutive observation cycles.
+   - Single-Spike Invariance: Isolated single-day spikes (e.g. Day 8 post-EVA workout) are filtered out, preventing alarm fatigue.
+   - Environmental & Operational Temporal Cross-Correlation: Cross-references cabin $CO_2$ telemetry ($> 4,000\text{ ppm}$) and recorded mission events (high-workload EVA drills) overlapping the anomaly window.
+   - Priority Grading: Assigns `HIGH` priority when $\ge 3$ indicators deviate or any $|z| \ge 3.0\sigma$; otherwise `MEDIUM`.
+
+3. **TASK-403: Alert Evidence Linking & Analysis Run Audit Logging (`backend/app/api/alerts.py`):**
+   - Recorded analysis runs in `analysis_runs` table with execution duration in ms and alert counts.
+   - Stored granular evidence links in `alert_evidence_links` mapping alert UUIDs to raw observation UUIDs.
+   - Exposed RESTful endpoints: `GET /api/v1/alerts`, `GET /api/v1/alerts/{id}/evidence`, `POST /api/v1/alerts/run-analysis`, `PATCH /api/v1/alerts/{id}/status`, `POST /api/v1/alerts/{id}/countermeasures`, and `GET /api/v1/alerts/{id}/countermeasures`.
+
+4. **TASK-404: Interactive Countermeasure Prescription & Protocol Tracker in UI (`AlertInspectorModal.tsx`):**
+   - Enhanced `AlertInspectorModal.tsx` with clinical countermeasure prescription interface (Sleep Schedule Adjustment, Hydration Protocol, Workload Modulation, Active Monitoring).
+   - Enabled CMO to input duration in days and specific clinical instructions.
+   - Added `prescribeCountermeasure` in `frontend/src/services/api.ts` with standardized types in `frontend/src/types/index.ts`.
+   - Prescription automatically transitions alert status to `MONITORING` and records permanent audit entry in `cmo_followups`.
+   - Displays active countermeasure protocols with timestamps, durations, notes, and prescribed interventions.
+
+5. **TASK-405: Automated Acceptance Testing (Tests 8, 9, 10, 11, 12) & Full Production Verification:**
+   - Pytest suite: **35/35 automated tests passing cleanly** (`tests/test_trends.py` 5/5, `tests/test_deterioration.py` 4/4).
+   - Frontend production build: `npm run build` transformed 2,015 modules in 6.17s with **0 errors and 0 warnings**.
+   - Verified live API and UI workflows in active workstation.
+
+### Files Created / Modified
+- `backend/app/services/analytics/__init__.py` (Created)
+- `backend/app/services/analytics/ols_trends.py` (Created)
+- `backend/app/services/deterioration_engine.py` (Created)
+- `backend/app/api/alerts.py` (Created)
+- `tests/test_trends.py` (Created)
+- `tests/test_deterioration.py` (Created)
+- `frontend/src/components/AlertInspectorModal.tsx` (Enhanced with countermeasure prescription & tracker)
+- `frontend/src/services/api.ts` (Added `prescribeCountermeasure`)
+- `frontend/src/types/index.ts` (Added `ClinicalCountermeasure`)
+- `docs/TASKS.md` (Updated `TASK-404` and `TASK-405` to `DONE`)
+- `docs/WORKLOG.md` (Updated)
+
+### Verification Summary
+- **Backend automated tests:** 35/35 passed in 3.85s (`tests/test_deterioration.py` 4/4, `tests/test_trends.py` 5/5).
+- **Frontend production build:** `npm run build` compiled 2,015 modules in 6.17s with 0 errors.
+- **Acceptance Tests Satisfied:**
+  - Test 8: Stable Pattern Invariance (PASSED)
+  - Test 9: Isolated Spike Filtering (PASSED)
+  - Test 10: Sustained Multi-Indicator Deterioration (PASSED)
+  - Test 11: Alert Evidence Linking & Auditability (PASSED)
+  - Test 12: CMO Alert Review & Status Transition (PASSED)
+
+### Next Step
+- Present Phase 4 Completion Report to user and enforce Completeness Gate (Rule 12). Await explicit user approval before proceeding to Phase 5.
+

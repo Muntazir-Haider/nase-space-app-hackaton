@@ -8,10 +8,13 @@ import {
   CheckCircle, 
   Clock, 
   Calculator,
-  UserCheck
+  UserCheck,
+  Pill,
+  PlusCircle,
+  Loader2
 } from 'lucide-react';
 import { AlertEvidenceDetail } from '../types';
-import { updateAlertStatus } from '../services/api';
+import { updateAlertStatus, prescribeCountermeasure } from '../services/api';
 
 interface Props {
   evidence: AlertEvidenceDetail | null;
@@ -22,18 +25,36 @@ interface Props {
 export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Props) {
   const [newStatus, setNewStatus] = useState<string>('UNDER_REVIEW');
   const [reviewerCallsign, setReviewerCallsign] = useState<string>('CMO-01');
-  const [reviewNotes, setReviewNotes] = useState<string>('Reviewed multi-indicator drift. Prescription of supplemental rest cycle and hydration protocol initiated.');
+  const [reviewNotes, setReviewNotes] = useState<string>('Reviewed multi-indicator drift. Clinical review initiated.');
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [successMsg, setSuccessMsg] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
 
+  // Countermeasure prescription form state
+  const [showCountermeasureForm, setShowCountermeasureForm] = useState<boolean>(false);
+  const [cmType, setCmType] = useState<string>('SLEEP_SCHEDULE_ADJUSTMENT');
+  const [cmTitle, setCmTitle] = useState<string>('Prescribe 60-Min Supplemental Sleep Cycle');
+  const [cmDetails, setCmDetails] = useState<string>('Provide 60-minute sleep extension prior to EVA prep. Modulate resistance load by -20%.');
+  const [cmDuration, setCmDuration] = useState<number>(48);
+  const [cmSubmitting, setCmSubmitting] = useState<boolean>(false);
+  const [cmSuccessMsg, setCmSuccessMsg] = useState<string>('');
+  const [cmErrorMsg, setCmErrorMsg] = useState<string>('');
+
   if (!evidence) return null;
 
-  const { alert: alertData, astronaut_callsign, astronaut_full_name, evidence_items, followups } = evidence;
+  const { 
+    alert: alertData, 
+    astronaut_callsign, 
+    astronaut_full_name, 
+    evidence_items, 
+    countermeasures, 
+    followups 
+  } = evidence;
+
   let mathData: Record<string, any> = {};
   try {
     mathData = JSON.parse(alertData.math_summary);
-  } catch (e) {
+  } catch {
     mathData = {};
   }
 
@@ -51,6 +72,30 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
       setErrorMsg(msg);
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handlePrescribeCountermeasure(e: React.FormEvent) {
+    e.preventDefault();
+    setCmSubmitting(true);
+    setCmSuccessMsg('');
+    setCmErrorMsg('');
+    try {
+      await prescribeCountermeasure(alertData.id, {
+        prescribed_by: reviewerCallsign,
+        countermeasure_type: cmType,
+        title: cmTitle.trim(),
+        prescription_details: cmDetails.trim(),
+        target_duration_hours: Number(cmDuration),
+      });
+      setCmSuccessMsg(`Clinical countermeasure prescribed. Alert status moved to MONITORING.`);
+      setShowCountermeasureForm(false);
+      onStatusUpdated();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setCmErrorMsg(msg);
+    } finally {
+      setCmSubmitting(false);
     }
   }
 
@@ -99,7 +144,7 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
           {/* Mathematical Provenance Breakdown */}
           <div className="bg-space-850/80 border border-space-750 rounded-xl p-4">
             <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 mb-3">
-              <Calculator className="w-4 h-4" /> Mathematical Provenance & OLS Regression
+              <Calculator className="w-4 h-4" /> Mathematical Provenance &amp; OLS Regression
             </h4>
             <div className="overflow-x-auto">
               <table className="w-full text-xs font-mono text-left">
@@ -142,7 +187,7 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
           {/* Linked Raw Evidence Records */}
           <div className="bg-space-850/80 border border-space-750 rounded-xl p-4">
             <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-nasa-cyan flex items-center gap-1.5 mb-3">
-              <Activity className="w-4 h-4" /> Linked Biometric & Environmental Evidence Records ({evidence_items.length})
+              <Activity className="w-4 h-4" /> Linked Biometric &amp; Environmental Evidence Records ({evidence_items.length})
             </h4>
             <div className="max-h-48 overflow-y-auto border border-space-800 rounded-lg">
               <table className="w-full text-[11px] font-mono text-left">
@@ -174,9 +219,165 @@ export function AlertInspectorModal({ evidence, onClose, onStatusUpdated }: Prop
           <div className="bg-space-900 border border-nasa-blue/40 rounded-xl p-3.5 flex items-start gap-3 text-xs font-mono text-slate-300">
             <ExternalLink className="w-4 h-4 text-nasa-cyan flex-shrink-0 mt-0.5" />
             <div>
-              <span className="font-bold text-white">NASA Grounding & Evidence Provenance:</span>
+              <span className="font-bold text-white">NASA Grounding &amp; Evidence Provenance:</span>
               <p className="text-slate-400 mt-0.5">{alertData.scientific_ref}</p>
             </div>
+          </div>
+
+          {/* CLINICAL COUNTERMEASURES PROTOCOL SECTION */}
+          <div className="bg-space-850/80 border border-space-750 rounded-xl p-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                <Pill className="w-4 h-4 text-amber-400" /> Clinical Countermeasures ({countermeasures.length})
+              </h4>
+              <button
+                type="button"
+                onClick={() => setShowCountermeasureForm(!showCountermeasureForm)}
+                className="flex items-center gap-1 text-xs font-mono text-nasa-cyan hover:text-white transition"
+              >
+                <PlusCircle className="w-3.5 h-3.5" />
+                <span>{showCountermeasureForm ? 'Cancel' : '+ Prescribe Protocol'}</span>
+              </button>
+            </div>
+
+            {cmSuccessMsg && (
+              <div className="p-2.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 rounded text-xs font-mono flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-400" /> {cmSuccessMsg}
+              </div>
+            )}
+
+            {cmErrorMsg && (
+              <div className="p-2.5 bg-red-950/60 border border-red-500/40 text-red-300 rounded text-xs font-mono flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-red-400" /> {cmErrorMsg}
+              </div>
+            )}
+
+            {/* Countermeasures List */}
+            {countermeasures.length > 0 ? (
+              <div className="space-y-2">
+                {countermeasures.map((c) => (
+                  <div key={c.id} className="p-3 rounded-lg bg-space-950 border border-space-800 font-mono text-xs flex flex-col gap-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-white">{c.title}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/40">
+                        {c.outcome_status}
+                      </span>
+                    </div>
+                    <p className="text-slate-300 text-[11px]">{c.prescription_details}</p>
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1">
+                      <span>Type: {c.countermeasure_type}</span>
+                      <span>Target: {c.target_duration_hours}h · Prescribed by: {c.prescribed_by}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs font-mono text-slate-500">
+                No clinical countermeasures prescribed yet. Click &quot;+ Prescribe Protocol&quot; to issue an intervention.
+              </p>
+            )}
+
+            {/* Interactive Prescription Form */}
+            {showCountermeasureForm && (
+              <form onSubmit={handlePrescribeCountermeasure} className="bg-space-900 border border-space-700 rounded-xl p-4 flex flex-col gap-3 mt-2 animate-fade-in font-mono text-xs">
+                <div className="font-bold text-white flex items-center gap-1.5">
+                  <Pill className="w-3.5 h-3.5 text-nasa-cyan" /> New Countermeasure Prescription
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-slate-400 block mb-1">Protocol Type</label>
+                    <select
+                      value={cmType}
+                      onChange={(e) => {
+                        setCmType(e.target.value);
+                        if (e.target.value === 'SLEEP_SCHEDULE_ADJUSTMENT') {
+                          setCmTitle('Prescribe 60-Min Supplemental Sleep Cycle');
+                          setCmDetails('Provide 60-minute sleep extension prior to EVA prep. Modulate resistance load by -20%.');
+                        } else if (e.target.value === 'HYDRATION_ELECTROLYTE_PROTOCOL') {
+                          setCmTitle('Oral Electrolyte Rehydration Protocol');
+                          setCmDetails('Administer 500 mL balanced electrolyte solution with increased hydration checks.');
+                        } else if (e.target.value === 'EXERCISE_WORKLOAD_MODULATION') {
+                          setCmTitle('Reduced ARED Workload Modulation');
+                          setCmDetails('Temporarily reduce heavy deadlift/squat load on ARED by 30% for 48 hours.');
+                        } else {
+                          setCmTitle('Active CMO 24h Observational Monitoring');
+                          setCmDetails('Scheduled follow-up vitals check at 12h and 24h marks.');
+                        }
+                      }}
+                      className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-white focus:outline-none focus:border-nasa-cyan"
+                    >
+                      <option value="SLEEP_SCHEDULE_ADJUSTMENT">Sleep Schedule Adjustment</option>
+                      <option value="HYDRATION_ELECTROLYTE_PROTOCOL">Hydration &amp; Electrolyte Protocol</option>
+                      <option value="EXERCISE_WORKLOAD_MODULATION">Exercise Workload Modulation</option>
+                      <option value="ACTIVE_MONITORING">Active Monitoring Protocol</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-slate-400 block mb-1">Protocol Title</label>
+                    <input
+                      type="text"
+                      value={cmTitle}
+                      onChange={(e) => setCmTitle(e.target.value)}
+                      className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-white focus:outline-none focus:border-nasa-cyan"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="md:col-span-2">
+                    <label className="text-slate-400 block mb-1">Prescription Details</label>
+                    <textarea
+                      rows={2}
+                      value={cmDetails}
+                      onChange={(e) => setCmDetails(e.target.value)}
+                      className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-white focus:outline-none focus:border-nasa-cyan"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-slate-400 block mb-1">Duration (Hours)</label>
+                    <input
+                      type="number"
+                      value={cmDuration}
+                      onChange={(e) => setCmDuration(Number(e.target.value))}
+                      className="w-full bg-space-950 border border-space-700 rounded-lg p-2 text-white focus:outline-none focus:border-nasa-cyan"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowCountermeasureForm(false)}
+                    className="px-3 py-1.5 text-slate-400 hover:text-white transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={cmSubmitting}
+                    className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-lg transition shadow flex items-center gap-2"
+                  >
+                    {cmSubmitting ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Prescribing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Pill className="w-3.5 h-3.5" />
+                        <span>Prescribe Protocol</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
 
           {/* Previous Follow-Ups History */}
