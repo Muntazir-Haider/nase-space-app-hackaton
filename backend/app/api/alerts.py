@@ -131,6 +131,59 @@ def update_alert_status(
     return alert
 
 
+@router.post("/{alert_id}/countermeasures", response_model=ClinicalCountermeasureOut, status_code=status.HTTP_201_CREATED)
+def prescribe_countermeasure(
+    alert_id: str,
+    payload: ClinicalCountermeasureCreate,
+    db: Session = Depends(get_db),
+):
+    alert = db.query(DeteriorationAlert).filter(DeteriorationAlert.id == alert_id).first()
+    if not alert:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Deterioration alert with ID '{alert_id}' not found.",
+        )
+
+    countermeasure = ClinicalCountermeasure(
+        alert_id=alert.id,
+        astronaut_id=alert.astronaut_id,
+        prescribed_by=payload.prescribed_by,
+        countermeasure_type=payload.countermeasure_type,
+        title=payload.title,
+        prescription_details=payload.prescription_details,
+        target_duration_hours=payload.target_duration_hours,
+        outcome_status="ACTIVE",
+    )
+    db.add(countermeasure)
+
+    # Transition alert status to MONITORING if currently NEW or UNDER_REVIEW
+    if alert.lifecycle_status in ["NEW", "UNDER_REVIEW"]:
+        old_status = alert.lifecycle_status
+        alert.lifecycle_status = "MONITORING"
+        alert.updated_at = datetime.now(timezone.utc).isoformat()
+        followup = CMOFollowup(
+            alert_id=alert.id,
+            astronaut_id=alert.astronaut_id,
+            reviewer_callsign=payload.prescribed_by,
+            review_notes=f"Prescribed countermeasure: {payload.title}. Status moved to MONITORING.",
+            status_transition=f"{old_status} -> MONITORING",
+            recorded_at=datetime.now(timezone.utc).isoformat(),
+        )
+        db.add(followup)
+
+    db.commit()
+    db.refresh(countermeasure)
+    return countermeasure
+
+
+@router.get("/{alert_id}/countermeasures", response_model=List[ClinicalCountermeasureOut])
+def list_countermeasures_for_alert(
+    alert_id: str,
+    db: Session = Depends(get_db),
+):
+    return db.query(ClinicalCountermeasure).filter(ClinicalCountermeasure.alert_id == alert_id).all()
+
+
 # --- Analysis Runs Router ---
 
 @runs_router.get("", response_model=List[AnalysisRunOut])

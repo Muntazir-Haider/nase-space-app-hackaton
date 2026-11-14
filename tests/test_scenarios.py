@@ -1,11 +1,43 @@
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine, event
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 from backend.app.main import app
-from backend.app.database import get_db, SessionLocal
+from backend.app.database import Base, get_db
 
 @pytest.fixture
 def api_client():
-    return TestClient(app)
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    
+    @event.listens_for(engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
+    TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+    def override_get_db():
+        db = TestingSessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+    client = TestClient(app)
+    
+    yield client
+    
+    app.dependency_overrides.clear()
+    Base.metadata.drop_all(bind=engine)
+
 
 def test_load_scenario_c_silent_deterioration(api_client):
     res = api_client.post("/api/v1/scenarios/load", json={"scenario_key": "SCENARIO_C_SILENT_DETERIORATION"})

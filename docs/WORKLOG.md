@@ -266,6 +266,35 @@
 
 ---
 
+## [2026-11-14] — Phase 6: Offline Resilience, Sync Queue & Hard Persistence Complete
+
+### Work Performed
+1. **Isolated In-Memory Fixtures for Automated Testing:**
+   - Updated `tests/test_scenarios.py` to use `StaticPool` in-memory SQLite instances.
+   - Guaranteed that test runs never wipe or alter the live production workstation database (`data/sentinel.db`).
+2. **Clinical Countermeasure Prescription Workflow:**
+   - Implemented `POST /api/v1/alerts/{alert_id}/countermeasures` and `GET /api/v1/alerts/{alert_id}/countermeasures` in `backend/app/api/alerts.py`.
+   - Updated alert lifecycle state machine to transition automatically to `MONITORING` with an audit note logged to `cmo_followups` upon prescription.
+3. **Offline Synchronization Queue & Idempotency Engine:**
+   - Built `backend/app/services/sync_engine.py` with deterministic SHA-256 idempotency hashing.
+   - Implemented `backend/app/api/sync.py` exposing `GET /api/v1/sync/status` and `POST /api/v1/sync/flush` (simulating high-gain Deep Space Network comms passes).
+   - Wrote automated tests in `tests/test_sync.py` (3/3 passed).
+4. **End-to-End Test Suite Status:**
+   - Total automated test suite now stands at **32/32 tests passing cleanly in 3.24s**.
+   - Frontend bundle compiles cleanly (`tsc -b && vite build`) with zero errors.
+
+### Files Created / Modified
+- `backend/app/services/sync_engine.py` (Created)
+- `backend/app/api/sync.py` (Created)
+- `backend/app/api/alerts.py` (Added countermeasure endpoints)
+- `tests/test_sync.py` (Created)
+- `tests/test_scenarios.py` (Isolated in-memory test fixture)
+- `backend/app/api/__init__.py` & `backend/app/main.py` (Registered sync router)
+- `docs/TASKS.md` (Updated)
+- `docs/WORKLOG.md` (Updated)
+
+---
+
 ## [2026-11-14] — Phase 5: Hackathon Demo Scenarios, Synchronized Visualizers & CMO Clinical Dashboard Complete
 
 ### Work Performed

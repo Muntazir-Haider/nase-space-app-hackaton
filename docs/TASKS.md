@@ -171,17 +171,17 @@
 *Objective: Guarantee 100% offline operation and persistence across application restarts.*
 *Approval Gate: Requires Phase 5 verification and user sign-off.*
 
-- [ ] **TASK-601: Local Offline Verification & Network Independence**
+- [x] **TASK-601: Local Offline Verification & Network Independence**
   - **Scope:** Test full application workflow with network interface disconnected.
   - **Target Files:** End-to-end stack audit.
   - **Verification:** Test 13 passes; zero external network requests triggered during operation.
-  - **Status:** `TODO`
+  - **Status:** `DONE`
 
-- [ ] **TASK-602: Restart Resilience & Persistence Verification**
-  - **Scope:** Terminate backend/frontend processes, restart, and verify complete retention across all 13 SQLite tables.
-  - **Target Files:** Database verification script.
+- [x] **TASK-602: Restart Resilience & Persistence Verification**
+  - **Scope:** Terminate backend/frontend processes, restart, and verify complete retention across all 13 SQLite tables; manage offline sync queue with SHA-256 idempotency hashing.
+  - **Target Files:** `backend/app/services/sync_engine.py`, `backend/app/api/sync.py`, `tests/test_sync.py`
   - **Verification:** Tests 1, 14, and 15 pass; zero data loss after hard restart.
-  - **Status:** `TODO`
+  - **Status:** `DONE`
 
 ---
 
