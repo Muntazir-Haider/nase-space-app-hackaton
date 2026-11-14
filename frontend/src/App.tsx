@@ -31,7 +31,7 @@ export function App() {
   const [isOffline, setIsOffline] = useState<boolean>(false);
   const [retrying, setRetrying] = useState<boolean>(false);
 
-  const [activeView, setActiveView] = useState<ActiveView>('fleet');
+  const [activeView, setActiveView] = useState<ActiveView>('review');
   const [astronauts, setAstronauts] = useState<AstronautSummary[]>([]);
   const [selectedAstronautId, setSelectedAstronautId] = useState<string | null>(null);
   const [timeline, setTimeline] = useState<AstronautTimelineResponse | null>(null);
@@ -221,6 +221,8 @@ export function App() {
                 loadAstronautDetails(selectedAstronautId);
               }
             }}
+            onLoadScenario={handleScenarioSwitch}
+            scenarioLoading={scenarioLoading}
           />
         )}
 

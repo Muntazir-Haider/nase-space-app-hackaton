@@ -8,9 +8,8 @@ import {
   Users, 
   Activity, 
   UserPlus, 
-  HardDrive,
-  BrainCircuit,
-  Compass,
+  HardDrive, 
+  Compass, 
 } from 'lucide-react';
 import { HealthCheckResponse } from '../../types';
 
@@ -62,6 +61,18 @@ export function Navbar({
       {/* Primary Navigation Tabs */}
       <nav className="flex items-center gap-1 bg-space-950 p-1 rounded-xl border border-space-800 text-xs font-mono">
         <button
+          onClick={() => onSelectView('review')}
+          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg transition ${
+            activeView === 'review'
+              ? 'bg-nasa-blue text-white font-bold shadow'
+              : 'text-slate-400 hover:text-white hover:bg-space-850'
+          }`}
+        >
+          <Activity className="w-3.5 h-3.5 text-nasa-cyan" />
+          <span>Live Health Monitor</span>
+        </button>
+
+        <button
           onClick={() => onSelectView('fleet')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
             activeView === 'fleet'
@@ -70,19 +81,30 @@ export function Navbar({
           }`}
         >
           <Users className="w-3.5 h-3.5" />
-          <span>Fleet Roster</span>
+          <span>Crew Fleet</span>
         </button>
 
+        {onOpenJudgeTour && (
+          <button
+            onClick={onOpenJudgeTour}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-purple-300 hover:text-white hover:bg-purple-950/50 transition border border-purple-500/30"
+            title="Open interactive 6-stage hackathon judge presentation guide"
+          >
+            <Compass className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
+            <span>Judge Tour</span>
+          </button>
+        )}
+
         <button
-          onClick={() => onSelectView('review')}
+          onClick={() => onSelectView('diagnostics')}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
-            activeView === 'review'
+            activeView === 'diagnostics'
               ? 'bg-nasa-blue text-white font-bold shadow'
               : 'text-slate-400 hover:text-white hover:bg-space-850'
           }`}
         >
-          <Activity className="w-3.5 h-3.5" />
-          <span>Medical Review</span>
+          <HardDrive className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Station System &amp; DB</span>
         </button>
 
         <button
@@ -94,31 +116,7 @@ export function Navbar({
           }`}
         >
           <UserPlus className="w-3.5 h-3.5 text-nasa-cyan" />
-          <span>Register Crew</span>
-        </button>
-
-        <button
-          onClick={() => onSelectView('diagnostics')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
-            activeView === 'diagnostics'
-              ? 'bg-nasa-blue text-white font-bold shadow'
-              : 'text-slate-400 hover:text-white hover:bg-space-850'
-          }`}
-        >
-          <HardDrive className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Station Diagnostics</span>
-        </button>
-
-        <button
-          onClick={() => onSelectView('benchmark')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
-            activeView === 'benchmark'
-              ? 'bg-purple-600 text-white font-bold shadow'
-              : 'text-slate-400 hover:text-white hover:bg-space-850'
-          }`}
-        >
-          <BrainCircuit className="w-3.5 h-3.5 text-purple-400" />
-          <span>ML Benchmark</span>
+          <span>+ Register Crew</span>
         </button>
       </nav>
 
@@ -157,17 +155,6 @@ export function Navbar({
             </span>
           )}
         </button>
-        {/* 1-Click Judge Tour Walkthrough */}
-        {onOpenJudgeTour && (
-          <button
-            onClick={onOpenJudgeTour}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-600/30 to-indigo-600/30 hover:from-purple-600/50 hover:to-indigo-600/50 border border-purple-500/40 text-purple-200 text-xs font-mono font-semibold transition shadow-sm hover:scale-105 active:scale-95"
-            title="Open interactive 6-step hackathon judge demonstration walkthrough"
-          >
-            <Compass className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
-            <span className="hidden sm:inline">Judge Tour</span>
-          </button>
-        )}
       </div>
 
       {/* 1-Click Demo Scenario Switcher for Hackathon Judges */}

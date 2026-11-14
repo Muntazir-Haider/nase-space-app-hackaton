@@ -27,6 +27,7 @@ import { BaselineInspectorModal } from './BaselineInspectorModal';
 import { MedicalHandoverModal } from './MedicalHandoverModal';
 import { QuickTelemetryModal } from './QuickTelemetryModal';
 import { ClearanceUpdateModal } from './ClearanceUpdateModal';
+import { LiveTelemetryTester } from './LiveTelemetryTester';
 import { runDeteriorationAnalysis } from '../../services/api';
 
 interface AstronautProfileDetailProps {
@@ -37,6 +38,8 @@ interface AstronautProfileDetailProps {
   onOpenEvidence: (alertId: string) => void;
   onOpenRegisterModal: () => void;
   onRefreshTimeline?: () => void;
+  onLoadScenario?: (scenarioKey: string) => void;
+  scenarioLoading?: boolean;
 }
 
 export function AstronautProfileDetail({
@@ -47,6 +50,8 @@ export function AstronautProfileDetail({
   onOpenEvidence,
   onOpenRegisterModal,
   onRefreshTimeline,
+  onLoadScenario,
+  scenarioLoading = false,
 }: AstronautProfileDetailProps) {
   const [showBaselineModal, setShowBaselineModal] = useState<boolean>(false);
   const [showFlightLog, setShowFlightLog] = useState<boolean>(true);
@@ -195,6 +200,19 @@ export function AstronautProfileDetail({
           )}
         </div>
       </div>
+
+      {/* Interactive Live Telemetry Input & Evaluation Tester (For Exhibition Demonstrations) */}
+      <LiveTelemetryTester
+        astronaut={astronaut}
+        activeAlert={activeAlert}
+        onDataSubmitted={() => {
+          if (onRefreshTimeline) onRefreshTimeline();
+        }}
+        onLoadScenario={(scKey) => {
+          if (onLoadScenario) onLoadScenario(scKey);
+        }}
+        scenarioLoading={scenarioLoading}
+      />
 
       {/* Baseline Metric Cards (Clickable to open math inspector) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
