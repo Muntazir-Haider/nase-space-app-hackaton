@@ -22,6 +22,7 @@ from backend.app.api import (
     scenarios_router,
     sync_router,
     analytics_router,
+    reports_router,
 )
 
 # Initialize structured logging
@@ -70,6 +71,7 @@ app.include_router(runs_router, prefix=settings.API_V1_STR)
 app.include_router(scenarios_router, prefix=settings.API_V1_STR)
 app.include_router(sync_router, prefix=settings.API_V1_STR)
 app.include_router(analytics_router, prefix=settings.API_V1_STR)
+app.include_router(reports_router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def root():
@@ -149,3 +151,44 @@ def station_diagnostics(db: Session = Depends(get_db)):
         "sqlite_journal_mode": "WAL",
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
     }
+
+@app.get(f"{settings.API_V1_STR}/health/database/snapshot")
+def export_database_snapshot(db: Session = Depends(get_db)):
+    """Exports a comprehensive offline JSON snapshot backup of all 14 SQLite relational tables."""
+    tables = [
+        "missions",
+        "astronaut_profiles",
+        "indicator_definitions",
+        "health_observations",
+        "environmental_telemetry",
+        "data_quality_audit_log",
+        "personal_baselines",
+        "mission_events",
+        "analysis_runs",
+        "deterioration_alerts",
+        "alert_evidence_links",
+        "clinical_countermeasures",
+        "cmo_followups",
+        "offline_sync_queue",
+    ]
+    snapshot_data = {}
+    total_records = 0
+    for tbl in tables:
+        try:
+            result = db.execute(text(f"SELECT * FROM {tbl}"))
+            cols = result.keys()
+            rows = [dict(zip(cols, row)) for row in result.fetchall()]
+            snapshot_data[tbl] = rows
+            total_records += len(rows)
+        except Exception as e:
+            snapshot_data[tbl] = {"error": str(e)}
+
+    return {
+        "system": settings.PROJECT_NAME,
+        "version": settings.VERSION,
+        "snapshot_timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "total_tables": len(tables),
+        "total_records": total_records,
+        "data": snapshot_data,
+    }
+

@@ -345,3 +345,65 @@ class BenchmarkEvaluationReportOut(BaseModel):
     daily_progression_scenario_b: List[DailyAnomalyScoreOut]
     synthesis_conclusions: List[str]
 
+
+# ============================================================================
+# PHASE 8 ENHANCEMENTS: CLINICAL OPERATIONS, CLEARANCE & HANDOVER CONTRACTS
+# ============================================================================
+
+class AstronautClearanceUpdate(BaseModel):
+    clearance_status: str = Field(
+        ...,
+        examples=["FULL_FLIGHT_CLEARANCE", "TEMPORARY_MEDICAL_HOLD", "OBSERVATION_RESTRICTED", "FIT_FOR_DUTY_WITH_RESTRICTIONS", "GROUNDED"],
+    )
+    reviewer_callsign: str = Field(default="CMO-01", examples=["CMO-01", "FLIGHT_SURGEON_MCC"])
+    notes: Optional[str] = Field(default=None, examples=["Imposing 48h medical hold due to adverse RHR slope and sleep deficit."])
+
+
+class MissionEventCreate(BaseModel):
+    astronaut_id: str
+    event_type: str = Field(..., examples=["EVA", "SLEEP_SHIFT", "HIGH_WORKLOAD_MAINTENANCE", "EXERCISE_SESSION"])
+    title: str = Field(..., examples=["Lunar Surface Sortie 03"])
+    start_time: str
+    end_time: str
+    workload_intensity: str = Field(default="NOMINAL", examples=["LOW", "NOMINAL", "HIGH", "SEVERE"])
+    notes: Optional[str] = None
+
+
+class MissionEventOut(BaseModel):
+    id: str
+    mission_id: str
+    astronaut_id: str
+    event_type: str
+    title: str
+    start_time: str
+    end_time: str
+    workload_intensity: str
+    notes: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class FlightSurgeonHandoverReportOut(BaseModel):
+    report_id: str
+    generated_at: str
+    astronaut_id: str
+    callsign: str
+    full_name: str
+    flight_role: str
+    mission_code: str
+    target_destination: str
+    flight_day: int
+    medical_clearance_status: str
+    overall_clinical_status: str  # 'NOMINAL', 'OBSERVATION', 'CRITICAL_REVIEW'
+    active_alerts_count: int
+    baselines_summary: Dict[str, Any]
+    active_alerts: List[Dict[str, Any]]
+    recent_observations_summary: Dict[str, Any]
+    environmental_context: Dict[str, Any]
+    recent_mission_events: List[Dict[str, Any]]
+    countermeasures_summary: List[Dict[str, Any]]
+    flight_surgeon_recommendation: str
+    cmo_handover_notes: Optional[str] = None
+    integrity_hash: str
+
+

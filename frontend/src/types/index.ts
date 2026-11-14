@@ -286,3 +286,106 @@ export interface BenchmarkEvaluationReport {
   synthesis_conclusions: string[];
 }
 
+export interface FlightSurgeonHandoverReport {
+  report_id: string;
+  generated_at: string;
+  astronaut_id: string;
+  callsign: string;
+  full_name: string;
+  flight_role: string;
+  mission_code: string;
+  target_destination: string;
+  flight_day: number;
+  medical_clearance_status: string;
+  overall_clinical_status: 'NOMINAL' | 'OBSERVATION' | 'CRITICAL_REVIEW';
+  active_alerts_count: number;
+  baselines_summary: Record<string, any>;
+  active_alerts: Array<{
+    alert_id: string;
+    indicator_key: string;
+    severity: string;
+    lifecycle_status: string;
+    trigger_reason: string;
+    evidence_summary: string;
+    ols_slope: number | null;
+    z_score: number | null;
+    persistence_count: number;
+    evidence_count: number;
+    created_at: string;
+  }>;
+  recent_observations_summary: Record<string, {
+    latest_value: number;
+    latest_time: string;
+    unit: string;
+    count: number;
+    min_7d: number;
+    max_7d: number;
+    avg_7d: number;
+  }>;
+  environmental_context: {
+    cabin_co2_mean_ppm: number | null;
+    cabin_co2_max_ppm: number | null;
+    cabin_co2_elevated: boolean;
+    radiation_total_usv: number;
+    total_readings_analyzed: number;
+    habitat_zone: string;
+  };
+  recent_mission_events: Array<{
+    event_id: string;
+    event_type: string;
+    title: string;
+    start_time: string;
+    end_time: string;
+    workload_intensity: string;
+    notes?: string | null;
+  }>;
+  countermeasures_summary: Array<{
+    countermeasure_id: string;
+    alert_id: string;
+    countermeasure_type: string;
+    prescription_details: string;
+    prescribed_by: string;
+    prescribed_at: string;
+    status: string;
+    efficacy_status: string;
+    followup_count: number;
+    latest_followup_note?: string | null;
+  }>;
+  flight_surgeon_recommendation: string;
+  cmo_handover_notes?: string | null;
+  integrity_hash: string;
+}
+
+export interface MissionEventItem {
+  id: string;
+  mission_id: string;
+  astronaut_id: string;
+  event_type: string;
+  title: string;
+  start_time: string;
+  end_time: string;
+  workload_intensity: string;
+  notes?: string | null;
+}
+
+export interface EnvironmentalTelemetryItem {
+  id: string;
+  mission_id: string;
+  parameter_name: string;
+  value: number;
+  unit: string;
+  habitat_zone: string;
+  timestamp: string;
+  quality_status: string;
+}
+
+export interface DatabaseSnapshotResponse {
+  system: string;
+  version: string;
+  snapshot_timestamp_utc: string;
+  total_tables: number;
+  total_records: number;
+  data: Record<string, any[]>;
+}
+
+

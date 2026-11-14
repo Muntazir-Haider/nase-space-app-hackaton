@@ -335,3 +335,46 @@
   - **Target Files:** Entire repository
   - **Verification:** 100% test pass rate across all suites (59 total tests: 16 acceptance + 43 integration/unit); clean build (0 errors); all 16 Acceptance Tests verified.
   - **Status:** `DONE`
+
+---
+
+## Phase 8 Enhancement: Operational Hardening & Aerospace Mission Workstation Completion
+*Objective: Implement missing clinical operations workflows identified in forensic review: NASA Flight Surgeon Clinical Handover reporting with JSON/Print export, dynamic medical clearance modifications, operational mission events scheduling, bedside quick telemetry entry, habitat environmental live monitor, and database backup snapshot export.*
+*Approval Gate: Approved by user for active execution.*
+
+- [x] **TASK-810: NASA Flight Surgeon Clinical Handover & Medical Summary Report Engine**
+  - **Scope:** Build dedicated report generation service and endpoint `GET /api/v1/reports/handover/{astronaut_id}` compiling demographics, clearance status, 7-day baselines, OLS slopes, active alerts, environmental stressors, countermeasures, and flight surgeon recommendations.
+  - **Target Files:** `backend/app/api/reports.py`, `backend/app/schemas/schemas.py`, `backend/app/main.py`
+  - **Verification:** Endpoint returns comprehensive clinical handover report grounded in biometrics and habitat telemetry with SHA-256 cryptographic provenance hash; verified in `tests/test_operations_enhancements.py::test_handover_report_generation`.
+  - **Status:** `DONE`
+
+- [x] **TASK-811: Dynamic Medical Clearance Lifecycle & Mission Events Scheduling APIs**
+  - **Scope:** Add `PATCH /api/v1/astronauts/{astronaut_id}/clearance` to allow CMO to place crew on medical hold or restriction with offline queueing; add `POST /api/v1/missions/{mission_id}/events` and `GET /api/v1/missions/{mission_id}/events` to schedule operational timeline events (EVAs, sleep shifts).
+  - **Target Files:** `backend/app/api/astronauts.py`, `backend/app/schemas/schemas.py`
+  - **Verification:** Clearance status persists and queues `ASTRONAUT_CLEARANCE_UPDATE` offline transaction; mission events persist and queue `MISSION_EVENT_CREATE`; verified in `tests/test_operations_enhancements.py::test_clearance_lifecycle_update` and `test_mission_events_lifecycle`.
+  - **Status:** `DONE`
+
+- [x] **TASK-812: Flight Surgeon Handover Report Modal & Print/JSON Export UI**
+  - **Scope:** Build `MedicalHandoverModal.tsx` displaying print-ready NASA clinical handover summary with official headers, baseline corridors, alert evidence, and 1-click JSON export and browser print actions.
+  - **Target Files:** `frontend/src/components/crew/MedicalHandoverModal.tsx`, `frontend/src/components/crew/AstronautProfileDetail.tsx`
+  - **Verification:** Interactive modal opens cleanly from astronaut profile header, renders complete clinical handover dossier, allows CMO handover notes sign-off, and exports to formatted JSON and print-ready document.
+  - **Status:** `DONE`
+
+- [x] **TASK-813: Bedside Quick Telemetry Entry Modal & Clearance Modifier UI**
+  - **Scope:** Build `QuickTelemetryModal.tsx` for immediate bedside biometric entry directly from astronaut profile; add interactive medical clearance dropdown pill in profile banner to change clearance status with 1 click.
+  - **Target Files:** `frontend/src/components/crew/QuickTelemetryModal.tsx`, `frontend/src/components/crew/ClearanceUpdateModal.tsx`, `frontend/src/components/crew/AstronautProfileDetail.tsx`
+  - **Verification:** CMO can log daily vitals at bedside (undergoing 7-point data quality audit) and toggle flight clearance tiers with offline attribution.
+  - **Status:** `DONE`
+
+- [x] **TASK-814: Habitat Environmental Live Monitor & Database Snapshot Export in Diagnostics**
+  - **Scope:** Expand `SystemStatusView.tsx` with Habitat Environmental Telemetry card showing recent CO2 and radiation readings, zone filters, and manual environmental reading form; add 1-click database snapshot export (`sentinel_backup.json`).
+  - **Target Files:** `frontend/src/components/system/SystemStatusView.tsx`, `backend/app/main.py`, `frontend/src/services/api.ts`
+  - **Verification:** Diagnostics displays live environmental telemetry with elevated CO2 warning badges, allows recording habitat readings, and exports full 14-table database JSON snapshot; verified in `test_database_snapshot_export`.
+  - **Status:** `DONE`
+
+- [x] **TASK-815: End-to-End Automated Testing & Production Build Verification**
+  - **Scope:** Write automated pytest tests in `tests/test_operations_enhancements.py` covering handover report, clearance update, mission events, and database export; verify clean frontend build and 100% test pass rate.
+  - **Target Files:** `tests/test_operations_enhancements.py`, entire codebase
+  - **Verification:** 100% test pass rate across all 63 tests (16 master acceptance + 47 integration/operations tests); zero TypeScript compiler errors (`npx tsc --noEmit`); clean production Vite build (2,020 modules transformed).
+  - **Status:** `DONE`
+

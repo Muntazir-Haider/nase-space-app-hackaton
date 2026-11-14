@@ -1,6 +1,7 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
+from datetime import datetime, timezone
 from dateutil import parser as date_parser
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from backend.app.database import get_db
 from backend.app.services.sync_engine import queue_offline_transaction
@@ -23,6 +24,9 @@ from backend.app.schemas.schemas import (
     TimelinePoint,
     MissionCreate,
     MissionOut,
+    AstronautClearanceUpdate,
+    MissionEventCreate,
+    MissionEventOut,
 )
 
 router = APIRouter(prefix="/astronauts", tags=["Astronauts"])
@@ -243,6 +247,58 @@ def create_astronaut(payload: AstronautProfileCreate, db: Session = Depends(get_
 
     return astro
 
+
+@router.patch("/{astronaut_id}/clearance", response_model=AstronautProfileOut)
+def update_astronaut_clearance(
+    astronaut_id: str,
+    payload: AstronautClearanceUpdate,
+    db: Session = Depends(get_db),
+):
+    astro = db.query(AstronautProfile).filter(AstronautProfile.id == astronaut_id).first()
+    if not astro:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Astronaut with ID '{astronaut_id}' not found.",
+        )
+
+    valid_statuses = [
+        "FULL_FLIGHT_CLEARANCE",
+        "TEMPORARY_MEDICAL_HOLD",
+        "OBSERVATION_RESTRICTED",
+        "FIT_FOR_DUTY_WITH_RESTRICTIONS",
+        "GROUNDED",
+    ]
+    if payload.clearance_status not in valid_statuses:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid clearance status '{payload.clearance_status}'. Valid values are: {valid_statuses}",
+        )
+
+    old_status = astro.medical_clearance_status
+    astro.medical_clearance_status = payload.clearance_status
+    astro.updated_at = datetime.now(timezone.utc).isoformat()
+    db.commit()
+    db.refresh(astro)
+
+    # Queue clearance update to offline store-and-forward queue
+    queue_offline_transaction(
+        db=db,
+        transaction_type="ASTRONAUT_CLEARANCE_UPDATE",
+        entity_table="astronaut_profiles",
+        entity_id=astro.id,
+        payload={
+            "astronaut_id": astro.id,
+            "callsign": astro.callsign,
+            "old_status": old_status,
+            "new_status": astro.medical_clearance_status,
+            "reviewer_callsign": payload.reviewer_callsign,
+            "notes": payload.notes,
+            "timestamp": astro.updated_at,
+        },
+    )
+
+    return astro
+
 # --- Missions endpoints ---
 
 @mission_router.get("", response_model=List[MissionOut])
@@ -262,3 +318,72 @@ def create_mission(payload: MissionCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(mission)
     return mission
+
+
+@mission_router.post("/{mission_id}/events", response_model=MissionEventOut, status_code=status.HTTP_201_CREATED)
+def create_mission_event(
+    mission_id: str,
+    payload: MissionEventCreate,
+    db: Session = Depends(get_db),
+):
+    mission = db.query(Mission).filter(Mission.id == mission_id).first()
+    if not mission:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Mission with ID '{mission_id}' not found.",
+        )
+
+    astro = db.query(AstronautProfile).filter(AstronautProfile.id == payload.astronaut_id).first()
+    if not astro:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Astronaut with ID '{payload.astronaut_id}' not found.",
+        )
+
+    event = MissionEvent(
+        mission_id=mission_id,
+        astronaut_id=payload.astronaut_id,
+        event_type=payload.event_type,
+        title=payload.title,
+        start_time=payload.start_time,
+        end_time=payload.end_time,
+        workload_intensity=payload.workload_intensity,
+        notes=payload.notes,
+    )
+    db.add(event)
+    db.commit()
+    db.refresh(event)
+
+    queue_offline_transaction(
+        db=db,
+        transaction_type="MISSION_EVENT_CREATE",
+        entity_table="mission_events",
+        entity_id=event.id,
+        payload={
+            "mission_id": mission_id,
+            "astronaut_id": event.astronaut_id,
+            "event_type": event.event_type,
+            "title": event.title,
+            "start_time": event.start_time,
+            "end_time": event.end_time,
+            "workload_intensity": event.workload_intensity,
+        },
+    )
+
+    return event
+
+
+@mission_router.get("/{mission_id}/events", response_model=List[MissionEventOut])
+def list_mission_events(
+    mission_id: str,
+    astronaut_id: Optional[str] = Query(None),
+    event_type: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+):
+    query = db.query(MissionEvent).filter(MissionEvent.mission_id == mission_id)
+    if astronaut_id:
+        query = query.filter(MissionEvent.astronaut_id == astronaut_id)
+    if event_type:
+        query = query.filter(MissionEvent.event_type == event_type)
+    return query.order_by(MissionEvent.start_time.desc()).all()
+

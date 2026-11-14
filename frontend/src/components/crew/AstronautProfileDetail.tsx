@@ -5,14 +5,17 @@ import {
   Moon, 
   Zap, 
   Loader2, 
-  Users,
-  Calculator,
-  ChevronRight,
-  Play,
-  CheckCircle2,
-  Table,
-  ChevronDown,
-  ChevronUp
+  Users, 
+  Calculator, 
+  ChevronRight, 
+  Play, 
+  CheckCircle2, 
+  Table, 
+  ChevronDown, 
+  ChevronUp, 
+  FileText, 
+  PlusCircle, 
+  UserCheck 
 } from 'lucide-react';
 import { 
   AstronautSummary, 
@@ -21,6 +24,9 @@ import {
 } from '../../types';
 import { SynchronizedCharts } from '../SynchronizedCharts';
 import { BaselineInspectorModal } from './BaselineInspectorModal';
+import { MedicalHandoverModal } from './MedicalHandoverModal';
+import { QuickTelemetryModal } from './QuickTelemetryModal';
+import { ClearanceUpdateModal } from './ClearanceUpdateModal';
 import { runDeteriorationAnalysis } from '../../services/api';
 
 interface AstronautProfileDetailProps {
@@ -46,6 +52,9 @@ export function AstronautProfileDetail({
   const [showFlightLog, setShowFlightLog] = useState<boolean>(true);
   const [runningAnalysis, setRunningAnalysis] = useState<boolean>(false);
   const [analysisFeedback, setAnalysisFeedback] = useState<string>('');
+  const [showHandoverModal, setShowHandoverModal] = useState<boolean>(false);
+  const [showQuickTelemetry, setShowQuickTelemetry] = useState<boolean>(false);
+  const [showClearanceModal, setShowClearanceModal] = useState<boolean>(false);
 
   if (!astronaut) {
     return (
@@ -95,7 +104,7 @@ export function AstronautProfileDetail({
       {/* Header Banner */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-space-800 pb-5">
         <div>
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
             <h2 className="font-bold text-xl text-white">{astronaut.full_name}</h2>
             <span className="text-xs font-mono text-nasa-cyan bg-space-850 px-2.5 py-0.5 rounded border border-space-700">
               {astronaut.callsign}
@@ -103,6 +112,20 @@ export function AstronautProfileDetail({
             <span className="text-xs font-mono text-slate-400">
               {astronaut.mission_role} · {astronaut.mission_code}
             </span>
+            <button
+              onClick={() => setShowClearanceModal(true)}
+              title="Click to modify flight medical clearance tier"
+              className={`text-[11px] font-mono px-2.5 py-0.5 rounded border transition flex items-center gap-1 cursor-pointer ${
+                astronaut.medical_clearance_status === 'FULL_FLIGHT_CLEARANCE'
+                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50 hover:bg-emerald-900'
+                  : astronaut.medical_clearance_status === 'TEMPORARY_MEDICAL_HOLD'
+                  ? 'bg-red-950/80 text-red-300 border-red-500/50 hover:bg-red-900 animate-pulse'
+                  : 'bg-amber-950/80 text-amber-300 border-amber-500/50 hover:bg-amber-900'
+              }`}
+            >
+              <UserCheck className="w-3 h-3" />
+              <span>{astronaut.medical_clearance_status}</span>
+            </button>
           </div>
           <p className="text-xs text-slate-400 font-mono mt-1">
             Personal Flight Baseline Reference: 7-Day Calendar-Time Rolling Window with Bessel&apos;s Correction (N-1)
@@ -116,6 +139,24 @@ export function AstronautProfileDetail({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setShowQuickTelemetry(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-space-850 hover:bg-space-800 border border-space-700 hover:border-nasa-cyan text-xs font-mono text-slate-200 transition shadow"
+            title="Log bedside vitals and telemetry directly into the station database"
+          >
+            <PlusCircle className="w-3.5 h-3.5 text-nasa-cyan" />
+            <span>+ Log Vitals</span>
+          </button>
+
+          <button
+            onClick={() => setShowHandoverModal(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-space-850 hover:bg-space-800 border border-space-700 hover:border-nasa-cyan text-xs font-mono text-slate-200 transition shadow"
+            title="Generate and export official NASA Flight Surgeon Handover & Medical Summary"
+          >
+            <FileText className="w-3.5 h-3.5 text-nasa-cyan" />
+            <span>Handover Report</span>
+          </button>
+
           <button
             onClick={handleTriggerAnalysis}
             disabled={runningAnalysis}
@@ -427,6 +468,33 @@ export function AstronautProfileDetail({
           }}
         />
       )}
+
+      {/* Flight Surgeon Handover Dossier Modal */}
+      <MedicalHandoverModal
+        astronautId={astronaut.id}
+        isOpen={showHandoverModal}
+        onClose={() => setShowHandoverModal(false)}
+      />
+
+      {/* Quick Bedside Telemetry Logging Modal */}
+      <QuickTelemetryModal
+        astronaut={astronaut}
+        isOpen={showQuickTelemetry}
+        onClose={() => setShowQuickTelemetry(false)}
+        onSuccess={() => {
+          if (onRefreshTimeline) onRefreshTimeline();
+        }}
+      />
+
+      {/* Flight Medical Clearance Modifier Modal */}
+      <ClearanceUpdateModal
+        astronaut={astronaut}
+        isOpen={showClearanceModal}
+        onClose={() => setShowClearanceModal(false)}
+        onSuccess={() => {
+          if (onRefreshTimeline) onRefreshTimeline();
+        }}
+      />
     </section>
   );
 }

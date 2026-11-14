@@ -16,6 +16,10 @@ import {
   ClinicalCountermeasure,
   SyncQueueSummary,
   BenchmarkEvaluationReport,
+  FlightSurgeonHandoverReport,
+  MissionEventItem,
+  EnvironmentalTelemetryItem,
+  DatabaseSnapshotResponse,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -220,4 +224,88 @@ export async function runMLBenchmark(): Promise<BenchmarkEvaluationReport> {
   });
   return handleResponse<BenchmarkEvaluationReport>(res, 'Failed to execute ML benchmark evaluation run');
 }
+
+export async function fetchHandoverReport(astronautId: string, cmoNotes?: string): Promise<FlightSurgeonHandoverReport> {
+  const url = cmoNotes 
+    ? `${API_BASE}/reports/handover/${astronautId}?cmo_notes=${encodeURIComponent(cmoNotes)}`
+    : `${API_BASE}/reports/handover/${astronautId}`;
+  const res = await fetch(url);
+  return handleResponse<FlightSurgeonHandoverReport>(res, 'Failed to fetch flight surgeon handover report');
+}
+
+export async function updateAstronautClearance(
+  astronautId: string,
+  clearanceStatus: string,
+  reviewerCallsign: string = 'CMO-01',
+  notes?: string
+): Promise<any> {
+  const res = await fetch(`${API_BASE}/astronauts/${astronautId}/clearance`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      clearance_status: clearanceStatus,
+      reviewer_callsign: reviewerCallsign,
+      notes: notes || undefined,
+    }),
+  });
+  return handleResponse<any>(res, 'Failed to update astronaut flight clearance');
+}
+
+export async function createMissionEvent(
+  missionId: string,
+  payload: {
+    astronaut_id: string;
+    event_type: string;
+    title: string;
+    start_time: string;
+    end_time: string;
+    workload_intensity?: string;
+    notes?: string;
+  }
+): Promise<MissionEventItem> {
+  const res = await fetch(`${API_BASE}/missions/${missionId}/events`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<MissionEventItem>(res, 'Failed to create mission event');
+}
+
+export async function fetchMissionEvents(missionId: string, astronautId?: string): Promise<MissionEventItem[]> {
+  const url = astronautId 
+    ? `${API_BASE}/missions/${missionId}/events?astronaut_id=${astronautId}`
+    : `${API_BASE}/missions/${missionId}/events`;
+  const res = await fetch(url);
+  return handleResponse<MissionEventItem[]>(res, 'Failed to fetch mission events');
+}
+
+export async function fetchEnvironmentalTelemetry(missionId?: string, limit: number = 50): Promise<EnvironmentalTelemetryItem[]> {
+  const url = missionId 
+    ? `${API_BASE}/environmental?mission_id=${missionId}&limit=${limit}`
+    : `${API_BASE}/environmental?limit=${limit}`;
+  const res = await fetch(url);
+  return handleResponse<EnvironmentalTelemetryItem[]>(res, 'Failed to fetch environmental telemetry');
+}
+
+export async function recordEnvironmentalTelemetry(payload: {
+  mission_id: string;
+  parameter_name: string;
+  value: number;
+  unit: string;
+  habitat_zone: string;
+  timestamp: string;
+}): Promise<EnvironmentalTelemetryItem> {
+  const res = await fetch(`${API_BASE}/environmental`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return handleResponse<EnvironmentalTelemetryItem>(res, 'Failed to record environmental telemetry');
+}
+
+export async function fetchDatabaseSnapshot(): Promise<DatabaseSnapshotResponse> {
+  const res = await fetch(`${API_BASE}/health/database/snapshot`);
+  return handleResponse<DatabaseSnapshotResponse>(res, 'Failed to export database snapshot');
+}
+
 
