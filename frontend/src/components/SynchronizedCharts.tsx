@@ -284,27 +284,22 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert, live
         </div>
 
         {/* Chart 2: Sleep Duration */}
-        <div className="bg-white border border-slate-300 rounded-md p-4 flex flex-col justify-between shadow-2xs">
-          <div className="flex items-center justify-between mb-2">
+        <div className="bg-white border border-black/[0.09] rounded-2xl p-5 flex flex-col justify-between shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] transition-shadow">
+          <div className="flex items-center justify-between mb-3 border-b border-black/[0.05] pb-2.5">
             <div className="flex items-center gap-2">
               <Moon className="w-4 h-4 text-sky-600" />
-              <h4 className="font-bold text-xs tracking-wide text-slate-800 uppercase">Sleep Duration</h4>
+              <h4 className="font-extrabold text-xs tracking-wider text-slate-950 uppercase font-mono">Sleep Duration</h4>
             </div>
             <div className="flex items-center gap-2">
               {liveVitals?.sleep !== undefined && (
-                <span className="text-[10px] font-mono text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200 flex items-center gap-1 font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
-                  Live: {liveVitals.sleep.toFixed(1)}h
-                </span>
-              )}
-              {sleepBase && (
-                <span className="text-[11px] font-mono text-slate-500">
-                  Base: {sleepBase.mean.toFixed(1)} ± {sleepBase.std_dev.toFixed(2)}h
+                <span className="text-[10px] font-mono text-sky-800 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-300 flex items-center gap-1 font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-sky-600 animate-pulse" />
+                  {liveVitals.sleep.toFixed(1)}h
                 </span>
               )}
             </div>
           </div>
-          <div className="h-48 w-full">
+          <div className="h-52 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -345,10 +340,10 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert, live
                   dataKey="sleep"
                   name="Sleep (hrs)"
                   stroke="#0284c7"
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   connectNulls={false}
                   isAnimationActive={false}
-                  dot={{ r: 3, fill: '#0284c7' }}
+                  dot={{ r: 3.5, fill: '#0284c7' }}
                   activeDot={{ r: 5 }}
                 />
               </LineChart>
@@ -357,27 +352,22 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert, live
         </div>
 
         {/* Chart 3: Heart Rate Recovery */}
-        <div className="bg-white border border-slate-300 rounded-md p-4 flex flex-col justify-between shadow-2xs">
-          <div className="flex items-center justify-between mb-2">
+        <div className="bg-white border border-black/[0.09] rounded-2xl p-5 flex flex-col justify-between shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] transition-shadow">
+          <div className="flex items-center justify-between mb-3 border-b border-black/[0.05] pb-2.5">
             <div className="flex items-center gap-2">
               <Timer className="w-4 h-4 text-emerald-600" />
-              <h4 className="font-bold text-xs tracking-wide text-slate-800 uppercase">HR Recovery (1-Min)</h4>
+              <h4 className="font-extrabold text-xs tracking-wider text-slate-950 uppercase font-mono">HR Recovery (1-Min)</h4>
             </div>
             <div className="flex items-center gap-2">
               {liveVitals?.hrr !== undefined && (
-                <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1 font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Live: {liveVitals.hrr.toFixed(1)} bpm
-                </span>
-              )}
-              {hrrBase && (
-                <span className="text-[11px] font-mono text-slate-500">
-                  Base: {hrrBase.mean.toFixed(1)} ± {hrrBase.std_dev.toFixed(1)}
+                <span className="text-[10px] font-mono text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1 font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                  {liveVitals.hrr.toFixed(1)} bpm
                 </span>
               )}
             </div>
           </div>
-          <div className="h-48 w-full">
+          <div className="h-52 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -418,7 +408,7 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert, live
                   dataKey="hrr"
                   name="HRR Drop (bpm)"
                   stroke="#10b981"
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   connectNulls={false}
                   isAnimationActive={false}
                   dot={(props: any) => {
@@ -431,7 +421,7 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert, live
                         </g>
                       );
                     }
-                    return <circle key={`hrr-dot-${props.index}`} cx={props.cx} cy={props.cy} r={3} fill="#10b981" />;
+                    return <circle key={`hrr-dot-${props.index}`} cx={props.cx} cy={props.cy} r={3.5} fill="#10b981" />;
                   }}
                   activeDot={{ r: 5 }}
                 />
@@ -442,38 +432,38 @@ export function SynchronizedCharts({ timeline, onOpenAlert, hasActiveAlert, live
       </div>
 
       {/* Synchronized Mission Events & Cabin Context */}
-      <div className="bg-white border border-slate-300 rounded-md p-4 shadow-2xs">
-        <div className="flex items-center justify-between mb-3">
+      <div className="bg-white border border-black/[0.09] rounded-2xl p-5 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)]">
+        <div className="flex items-center justify-between mb-3 border-b border-black/[0.05] pb-2.5">
           <div className="flex items-center gap-2">
             <Wind className="w-4 h-4 text-[#0b3d91]" />
-            <h4 className="font-bold text-xs tracking-wide text-slate-800 uppercase">
+            <h4 className="font-extrabold text-xs tracking-wider text-slate-950 uppercase font-mono">
               Mission Events &amp; Habitat Stressors
             </h4>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
           {timeline_points.map((pt, i) => {
             const hasEvent = pt.mission_events.length > 0;
             const hasCO2 = pt.cabin_co2_ppm && pt.cabin_co2_ppm > 2500;
             return (
               <div
                 key={pt.date}
-                className={`p-2 rounded-lg border text-xs font-mono transition ${
+                className={`p-3 rounded-xl border text-xs font-mono transition ${
                   hasCO2 || hasEvent
-                    ? 'bg-amber-50 border-amber-300 text-amber-900'
-                    : 'bg-slate-50 border-slate-200 text-slate-600'
+                    ? 'bg-amber-50/90 border-amber-300 text-amber-950 font-bold shadow-2xs'
+                    : 'bg-[#f4f5f8] border-black/[0.05] text-slate-700'
                 }`}
               >
-                <div className="font-bold text-[11px] text-slate-800">FD{i + 1}</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">{pt.date.slice(5)}</div>
+                <div className="font-extrabold text-xs text-slate-950">FD{i + 1}</div>
+                <div className="text-[10px] text-slate-600 mt-0.5 font-semibold">{pt.date.slice(5)}</div>
                 {hasCO2 && (
-                  <div className="mt-1 text-[10px] text-amber-800 font-bold">
+                  <div className="mt-1 text-[10px] text-amber-900 font-extrabold">
                     CO2: {pt.cabin_co2_ppm} ppm
                   </div>
                 )}
                 {hasEvent && (
-                  <div className="mt-1 text-[9px] text-slate-700 leading-tight">
+                  <div className="mt-1 text-[10px] text-slate-800 font-medium leading-tight">
                     {pt.mission_events[0]}
                   </div>
                 )}

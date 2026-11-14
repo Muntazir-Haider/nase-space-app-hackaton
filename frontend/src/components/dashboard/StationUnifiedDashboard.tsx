@@ -569,149 +569,155 @@ export function StationUnifiedDashboard({
               </span>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-black/[0.06]">
+            <div className="overflow-x-auto rounded-xl border border-black/[0.08] shadow-2xs">
               <table className="w-full text-xs text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-[#f5f5f7] text-[10px] font-mono uppercase text-slate-600">
-                    <th className="py-2.5 px-3.5 font-bold">Organ System</th>
-                    <th className="py-2.5 px-3.5 font-bold">Device Channel</th>
-                    <th className="py-2.5 px-3.5 font-bold">Live Value</th>
-                    <th className="py-2.5 px-3.5 font-bold">7-Day Baseline</th>
-                    <th className="py-2.5 px-3.5 font-bold">Z-Score</th>
-                    <th className="py-2.5 px-3.5 font-bold">Status</th>
-                    <th className="py-2.5 px-3.5 font-bold">Clinical Directive</th>
+                  <tr className="border-b border-black/[0.08] bg-[#f4f5f8] text-xs font-mono uppercase text-slate-800">
+                    <th className="py-3 px-4 font-extrabold">Organ System</th>
+                    <th className="py-3 px-4 font-extrabold">Device Channel</th>
+                    <th className="py-3 px-4 font-extrabold">Live Value</th>
+                    <th className="py-3 px-4 font-extrabold">Baseline Corridor</th>
+                    <th className="py-3 px-4 font-extrabold">Deviation</th>
+                    <th className="py-3 px-4 font-extrabold">Clinical State</th>
+                    <th className="py-3 px-4 font-extrabold">Directive</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-[11px]">
+                <tbody className="divide-y divide-black/[0.05] text-xs bg-white">
                   {/* Row 1: Cardiovascular */}
-                  <tr className="hover:bg-slate-50/70">
-                    <td className="py-3 px-3.5 font-semibold text-slate-900 flex items-center gap-1.5">
-                      <Activity className="w-3.5 h-3.5 text-red-500" /> Cardiovascular
+                  <tr className="hover:bg-slate-50/90 transition-colors">
+                    <td className="py-3.5 px-4 font-extrabold text-slate-950 flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-red-600" /> Cardiovascular
                     </td>
-                    <td className="py-3 px-3.5 font-mono text-slate-600">Astroskin Bio-Vest (Lead II)</td>
-                    <td className="py-3 px-3.5 font-mono font-bold text-slate-900">{liveVitals.rhr.toFixed(1)} bpm</td>
-                    <td className="py-3 px-3.5 font-mono text-slate-500">{rhrBaseline ? `${rhrBaseline.mean.toFixed(1)} ± ${rhrBaseline.std_dev.toFixed(1)}` : '62.0 ± 2.5'}</td>
-                    <td className="py-3 px-3.5 font-mono font-bold">
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-700">Astroskin Bio-Vest (Lead II)</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold text-slate-950 text-sm">{liveVitals.rhr.toFixed(1)} bpm</td>
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-600">{rhrBaseline ? `${rhrBaseline.mean.toFixed(1)} ± ${rhrBaseline.std_dev.toFixed(1)}` : '62.0 ± 2.5'}</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold">
                       {rhrBaseline ? (
-                        <span className={Math.abs((liveVitals.rhr - rhrBaseline.mean)/rhrBaseline.std_dev) >= 1.5 ? 'text-rose-600' : 'text-emerald-700'}>
+                        <span className={`px-2 py-0.5 rounded-full ${Math.abs((liveVitals.rhr - rhrBaseline.mean)/rhrBaseline.std_dev) >= 1.5 ? 'bg-rose-100 text-rose-900 border border-rose-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'}`}>
                           {((liveVitals.rhr - rhrBaseline.mean)/rhrBaseline.std_dev) > 0 ? '+' : ''}{((liveVitals.rhr - rhrBaseline.mean)/rhrBaseline.std_dev).toFixed(2)}σ
                         </span>
                       ) : '0.0σ'}
                     </td>
-                    <td className="py-3 px-3.5">
-                      <span className={`px-2.5 py-0.5 rounded-full font-mono font-bold text-[10px] ${activeAlert ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
-                        {activeAlert ? 'MYOCARDIAL DRIFT' : 'HOMEOSTATIC'}
+                    <td className="py-3.5 px-4">
+                      <span className={`px-2.5 py-0.5 rounded-full font-mono font-extrabold text-[10px] ${activeAlert ? 'bg-rose-100 text-rose-900 border border-rose-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'}`}>
+                        {activeAlert ? 'MYOCARDIAL DRIFT' : 'NOMINAL'}
                       </span>
                     </td>
-                    <td className="py-3 px-3.5 text-slate-600 text-[10px]">
-                      {activeAlert ? 'Hypercapnia & post-EVA cardiac strain screening' : 'Nominal countermeasure exercise protocol'}
+                    <td className="py-3.5 px-4 text-slate-700 font-semibold text-xs">
+                      {activeAlert ? 'Screen hypercapnia & post-EVA strain' : 'Standard countermeasure exercise protocol'}
                     </td>
                   </tr>
 
                   {/* Row 2: Circadian / Sleep */}
-                  <tr className="hover:bg-slate-50/70">
-                    <td className="py-3 px-3.5 font-semibold text-slate-900 flex items-center gap-1.5">
-                      <Moon className="w-3.5 h-3.5 text-sky-600" /> Circadian & Neurological
+                  <tr className="hover:bg-slate-50/90 transition-colors">
+                    <td className="py-3.5 px-4 font-extrabold text-slate-950 flex items-center gap-2">
+                      <Moon className="w-4 h-4 text-sky-600" /> Circadian & Neuro
                     </td>
-                    <td className="py-3 px-3.5 font-mono text-slate-600">Somna Neuro-Band EEG</td>
-                    <td className="py-3 px-3.5 font-mono font-bold text-slate-900">{liveVitals.sleep.toFixed(1)} hrs</td>
-                    <td className="py-3 px-3.5 font-mono text-slate-500">{sleepBaseline ? `${sleepBaseline.mean.toFixed(1)} ± ${sleepBaseline.std_dev.toFixed(2)}` : '7.4 ± 0.45'}</td>
-                    <td className="py-3 px-3.5 font-mono font-bold">
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-700">Somna Neuro-Band EEG</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold text-slate-950 text-sm">{liveVitals.sleep.toFixed(1)} hrs</td>
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-600">{sleepBaseline ? `${sleepBaseline.mean.toFixed(1)} ± ${sleepBaseline.std_dev.toFixed(2)}` : '7.4 ± 0.45'}</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold">
                       {sleepBaseline ? (
-                        <span className={(liveVitals.sleep - sleepBaseline.mean)/sleepBaseline.std_dev <= -1.5 ? 'text-rose-600' : 'text-emerald-700'}>
+                        <span className={`px-2 py-0.5 rounded-full ${(liveVitals.sleep - sleepBaseline.mean)/sleepBaseline.std_dev <= -1.5 ? 'bg-rose-100 text-rose-900 border border-rose-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'}`}>
                           {((liveVitals.sleep - sleepBaseline.mean)/sleepBaseline.std_dev).toFixed(2)}σ
                         </span>
                       ) : '0.0σ'}
                     </td>
-                    <td className="py-3 px-3.5">
-                      <span className={`px-2.5 py-0.5 rounded-full font-mono font-bold text-[10px] ${liveVitals.sleep < 6 ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
-                        {liveVitals.sleep < 6 ? 'SWS SLEEP DEFICIT' : 'OPTIMAL NREM/REM'}
+                    <td className="py-3.5 px-4">
+                      <span className={`px-2.5 py-0.5 rounded-full font-mono font-extrabold text-[10px] ${liveVitals.sleep < 6 ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'}`}>
+                        {liveVitals.sleep < 6 ? 'SLEEP DEFICIT' : 'OPTIMAL NREM'}
                       </span>
                     </td>
-                    <td className="py-3 px-3.5 text-slate-600 text-[10px]">
-                      {liveVitals.sleep < 6 ? 'Enforce 45-min sleep opportunity & dim lighting' : 'Circadian phase aligned with UTC schedule'}
+                    <td className="py-3.5 px-4 text-slate-700 font-semibold text-xs">
+                      {liveVitals.sleep < 6 ? 'Enforce sleep opportunity & dim cabin lights' : 'Aligned with UTC circadian timeline'}
                     </td>
                   </tr>
 
                   {/* Row 3: Autonomic HRR */}
-                  <tr className="hover:bg-slate-50/70">
-                    <td className="py-3 px-3.5 font-semibold text-slate-900 flex items-center gap-1.5">
-                      <Zap className="w-3.5 h-3.5 text-emerald-600" /> Autonomic Recovery
+                  <tr className="hover:bg-slate-50/90 transition-colors">
+                    <td className="py-3.5 px-4 font-extrabold text-slate-950 flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-emerald-600" /> Autonomic Recovery
                     </td>
-                    <td className="py-3 px-3.5 font-mono text-slate-600">Hexoskin Smart Pod</td>
-                    <td className="py-3 px-3.5 font-mono font-bold text-slate-900">{liveVitals.hrr.toFixed(1)} bpm</td>
-                    <td className="py-3 px-3.5 font-mono text-slate-500">{hrrBaseline ? `${hrrBaseline.mean.toFixed(1)} ± ${hrrBaseline.std_dev.toFixed(1)}` : '28.0 ± 3.0'}</td>
-                    <td className="py-3 px-3.5 font-mono font-bold">
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-700">Hexoskin Smart Pod</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold text-slate-950 text-sm">{liveVitals.hrr.toFixed(1)} bpm</td>
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-600">{hrrBaseline ? `${hrrBaseline.mean.toFixed(1)} ± ${hrrBaseline.std_dev.toFixed(1)}` : '28.0 ± 3.0'}</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold">
                       {hrrBaseline ? (
-                        <span className={(liveVitals.hrr - hrrBaseline.mean)/hrrBaseline.std_dev <= -1.5 ? 'text-rose-600' : 'text-emerald-700'}>
+                        <span className={`px-2 py-0.5 rounded-full ${(liveVitals.hrr - hrrBaseline.mean)/hrrBaseline.std_dev <= -1.5 ? 'bg-rose-100 text-rose-900 border border-rose-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'}`}>
                           {((liveVitals.hrr - hrrBaseline.mean)/hrrBaseline.std_dev) > 0 ? '+' : ''}{((liveVitals.hrr - hrrBaseline.mean)/hrrBaseline.std_dev).toFixed(2)}σ
                         </span>
                       ) : '0.0σ'}
                     </td>
-                    <td className="py-3 px-3.5">
-                      <span className={`px-2.5 py-0.5 rounded-full font-mono font-bold text-[10px] ${activeAlert ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
-                        {activeAlert ? 'DELAYED RECOVERY' : 'VAGAL TONE STABLE'}
+                    <td className="py-3.5 px-4">
+                      <span className={`px-2.5 py-0.5 rounded-full font-mono font-extrabold text-[10px] ${activeAlert ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'}`}>
+                        {activeAlert ? 'DELAYED RECOVERY' : 'STABLE TONE'}
                       </span>
                     </td>
-                    <td className="py-3 px-3.5 text-slate-600 text-[10px]">
-                      Cardiac vagal reactivation index post countermeasure exertion
+                    <td className="py-3.5 px-4 text-slate-700 font-semibold text-xs">
+                      Post-exercise vagal reactivation index monitoring
                     </td>
                   </tr>
 
                   {/* Row 4: Pulmonary SpO2 */}
-                  <tr className="hover:bg-slate-50/70">
-                    <td className="py-3 px-3.5 font-semibold text-slate-900 flex items-center gap-1.5">
-                      <Wind className="w-3.5 h-3.5 text-teal-600" /> Pulmonary & Blood Gas
+                  <tr className="hover:bg-slate-50/90 transition-colors">
+                    <td className="py-3.5 px-4 font-extrabold text-slate-950 flex items-center gap-2">
+                      <Wind className="w-4 h-4 text-teal-600" /> Pulmonary & Gas
                     </td>
-                    <td className="py-3 px-3.5 font-mono text-slate-600">Astroskin Pulse Oximeter</td>
-                    <td className="py-3 px-3.5 font-mono font-bold text-slate-900">{liveVitals.spo2.toFixed(1)}% SpO₂</td>
-                    <td className="py-3 px-3.5 font-mono text-slate-500">98.5 ± 0.8%</td>
-                    <td className="py-3 px-3.5 font-mono font-bold text-emerald-700">-0.12σ</td>
-                    <td className="py-3 px-3.5">
-                      <span className="px-2.5 py-0.5 rounded-full font-mono font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        NOMINAL OXYGENATION
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-700">Astroskin Pulse Oximeter</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold text-slate-950 text-sm">{liveVitals.spo2.toFixed(1)}% SpO₂</td>
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-600">98.5 ± 0.8%</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">-0.12σ</span>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="px-2.5 py-0.5 rounded-full font-mono font-extrabold text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-300">
+                        NOMINAL OXYGEN
                       </span>
                     </td>
-                    <td className="py-3 px-3.5 text-slate-600 text-[10px]">
-                      Adequate alveolar gas exchange; sea-level $pO_2$ maintained
+                    <td className="py-3.5 px-4 text-slate-700 font-semibold text-xs">
+                      Normal alveolar diffusion; nominal cabin $pO_2$
                     </td>
                   </tr>
 
                   {/* Row 5: Thermoregulatory Core Temp */}
-                  <tr className="hover:bg-slate-50/70">
-                    <td className="py-3 px-3.5 font-semibold text-slate-900 flex items-center gap-1.5">
-                      <Thermometer className="w-3.5 h-3.5 text-purple-600" /> Core Thermoregulatory
+                  <tr className="hover:bg-slate-50/90 transition-colors">
+                    <td className="py-3.5 px-4 font-extrabold text-slate-950 flex items-center gap-2">
+                      <Thermometer className="w-4 h-4 text-purple-600" /> Core Temp
                     </td>
-                    <td className="py-3 px-3.5 font-mono text-slate-600">VitalSense Core Capsule</td>
-                    <td className="py-3 px-3.5 font-mono font-bold text-slate-900">{liveVitals.temp.toFixed(2)} °C</td>
-                    <td className="py-3 px-3.5 font-mono text-slate-500">36.80 ± 0.18 °C</td>
-                    <td className="py-3 px-3.5 font-mono font-bold text-emerald-700">+0.05σ</td>
-                    <td className="py-3 px-3.5">
-                      <span className="px-2.5 py-0.5 rounded-full font-mono font-bold text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200">
-                        EUTHERMIC NOMINAL
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-700">VitalSense Core Capsule</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold text-slate-950 text-sm">{liveVitals.temp.toFixed(2)} °C</td>
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-600">36.80 ± 0.18 °C</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">+0.05σ</span>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="px-2.5 py-0.5 rounded-full font-mono font-extrabold text-[10px] bg-emerald-100 text-emerald-900 border border-emerald-300">
+                        EUTHERMIC
                       </span>
                     </td>
-                    <td className="py-3 px-3.5 text-slate-600 text-[10px]">
-                      Visceral core telemetry; zero hyperthermic heat exhaustion signs
+                    <td className="py-3.5 px-4 text-slate-700 font-semibold text-xs">
+                      Visceral core normal; zero heat accumulation
                     </td>
                   </tr>
 
                   {/* Row 6: Habitat Coupling */}
-                  <tr className="hover:bg-slate-50/70">
-                    <td className="py-3 px-3.5 font-semibold text-slate-900 flex items-center gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600" /> Habitat ECLSS Coupling
+                  <tr className="hover:bg-slate-50/90 transition-colors">
+                    <td className="py-3.5 px-4 font-extrabold text-slate-950 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-600" /> Habitat ECLSS
                     </td>
-                    <td className="py-3 px-3.5 font-mono text-slate-600">Cabin CO₂ & Pressure Array</td>
-                    <td className="py-3 px-3.5 font-mono font-bold text-amber-700">3,450 ppm CO₂</td>
-                    <td className="py-3 px-3.5 font-mono text-slate-500">&lt; 2,500 ppm limit</td>
-                    <td className="py-3 px-3.5 font-mono font-bold text-amber-700">+2.10σ</td>
-                    <td className="py-3 px-3.5">
-                      <span className="px-2.5 py-0.5 rounded-full font-mono font-bold text-[10px] bg-amber-50 text-amber-800 border border-amber-300">
-                        ECLSS ELEVATED POST-EVA
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-700">Cabin CO₂ & Pressure Array</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold text-amber-900 text-sm">3,450 ppm CO₂</td>
+                    <td className="py-3.5 px-4 font-mono font-semibold text-slate-600">&lt; 2,500 ppm limit</td>
+                    <td className="py-3.5 px-4 font-mono font-extrabold">
+                      <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">+2.10σ</span>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="px-2.5 py-0.5 rounded-full font-mono font-extrabold text-[10px] bg-amber-100 text-amber-900 border border-amber-300">
+                        ELEVATED POST-EVA
                       </span>
                     </td>
-                    <td className="py-3 px-3.5 text-slate-600 text-[10px]">
-                      Verify amine scrubber cycling; correlate with astronaut RHR trend
+                    <td className="py-3.5 px-4 text-slate-700 font-semibold text-xs">
+                      Verify amine scrubbers; cross-correlate with crew heart rate
                     </td>
                   </tr>
                 </tbody>

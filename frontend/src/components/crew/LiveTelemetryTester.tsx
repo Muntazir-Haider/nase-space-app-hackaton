@@ -216,33 +216,33 @@ export function LiveTelemetryTester({
   }
 
   return (
-    <div className="bg-white border border-slate-300 rounded-md p-5 shadow-2xs flex flex-col gap-4 font-sans">
+    <div className="bg-white rounded-2xl border border-black/[0.09] p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col gap-5 font-sans">
       
       {/* ── Top Station Docking Header ── */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3.5">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-md bg-[#0b3d91] flex items-center justify-center text-white shadow-xs">
-            <Radio className="w-4 h-4 animate-pulse" />
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/[0.05] pb-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs">
+            <Radio className="w-5 h-5 animate-pulse" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                NASA Bio-Station Dock // Astronaut Device Synchronizer
+            <div className="flex items-center gap-2.5">
+              <h3 className="text-sm font-extrabold text-slate-950 uppercase tracking-tight font-mono">
+                Astronaut Wearables Dock · Telemetry Ingestion
               </h3>
               {activeAlert ? (
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-sm bg-rose-50 text-rose-800 border border-rose-300 font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
-                  DRIFT DETECTED: {activeAlert.review_priority}
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-900 border border-rose-300 font-bold flex items-center gap-1.5 shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-ping" />
+                  ALERT: {activeAlert.review_priority}
                 </span>
               ) : (
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-sm bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                  DOCK LINK ACTIVE
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-900 border border-emerald-300 font-bold flex items-center gap-1.5 shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                  DOCK ACTIVE
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-500 font-sans mt-0.5">
-              Automated wireless bio-telemetry offload, cryptographic device verification & station database sync
+            <p className="text-xs text-slate-600 font-semibold mt-0.5">
+              4 Monitored Biosensor Channels · Real-Time Station WAL Synchronization
             </p>
           </div>
         </div>
@@ -253,160 +253,160 @@ export function LiveTelemetryTester({
             type="button"
             disabled={isSyncingDevices || scenarioLoading}
             onClick={handleSyncAllDevices}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-[#0b3d91] hover:bg-[#092d6c] text-white text-xs font-semibold shadow-xs transition cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0b3d91] hover:bg-[#092d6c] text-white text-xs font-bold shadow-xs transition cursor-pointer active:scale-[0.98]"
             title="Sync all connected astronaut wearables directly to Station SQLite WAL storage"
           >
             {isSyncingDevices ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <RefreshCw className="w-3.5 h-3.5" />
+              <RefreshCw className="w-4 h-4" />
             )}
-            <span>{isSyncingDevices ? 'Syncing Wearables...' : 'Sync Wearables to Station'}</span>
+            <span>{isSyncingDevices ? 'Syncing...' : 'Sync Wearables to Station'}</span>
           </button>
         </div>
       </div>
 
       {/* ── Connected Medical Wearables Grid ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Device 1: Astroskin Bio-Vest */}
-        <div className="p-3 rounded-md border border-slate-200 bg-slate-50/70 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="font-semibold text-slate-800 flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 text-red-500" />
+        <div className="p-4 rounded-xl border border-black/[0.06] bg-[#f4f5f8] flex flex-col justify-between shadow-2xs hover:border-black/[0.12] transition">
+          <div className="flex items-center justify-between text-xs mb-1.5">
+            <span className="font-extrabold text-slate-900 flex items-center gap-1.5 text-xs">
+              <Activity className="w-4 h-4 text-red-600" />
               Astroskin Bio-Vest
             </span>
-            <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-xs border border-emerald-200">
-              BLE 5.4 · 94%
+            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-300">
+              94%
             </span>
           </div>
-          <div className="text-[11px] text-slate-600 font-mono">
-            Lead II Continuous ECG · Respiration Rate
+          <div className="text-xs text-slate-700 font-semibold font-mono">
+            Lead II Continuous ECG · Resp
           </div>
-          <div className="mt-2 pt-1.5 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500">
-            <span>RSSI: -38 dBm</span>
-            <span className="text-emerald-700 font-bold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Synced
+          <div className="mt-2.5 pt-2 border-t border-black/[0.05] flex items-center justify-between text-[11px] text-slate-600 font-medium">
+            <span>250 Hz Stream</span>
+            <span className="text-emerald-800 font-bold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" /> Synced
             </span>
           </div>
         </div>
 
         {/* Device 2: Hexoskin Smart Pod */}
-        <div className="p-3 rounded-md border border-slate-200 bg-slate-50/70 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="font-semibold text-slate-800 flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-purple-600" />
-              Hexoskin Pod #HEX-331
+        <div className="p-4 rounded-xl border border-black/[0.06] bg-[#f4f5f8] flex flex-col justify-between shadow-2xs hover:border-black/[0.12] transition">
+          <div className="flex items-center justify-between text-xs mb-1.5">
+            <span className="font-extrabold text-slate-900 flex items-center gap-1.5 text-xs">
+              <Zap className="w-4 h-4 text-purple-600" />
+              Hexoskin Pod
             </span>
-            <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-xs border border-emerald-200">
-              UWB · 88%
+            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-300">
+              88%
             </span>
           </div>
-          <div className="text-[11px] text-slate-600 font-mono">
-            R-R Autonomic Intervals · HR Recovery
+          <div className="text-xs text-slate-700 font-semibold font-mono">
+            R-R Intervals · HR Recovery
           </div>
-          <div className="mt-2 pt-1.5 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500">
-            <span>Rate: 100 Hz</span>
-            <span className="text-emerald-700 font-bold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Synced
+          <div className="mt-2.5 pt-2 border-t border-black/[0.05] flex items-center justify-between text-[11px] text-slate-600 font-medium">
+            <span>100 Hz Rate</span>
+            <span className="text-emerald-800 font-bold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" /> Synced
             </span>
           </div>
         </div>
 
         {/* Device 3: VitalSense Core Temp Capsule */}
-        <div className="p-3 rounded-md border border-slate-200 bg-slate-50/70 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="font-semibold text-slate-800 flex items-center gap-1.5">
-              <Thermometer className="w-3.5 h-3.5 text-amber-500" />
-              VitalSense Core Capsule
+        <div className="p-4 rounded-xl border border-black/[0.06] bg-[#f4f5f8] flex flex-col justify-between shadow-2xs hover:border-black/[0.12] transition">
+          <div className="flex items-center justify-between text-xs mb-1.5">
+            <span className="font-extrabold text-slate-900 flex items-center gap-1.5 text-xs">
+              <Thermometer className="w-4 h-4 text-amber-600" />
+              VitalSense Capsule
             </span>
-            <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-xs border border-emerald-200">
-              433 MHz RF
+            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-300">
+              99%
             </span>
           </div>
-          <div className="text-[11px] text-slate-600 font-mono">
-            Visceral Deep Core Temperature (36.8°C)
+          <div className="text-xs text-slate-700 font-semibold font-mono">
+            Visceral Core Temp (36.8°C)
           </div>
-          <div className="mt-2 pt-1.5 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500">
-            <span>Metabolic Flux</span>
-            <span className="text-emerald-700 font-bold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Active Link
+          <div className="mt-2.5 pt-2 border-t border-black/[0.05] flex items-center justify-between text-[11px] text-slate-600 font-medium">
+            <span>0.1 Hz Telemetry</span>
+            <span className="text-emerald-800 font-bold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" /> Active
             </span>
           </div>
         </div>
 
         {/* Device 4: Somna Neuro-Sleep Band */}
-        <div className="p-3 rounded-md border border-slate-200 bg-slate-50/70 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="font-semibold text-slate-800 flex items-center gap-1.5">
-              <Moon className="w-3.5 h-3.5 text-sky-600" />
+        <div className="p-4 rounded-xl border border-black/[0.06] bg-[#f4f5f8] flex flex-col justify-between shadow-2xs hover:border-black/[0.12] transition">
+          <div className="flex items-center justify-between text-xs mb-1.5">
+            <span className="font-extrabold text-slate-900 flex items-center gap-1.5 text-xs">
+              <Moon className="w-4 h-4 text-sky-600" />
               Somna Neuro-Band
             </span>
-            <span className="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-xs border border-emerald-200">
-              Optical · 91%
+            <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-300">
+              91%
             </span>
           </div>
-          <div className="text-[11px] text-slate-600 font-mono">
-            Circadian Phase & Slow-Wave Sleep EEG
+          <div className="text-xs text-slate-700 font-semibold font-mono">
+            Frontal EEG Sleep State
           </div>
-          <div className="mt-2 pt-1.5 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500">
-            <span>Delta Power SWS</span>
-            <span className="text-emerald-700 font-bold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Docked
+          <div className="mt-2.5 pt-2 border-t border-black/[0.05] flex items-center justify-between text-[11px] text-slate-600 font-medium">
+            <span>128 Hz EEG</span>
+            <span className="text-emerald-800 font-bold flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" /> Docked
             </span>
           </div>
         </div>
       </div>
 
       {/* ── Flight Physiological Conditions Toolbar ── */}
-      <div className="p-3 rounded-md bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="p-4 rounded-xl bg-[#f4f5f8] border border-black/[0.06] flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2">
-          <Cpu className="w-3.5 h-3.5 text-[#0b3d91]" />
-          <span className="font-bold text-slate-800 uppercase tracking-wide text-[11px]">
-            Flight Clinical State:
+          <Cpu className="w-4 h-4 text-[#0b3d91]" />
+          <span className="font-extrabold text-slate-950 uppercase tracking-wide text-xs font-mono">
+            Clinical Triage Preset:
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             type="button"
             disabled={scenarioLoading || submitting}
             onClick={handlePresetNominal}
-            className="px-2.5 py-1.5 rounded-sm bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 text-slate-700 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl bg-white hover:bg-emerald-50 border border-black/[0.08] hover:border-emerald-300 text-slate-900 text-xs font-bold transition cursor-pointer flex items-center gap-2 shadow-2xs active:scale-[0.98]"
             title="Load nominal baseline condition"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>1. Nominal Baseline Transit</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span>1. Nominal Baseline</span>
           </button>
 
           <button
             type="button"
             disabled={scenarioLoading || submitting}
             onClick={handlePresetSpike}
-            className="px-2.5 py-1.5 rounded-sm bg-white hover:bg-amber-50 border border-slate-200 hover:border-amber-300 text-slate-700 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl bg-white hover:bg-amber-50 border border-black/[0.08] hover:border-amber-300 text-slate-900 text-xs font-bold transition cursor-pointer flex items-center gap-2 shadow-2xs active:scale-[0.98]"
             title="Load acute EVA physical exertion condition"
           >
-            <span className="w-2 h-2 rounded-full bg-amber-500" />
-            <span>2. Acute Spacewalk Exertion</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+            <span>2. Spacewalk Exertion</span>
           </button>
 
           <button
             type="button"
             disabled={scenarioLoading || submitting}
             onClick={handlePresetDeterioration}
-            className="px-2.5 py-1.5 rounded-sm bg-white hover:bg-rose-50 border border-slate-200 hover:border-rose-300 text-slate-700 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
-            title="Load silent deterioration condition post-EVA"
+            className="px-3.5 py-2 rounded-xl bg-white hover:bg-rose-50 border border-black/[0.08] hover:border-rose-300 text-slate-900 text-xs font-bold transition cursor-pointer flex items-center gap-2 shadow-2xs active:scale-[0.98]"
+            title="Load multi-day silent deterioration condition"
           >
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-            <span>3. Multi-Day Silent Deterioration</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+            <span>3. Multi-Day EVA Drift</span>
           </button>
 
           <button
             type="button"
             onClick={() => setShowOverrideForm(!showOverrideForm)}
-            className="px-2.5 py-1.5 rounded-sm bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 text-xs font-mono transition cursor-pointer flex items-center gap-1"
+            className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 border border-black/[0.08] text-slate-800 text-xs font-bold transition cursor-pointer flex items-center gap-1.5 shadow-2xs active:scale-[0.98]"
           >
             <span>{showOverrideForm ? 'Hide Sensor Buffer' : 'Sensor Buffer Override'}</span>
-            {showOverrideForm ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            {showOverrideForm ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
         </div>
       </div>
