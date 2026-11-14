@@ -12,6 +12,7 @@ from backend.app.api import (
     baselines_router,
     alerts_router,
     runs_router,
+    scenarios_router,
 )
 
 @asynccontextmanager
@@ -48,6 +49,7 @@ app.include_router(environmental_router, prefix=settings.API_V1_STR)
 app.include_router(baselines_router, prefix=settings.API_V1_STR)
 app.include_router(alerts_router, prefix=settings.API_V1_STR)
 app.include_router(runs_router, prefix=settings.API_V1_STR)
+app.include_router(scenarios_router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def root():

@@ -29,7 +29,12 @@ def get_db():
 def init_db():
     # Import all models before calling create_all to register schemas
     from backend.app.models import entities  # noqa: F401
+    from backend.app.models.entities import AstronautProfile
     from backend.app.services.seed_data import seed_default_indicators
+    from backend.app.services.scenario_loader import load_scenario
     Base.metadata.create_all(bind=engine)
     with SessionLocal() as db:
         seed_default_indicators(db)
+        if db.query(AstronautProfile).count() == 0:
+            load_scenario(db, "SCENARIO_C_SILENT_DETERIORATION")
+

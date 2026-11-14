@@ -56,6 +56,36 @@ class AstronautSummaryOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class TimelineBaselineInfo(BaseModel):
+    mean: float
+    std_dev: float
+    status: str
+
+
+class TimelinePoint(BaseModel):
+    date: str
+    timestamp: str
+    rhr_value: Optional[float] = None
+    rhr_z_score: Optional[float] = None
+    sleep_value: Optional[float] = None
+    sleep_z_score: Optional[float] = None
+    hrr_value: Optional[float] = None
+    hrr_z_score: Optional[float] = None
+    cabin_co2_ppm: Optional[float] = None
+    radiation_usv: Optional[float] = None
+    mission_events: List[str] = []
+
+
+class AstronautTimelineResponse(BaseModel):
+    astronaut_id: str
+    callsign: str
+    full_name: str
+    window_days: int
+    baselines: Dict[str, TimelineBaselineInfo]
+    timeline_points: List[TimelinePoint]
+
+
+
 # ============================================================================
 # INDICATORS & TELEMETRY
 # ============================================================================

@@ -141,29 +141,29 @@
 *Objective: Build high-density medical review interface, Recharts data visualization, alert inspection, countermeasure logging, and scenario switcher.*
 *Approval Gate: Requires Phase 4 verification and user sign-off.*
 
-- [ ] **TASK-501: CMO Dashboard & Crew Status Overview**
+- [x] **TASK-501: CMO Dashboard & Crew Status Overview**
   - **Scope:** Build fleet cards, active alert banners, data quality counters, and 1-click Demo Scenario switcher.
-  - **Target Files:** `frontend/src/components/FleetOverview.tsx`, `frontend/src/components/Header.tsx`
+  - **Target Files:** `frontend/src/App.tsx`, `frontend/src/services/api.ts`
   - **Verification:** Displays actual backend data with zero hardcoded metrics.
-  - **Status:** `TODO`
+  - **Status:** `DONE`
 
-- [ ] **TASK-502: Synchronized Multi-Indicator & Habitat Time-Series Charts**
+- [x] **TASK-502: Synchronized Multi-Indicator & Habitat Time-Series Charts**
   - **Scope:** Implement Recharts visualizers with baseline bands ($\pm 1.5\sigma$), reading points, missing data gaps, cabin $CO_2$ overlay, and alert markers.
-  - **Target Files:** `frontend/src/components/charts/SynchronizedCharts.tsx`
+  - **Target Files:** `frontend/src/components/SynchronizedCharts.tsx`, `backend/app/api/astronauts.py`
   - **Verification:** Real stored data rendered accurately with crisp time-axis alignment.
-  - **Status:** `TODO`
+  - **Status:** `DONE`
 
-- [ ] **TASK-503: Alert Detail Drill-Down, Evidence Inspector & Data Quality Modal**
+- [x] **TASK-503: Alert Detail Drill-Down, Evidence Inspector & Data Quality Modal**
   - **Scope:** Modal/view presenting detection narrative, baseline math breakdown, mission context, raw readings table, and Data Quality rejection audit inspector.
-  - **Target Files:** `frontend/src/components/alerts/AlertEvidenceModal.tsx`, `frontend/src/components/quality/DataQualityModal.tsx`
+  - **Target Files:** `frontend/src/components/AlertInspectorModal.tsx`, `frontend/src/components/DataQualityModal.tsx`
   - **Verification:** CMO can drill directly from alert to underlying evidence records and inspect rejected sensor packets.
-  - **Status:** `TODO`
+  - **Status:** `DONE`
 
-- [ ] **TASK-504: Clinical Countermeasures & CMO Follow-Up Workflow**
+- [x] **TASK-504: Clinical Countermeasures & CMO Follow-Up Workflow**
   - **Scope:** Enable CMO to prescribe clinical countermeasures (`SLEEP_SCHEDULE_ADJUSTMENT`, `HYDRATION_PROTOCOL`, etc.), append review notes, and transition alert states.
-  - **Target Files:** `frontend/src/components/alerts/ClinicalCountermeasures.tsx`, `backend/app/api/countermeasures.py`
+  - **Target Files:** `frontend/src/components/AlertInspectorModal.tsx`, `backend/app/api/alerts.py`
   - **Verification:** Countermeasures persist to `clinical_countermeasures` table and update outcome states.
-  - **Status:** `TODO`
+  - **Status:** `DONE`
 
 ---
 
