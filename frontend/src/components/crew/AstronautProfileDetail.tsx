@@ -1,10 +1,13 @@
+import { useState } from 'react';
 import { 
   ShieldAlert, 
   Activity, 
   Moon, 
   Zap, 
   Loader2, 
-  Users
+  Users,
+  Calculator,
+  ChevronRight
 } from 'lucide-react';
 import { 
   AstronautSummary, 
@@ -12,6 +15,7 @@ import {
   DeteriorationAlert 
 } from '../../types';
 import { SynchronizedCharts } from '../SynchronizedCharts';
+import { BaselineInspectorModal } from './BaselineInspectorModal';
 
 interface AstronautProfileDetailProps {
   astronaut: AstronautSummary | null;
@@ -20,6 +24,7 @@ interface AstronautProfileDetailProps {
   timelineLoading: boolean;
   onOpenEvidence: (alertId: string) => void;
   onOpenRegisterModal: () => void;
+  onRefreshTimeline?: () => void;
 }
 
 export function AstronautProfileDetail({
@@ -29,7 +34,10 @@ export function AstronautProfileDetail({
   timelineLoading,
   onOpenEvidence,
   onOpenRegisterModal,
+  onRefreshTimeline,
 }: AstronautProfileDetailProps) {
+  const [showBaselineModal, setShowBaselineModal] = useState<boolean>(false);
+
   if (!astronaut) {
     return (
       <div className="bg-space-900 border border-space-800 rounded-2xl p-12 text-center flex flex-col items-center justify-center gap-4">
@@ -73,25 +81,38 @@ export function AstronautProfileDetail({
           </p>
         </div>
 
-        {activeAlert ? (
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => onOpenEvidence(activeAlert.id)}
-            className="px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-mono text-xs font-bold rounded-xl shadow-lg shadow-red-950/40 transition flex items-center gap-2 animate-pulse"
+            onClick={() => setShowBaselineModal(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-space-850 hover:bg-space-800 border border-space-700 hover:border-nasa-cyan text-xs font-mono text-slate-200 transition shadow"
           >
-            <ShieldAlert className="w-4 h-4 text-white" />
-            <span>Inspect Active Alert ({activeAlert.review_priority})</span>
+            <Calculator className="w-3.5 h-3.5 text-nasa-cyan" />
+            <span>Audit Baselines &amp; Formulas</span>
           </button>
-        ) : (
-          <div className="px-3 py-1.5 rounded-xl bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 font-mono text-xs flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>Nominal Physiological Variance</span>
-          </div>
-        )}
+
+          {activeAlert ? (
+            <button
+              onClick={() => onOpenEvidence(activeAlert.id)}
+              className="px-4 py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-mono text-xs font-bold rounded-xl shadow-lg shadow-red-950/40 transition flex items-center gap-2 animate-pulse"
+            >
+              <ShieldAlert className="w-4 h-4 text-white" />
+              <span>Inspect Active Alert ({activeAlert.review_priority})</span>
+            </button>
+          ) : (
+            <div className="px-3 py-1.5 rounded-xl bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 font-mono text-xs flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span>Nominal Baseline</span>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Baseline Metric Cards */}
+      {/* Baseline Metric Cards (Clickable to open math inspector) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-space-950 border border-space-800 rounded-xl p-3.5 flex items-center justify-between">
+        <div 
+          onClick={() => setShowBaselineModal(true)}
+          className="bg-space-950 border border-space-800 hover:border-space-700 rounded-xl p-3.5 flex items-center justify-between cursor-pointer transition shadow hover:shadow-nasa-cyan/10"
+        >
           <div>
             <div className="flex items-center gap-1.5 text-slate-400 text-xs font-mono">
               <Activity className="w-3.5 h-3.5 text-nasa-cyan" />
@@ -100,8 +121,8 @@ export function AstronautProfileDetail({
             <div className="text-lg font-bold font-mono text-white mt-1">
               {rhrBaseline ? `${rhrBaseline.mean.toFixed(1)} ± ${rhrBaseline.std_dev.toFixed(1)} bpm` : '62.0 ± 2.5 bpm'}
             </div>
-            <span className="text-[10px] font-mono text-emerald-400">
-              Status: {rhrBaseline?.status || 'ACTIVE'}
+            <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+              Status: {rhrBaseline?.status || 'ACTIVE'} <ChevronRight className="w-2.5 h-2.5" />
             </span>
           </div>
           <span className="text-xs font-mono text-slate-500 bg-space-900 px-2 py-1 rounded">
@@ -109,7 +130,10 @@ export function AstronautProfileDetail({
           </span>
         </div>
 
-        <div className="bg-space-950 border border-space-800 rounded-xl p-3.5 flex items-center justify-between">
+        <div 
+          onClick={() => setShowBaselineModal(true)}
+          className="bg-space-950 border border-space-800 hover:border-space-700 rounded-xl p-3.5 flex items-center justify-between cursor-pointer transition shadow hover:shadow-nasa-cyan/10"
+        >
           <div>
             <div className="flex items-center gap-1.5 text-slate-400 text-xs font-mono">
               <Moon className="w-3.5 h-3.5 text-indigo-400" />
@@ -118,16 +142,19 @@ export function AstronautProfileDetail({
             <div className="text-lg font-bold font-mono text-white mt-1">
               {sleepBaseline ? `${sleepBaseline.mean.toFixed(1)} ± ${sleepBaseline.std_dev.toFixed(2)} hrs` : '7.4 ± 0.45 hrs'}
             </div>
-            <span className="text-[10px] font-mono text-emerald-400">
-              Status: {sleepBaseline?.status || 'ACTIVE'}
+            <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+              Status: {sleepBaseline?.status || 'ACTIVE'} <ChevronRight className="w-2.5 h-2.5" />
             </span>
           </div>
           <span className="text-xs font-mono text-slate-500 bg-space-900 px-2 py-1 rounded">
-            Rest & Vigilance
+            Rest &amp; Vigilance
           </span>
         </div>
 
-        <div className="bg-space-950 border border-space-800 rounded-xl p-3.5 flex items-center justify-between">
+        <div 
+          onClick={() => setShowBaselineModal(true)}
+          className="bg-space-950 border border-space-800 hover:border-space-700 rounded-xl p-3.5 flex items-center justify-between cursor-pointer transition shadow hover:shadow-nasa-cyan/10"
+        >
           <div>
             <div className="flex items-center gap-1.5 text-slate-400 text-xs font-mono">
               <Zap className="w-3.5 h-3.5 text-amber-400" />
@@ -136,8 +163,8 @@ export function AstronautProfileDetail({
             <div className="text-lg font-bold font-mono text-white mt-1">
               {hrrBaseline ? `${hrrBaseline.mean.toFixed(1)} ± ${hrrBaseline.std_dev.toFixed(1)} bpm` : '28.0 ± 3.0 bpm'}
             </div>
-            <span className="text-[10px] font-mono text-emerald-400">
-              Status: {hrrBaseline?.status || 'ACTIVE'}
+            <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+              Status: {hrrBaseline?.status || 'ACTIVE'} <ChevronRight className="w-2.5 h-2.5" />
             </span>
           </div>
           <span className="text-xs font-mono text-slate-500 bg-space-900 px-2 py-1 rounded">
@@ -158,6 +185,17 @@ export function AstronautProfileDetail({
             if (activeAlert) onOpenEvidence(activeAlert.id);
           }}
           hasActiveAlert={Boolean(activeAlert)}
+        />
+      )}
+
+      {/* Baseline Inspector & Recompute Modal */}
+      {showBaselineModal && (
+        <BaselineInspectorModal
+          astronaut={astronaut}
+          onClose={() => setShowBaselineModal(false)}
+          onBaselineUpdated={() => {
+            if (onRefreshTimeline) onRefreshTimeline();
+          }}
         />
       )}
     </section>

@@ -207,6 +207,11 @@ export function App() {
             timelineLoading={timelineLoading}
             onOpenEvidence={handleOpenEvidence}
             onOpenRegisterModal={() => setShowRegisterModal(true)}
+            onRefreshTimeline={() => {
+              if (selectedAstronautId) {
+                loadAstronautDetails(selectedAstronautId);
+              }
+            }}
           />
         )}
 

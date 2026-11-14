@@ -12,6 +12,7 @@ import {
   IndicatorDefinitionOut,
   IngestionResponse,
   MissingDataGapsResponse,
+  PersonalBaselineOut,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -75,6 +76,18 @@ export async function loadDemoScenario(scenarioKey: string): Promise<ScenarioLoa
 export async function fetchAstronautTimeline(astronautId: string): Promise<AstronautTimelineResponse> {
   const res = await fetch(`${API_BASE}/astronauts/${astronautId}/timeline`);
   return handleResponse<AstronautTimelineResponse>(res, 'Failed to fetch astronaut timeline');
+}
+
+export async function fetchAstronautBaselines(astronautId: string): Promise<PersonalBaselineOut[]> {
+  const res = await fetch(`${API_BASE}/astronauts/${astronautId}/baseline`);
+  return handleResponse<PersonalBaselineOut[]>(res, 'Failed to fetch astronaut personal baselines');
+}
+
+export async function recomputeAstronautBaselines(astronautId: string): Promise<PersonalBaselineOut[]> {
+  const res = await fetch(`${API_BASE}/astronauts/${astronautId}/baseline/recompute`, {
+    method: 'POST',
+  });
+  return handleResponse<PersonalBaselineOut[]>(res, 'Failed to recompute astronaut baselines');
 }
 
 export async function fetchAlerts(astronautId?: string): Promise<DeteriorationAlert[]> {

@@ -466,4 +466,42 @@ With Phase 1 approved and permanent development standards active, executed Phase
 - `docs/WORKLOG.md` (Updated)
 
 ### Next Step
-- Present the Phase 2 Completion Report to the user and await explicit approval before proceeding to Phase 3.
+- Complete Phase 3 verification and present completion report to user.
+
+---
+
+## [2026-11-14] — Phase 3: Personal Baseline Engine Hardening & Verification Complete
+
+### Background & Context
+With Phase 2 approved, executed Phase 3 focusing on mathematical correctness of 7-day rolling baselines, Bessel's correction ($N-1$ sample variance), insufficient data state handling, version increments, recomputation workflows, and CMO interactive auditability.
+
+### Work Performed
+1. **Mathematical Precision & Bessel's Correction (Acceptance Tests 6, 7, 16):**
+   - Verified that `backend/app/services/baseline_engine.py` evaluates 7-day rolling calendar windows ($W = [T_0 - 7\text{d}, T_0]$).
+   - Enforces $N \ge 4$ sample threshold; if $N < 4$, sets status to `INSUFFICIENT_BASELINE_DATA` and suppresses premature alerts.
+   - Computes arithmetic mean ($\mu$), median ($M$), and sample standard deviation ($\sigma$) with Bessel's correction ($N-1$ degrees of freedom).
+   - Increments monotonically increasing version counter (`version: 1 -> 2 -> ...`) on every recompute.
+   - Automated tests in `tests/test_baseline.py` pass 100% (3/3 passed).
+
+2. **Interactive Baseline Recomputation & Audit Inspector (`BaselineInspectorModal.tsx`):**
+   - Built `frontend/src/components/crew/BaselineInspectorModal.tsx` allowing CMO and judges to inspect the statistical distribution parameters, lookback window dates, sample counts, and version numbers.
+   - Integrated a 1-click **"Recompute 7d Baselines"** action button that hits `POST /api/v1/astronauts/{id}/baseline/recompute`, updates the database, increments the version counter, and refreshes the timeline charts live.
+   - Made the 3 baseline cards on `AstronautProfileDetail.tsx` clickable to open the baseline inspector.
+   - Added mathematical proof card explaining Bessel's correction formula and $z$-score calculation.
+
+3. **Production Verification:**
+   - Automated Pytest Suite: **35/35 passed** (`tests/test_baseline.py` 3/3 passed).
+   - Frontend Production Build: `npm run build` compiled 2,015 modules in 8.36s with **0 errors and 0 warnings**.
+   - Live API verification: `GET /api/v1/astronauts/astro-vance-001/baseline` and `POST /api/v1/astronauts/astro-vance-001/baseline/recompute` verified with version increment from 1 to 2.
+
+### Files Modified / Created
+- `frontend/src/types/index.ts` (Added `PersonalBaselineOut`)
+- `frontend/src/services/api.ts` (Added `fetchAstronautBaselines` and `recomputeAstronautBaselines`)
+- `frontend/src/components/crew/BaselineInspectorModal.tsx` (Created)
+- `frontend/src/components/crew/AstronautProfileDetail.tsx` (Added baseline audit modal and click handlers)
+- `frontend/src/App.tsx` (Passed timeline refresh callback)
+- `docs/TASKS.md` (Updated Phase 3 statuses to `DONE`)
+- `docs/WORKLOG.md` (Updated)
+
+### Next Step
+- Present the Phase 3 Completion Report to the user and await explicit approval before proceeding to Phase 4.

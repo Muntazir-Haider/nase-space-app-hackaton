@@ -74,6 +74,22 @@ export interface TimelineBaselineInfo {
   status: string;
 }
 
+export interface PersonalBaselineOut {
+  id: string;
+  astronaut_id: string;
+  indicator_id: string;
+  indicator_key: string;
+  window_start: string;
+  window_end: string;
+  sample_count: number;
+  mean: number;
+  median: number;
+  std_dev: number;
+  status: 'ACTIVE' | 'INSUFFICIENT_BASELINE_DATA';
+  version: number;
+  calculated_at: string;
+}
+
 export interface TimelinePoint {
   date: string;
   timestamp: string;

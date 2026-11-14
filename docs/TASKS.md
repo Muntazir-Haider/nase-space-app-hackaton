@@ -127,9 +127,9 @@
 
 ---
 
-## Phase 3: Personal Baseline Engine
-*Objective: Calculate 7-day calendar-time rolling baselines and handle insufficient data conditions.*
-*Approval Gate: Requires Phase 2 verification and user sign-off.*
+## Phase 3: Personal Baseline Engine — Hardening & Verification
+*Objective: Calculate 7-day calendar-time rolling baselines, Bessel's correction sample variance, handle insufficient data states, baseline versioning, recomputation workflows, and interactive mathematical inspection for the CMO.*
+*Approval Gate: Approved by user for active execution.*
 
 - [x] **TASK-301: Rolling Calendar-Time Baseline Calculation**
   - **Scope:** Calculate mean ($\mu$), median ($M$), sample standard deviation ($\sigma$), and sample count over 7-day calendar window ($N \ge 4$).
@@ -138,9 +138,21 @@
   - **Status:** `DONE`
 
 - [x] **TASK-302: Baseline Versioning & State Management Endpoint**
-  - **Scope:** Implement sample threshold rule ($<4$ samples $\rightarrow$ `INSUFFICIENT_BASELINE_DATA`; $\ge 4$ samples $\rightarrow$ `ACTIVE`); expose `GET /api/v1/astronauts/{id}/baseline`.
+  - **Scope:** Implement sample threshold rule ($<4$ samples $\rightarrow$ `INSUFFICIENT_BASELINE_DATA`; $\ge 4$ samples $\rightarrow$ `ACTIVE`); expose `GET /api/v1/astronauts/{id}/baseline` and `POST /api/v1/astronauts/{id}/baseline/recompute`.
   - **Target Files:** `backend/app/api/baselines.py`
-  - **Verification:** API returns versioned baseline object with active status flags.
+  - **Verification:** API returns versioned baseline object with active status flags and incremented version counter.
+  - **Status:** `DONE`
+
+- [x] **TASK-303: Interactive Baseline Recomputation & Mathematical Audit Inspector**
+  - **Scope:** Implement typed API clients (`fetchAstronautBaselines`, `recomputeAstronautBaselines`); build `BaselineInspectorModal.tsx` allowing CMO and judges to inspect exact $\mu, M, \sigma$ (Bessel's correction $N-1$), lookback window dates, sample counts, version logs, and trigger live recomputations.
+  - **Target Files:** `frontend/src/components/crew/BaselineInspectorModal.tsx`, `frontend/src/components/crew/AstronautProfileDetail.tsx`, `frontend/src/services/api.ts`
+  - **Verification:** UI displays live baseline parameters, allows 1-click recomputations, and displays formula explanations.
+  - **Status:** `DONE`
+
+- [x] **TASK-304: Full Phase 3 Automated & Manual Verification**
+  - **Scope:** Execute complete test suite (`tests/test_baseline.py` and full pytest), run TypeScript build, verify recomputation in live SQLite database, and confirm persistence across restarts.
+  - **Target Files:** Entire repository
+  - **Verification:** All 35 tests pass; `npm run build` succeeds; interactive recomputation verified.
   - **Status:** `DONE`
 
 ---
