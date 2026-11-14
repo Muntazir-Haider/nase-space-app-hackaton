@@ -15,6 +15,7 @@ import {
   PersonalBaselineOut,
   ClinicalCountermeasure,
   SyncQueueSummary,
+  BenchmarkEvaluationReport,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -207,3 +208,16 @@ export async function triggerCommsFlush(): Promise<{ status: string; flushed_cou
   });
   return handleResponse<{ status: string; flushed_count: number; message: string }>(res, 'Failed to flush comms sync queue');
 }
+
+export async function fetchMLBenchmark(): Promise<BenchmarkEvaluationReport> {
+  const res = await fetch(`${API_BASE}/analytics/benchmark-evaluation`);
+  return handleResponse<BenchmarkEvaluationReport>(res, 'Failed to fetch ML benchmark evaluation');
+}
+
+export async function runMLBenchmark(): Promise<BenchmarkEvaluationReport> {
+  const res = await fetch(`${API_BASE}/analytics/benchmark-evaluation/run`, {
+    method: 'POST',
+  });
+  return handleResponse<BenchmarkEvaluationReport>(res, 'Failed to execute ML benchmark evaluation run');
+}
+

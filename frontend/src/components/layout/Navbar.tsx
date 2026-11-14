@@ -8,11 +8,12 @@ import {
   Users, 
   Activity, 
   UserPlus, 
-  HardDrive 
+  HardDrive,
+  BrainCircuit,
 } from 'lucide-react';
 import { HealthCheckResponse } from '../../types';
 
-export type ActiveView = 'fleet' | 'review' | 'register' | 'diagnostics';
+export type ActiveView = 'fleet' | 'review' | 'register' | 'diagnostics' | 'benchmark';
 
 interface NavbarProps {
   health: HealthCheckResponse | null;
@@ -103,6 +104,18 @@ export function Navbar({
         >
           <HardDrive className="w-3.5 h-3.5 text-emerald-400" />
           <span>Station Diagnostics</span>
+        </button>
+
+        <button
+          onClick={() => onSelectView('benchmark')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
+            activeView === 'benchmark'
+              ? 'bg-purple-600 text-white font-bold shadow'
+              : 'text-slate-400 hover:text-white hover:bg-space-850'
+          }`}
+        >
+          <BrainCircuit className="w-3.5 h-3.5 text-purple-400" />
+          <span>ML Benchmark</span>
         </button>
       </nav>
 

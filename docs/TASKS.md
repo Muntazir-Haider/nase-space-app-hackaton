@@ -255,13 +255,43 @@
 
 ## Phase 7: Experimental Anomaly Detection Evaluation
 *Objective: Benchmark optional unsupervised ML anomaly detection against rule-based baseline.*
-*Approval Gate: Requires Phase 6 verification and user sign-off.*
+*Approval Gate: Approved by user for active execution.*
 
-- [ ] **TASK-701: Unsupervised Model Exploration (Isolation Forest / LOF)**
-  - **Scope:** Implement experimental local scikit-learn anomaly detector on synthetic multi-indicator scenarios.
-  - **Target Files:** `backend/app/analytics/experimental_ml.py`
-  - **Verification:** Comparative evaluation matrix documenting detection latency, false positives, and interpretability trade-offs.
-  - **Status:** `TODO`
+- [x] **TASK-701: Aerospace Medicine ML Research & Benchmark Dataset Formulation**
+  - **Scope:** Formalize scientific evaluation framework comparing deterministic rules vs unsupervised ML (Isolation Forest, Local Outlier Factor); define multi-indicator feature vectors ($z$-scores, relative rate of change, baseline delta) across Scenarios A, B, and C.
+  - **Target Files:** `backend/app/services/analytics/experimental_ml.py`, `docs/REQUIREMENTS.md`
+  - **Verification:** Feature extraction pipelines preserve exact temporal order and clinical scaling.
+  - **Status:** `DONE`
+
+- [x] **TASK-702: Local Unsupervised Anomaly Detection Service (Isolation Forest & LOF)**
+  - **Scope:** Implement offline scikit-learn anomaly detectors (`IsolationForest` with calibrated contamination & `LocalOutlierFactor`) in `backend/app/services/analytics/experimental_ml.py` executing 100% locally with zero external network access.
+  - **Target Files:** `backend/app/services/analytics/experimental_ml.py`, `backend/app/analytics/experimental_ml.py`
+  - **Verification:** Models compute anomaly scores, outlier flags (-1 / 1), and normalized risk probabilities ($p \in [0, 1]$).
+  - **Status:** `DONE`
+
+- [x] **TASK-703: Comparative Evaluation Engine & Trade-off Synthesis**
+  - **Scope:** Build comparative evaluation engine calculating detection latency (flight day of first alert), false positive rate on isolated spikes (Scenario B), sensitivity on silent drift (Scenario C), local execution time (ms), and clinical explainability rating.
+  - **Target Files:** `backend/app/services/analytics/experimental_ml.py`
+  - **Verification:** Produces structured comparison matrix across Rule-Based OLS vs Isolation Forest vs Local Outlier Factor.
+  - **Status:** `DONE`
+
+- [x] **TASK-704: RESTful API for Experimental ML Benchmark**
+  - **Scope:** Add `GET /api/v1/analytics/benchmark-evaluation` and `POST /api/v1/analytics/benchmark-evaluation/run` in `backend/app/api/analytics.py` returning typed benchmark comparison results and daily anomaly score progressions.
+  - **Target Files:** `backend/app/api/analytics.py`, `backend/app/main.py`, `backend/app/schemas/schemas.py`
+  - **Verification:** Endpoints return 200 OK with valid Pydantic models.
+  - **Status:** `DONE`
+
+- [x] **TASK-705: CMO UI Experimental ML Benchmark Inspector**
+  - **Scope:** Build interactive Experimental ML Benchmark panel in frontend (accessible via dedicated tab in `Navbar.tsx` and `App.tsx`) displaying side-by-side comparative matrix, daily anomaly score timeline chart, explainability breakdown, and on-demand benchmark trigger button.
+  - **Target Files:** `frontend/src/components/system/MLBenchmarkView.tsx`, `frontend/src/services/api.ts`, `frontend/src/types/index.ts`, `frontend/src/App.tsx`, `frontend/src/components/layout/Navbar.tsx`
+  - **Verification:** CMO can inspect and trigger comparative benchmark directly from UI; visual charts render anomaly score curves.
+  - **Status:** `DONE`
+
+- [x] **TASK-706: Automated Test Suite & Production Build Verification**
+  - **Scope:** Author automated pytest test suite in `tests/test_experimental_ml.py` verifying model consistency, deterministic seed reproducibility, zero-network execution, and API contracts; execute clean Vite production build.
+  - **Target Files:** `tests/test_experimental_ml.py`, entire codebase
+  - **Verification:** 100% pytest test pass rate (43/43 tests); clean production build with 0 TypeScript errors (2,016 modules).
+  - **Status:** `DONE`
 
 ---
 

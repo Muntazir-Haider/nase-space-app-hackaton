@@ -250,3 +250,39 @@ export interface SyncQueueSummary {
   latency_simulation: string;
   recent_items: OfflineSyncItem[];
 }
+
+export interface DailyAnomalyScore {
+  day: number;
+  date: string;
+  rule_based_alert: boolean;
+  isolation_forest_score: number;
+  isolation_forest_is_anomaly: boolean;
+  lof_score: number;
+  lof_is_anomaly: boolean;
+  context_event?: string | null;
+}
+
+export interface ModelComparisonMetrics {
+  model_name: string;
+  model_family: string;
+  description: string;
+  detection_day_scenario_c?: number | null;
+  scenario_b_false_positives: number;
+  scenario_a_false_positives: number;
+  explainability_score_out_of_10: number;
+  explainability_rationale: string;
+  computational_latency_ms: number;
+  nasa_flight_surgeon_verdict: string;
+}
+
+export interface BenchmarkEvaluationReport {
+  timestamp_utc: string;
+  execution_duration_ms: number;
+  evaluated_scenarios: string[];
+  models_evaluated: string[];
+  comparison_matrix: ModelComparisonMetrics[];
+  daily_progression_scenario_c: DailyAnomalyScore[];
+  daily_progression_scenario_b: DailyAnomalyScore[];
+  synthesis_conclusions: string[];
+}
+

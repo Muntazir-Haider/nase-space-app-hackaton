@@ -21,6 +21,7 @@ import { FleetOverview } from './components/crew/FleetOverview';
 import { AstronautProfileDetail } from './components/crew/AstronautProfileDetail';
 import { ProfileRegistrationModal } from './components/crew/ProfileRegistrationModal';
 import { SystemStatusView } from './components/system/SystemStatusView';
+import { MLBenchmarkView } from './components/system/MLBenchmarkView';
 import { AlertInspectorModal } from './components/AlertInspectorModal';
 import { DataQualityModal } from './components/DataQualityModal';
 
@@ -222,6 +223,10 @@ export function App() {
 
         {activeView === 'diagnostics' && (
           <SystemStatusView onRefreshHealth={loadInitialData} />
+        )}
+
+        {activeView === 'benchmark' && (
+          <MLBenchmarkView />
         )}
       </main>
 

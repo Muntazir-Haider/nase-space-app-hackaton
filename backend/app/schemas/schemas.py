@@ -305,3 +305,43 @@ class ScenarioLoadResponse(BaseModel):
     environmental_inserted: int
     active_alerts_generated: int
     message: str
+
+
+# ============================================================================
+# EXPERIMENTAL ML BENCHMARK CONTRACTS (PHASE 7)
+# ============================================================================
+
+class DailyAnomalyScoreOut(BaseModel):
+    day: int
+    date: str
+    rule_based_alert: bool
+    isolation_forest_score: float
+    isolation_forest_is_anomaly: bool
+    lof_score: float
+    lof_is_anomaly: bool
+    context_event: Optional[str] = None
+
+
+class ModelComparisonMetricsOut(BaseModel):
+    model_name: str
+    model_family: str
+    description: str
+    detection_day_scenario_c: Optional[int]
+    scenario_b_false_positives: int
+    scenario_a_false_positives: int
+    explainability_score_out_of_10: int
+    explainability_rationale: str
+    computational_latency_ms: float
+    nasa_flight_surgeon_verdict: str
+
+
+class BenchmarkEvaluationReportOut(BaseModel):
+    timestamp_utc: str
+    execution_duration_ms: float
+    evaluated_scenarios: List[str]
+    models_evaluated: List[str]
+    comparison_matrix: List[ModelComparisonMetricsOut]
+    daily_progression_scenario_c: List[DailyAnomalyScoreOut]
+    daily_progression_scenario_b: List[DailyAnomalyScoreOut]
+    synthesis_conclusions: List[str]
+
