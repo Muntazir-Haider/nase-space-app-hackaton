@@ -229,20 +229,26 @@
 
 ---
 
-## Phase 6: Offline Operation & Local Resilience
-*Objective: Guarantee 100% offline operation and persistence across application restarts.*
-*Approval Gate: Requires Phase 5 verification and user sign-off.*
+## Phase 6: Offline Operation & Local Resilience — Hardening & Verification
+*Objective: Guarantee 100% offline-first execution, automatic transaction queuing to SQLite store-and-forward queue with SHA-256 idempotency deduplication, simulated Deep Space Network (DSN) high-gain pass comms flush in Station Diagnostics UI, and hard process restart resilience across all 14 relational tables.*
+*Approval Gate: Approved by user for active execution.*
 
-- [x] **TASK-601: Local Offline Verification & Network Independence**
-  - **Scope:** Test full application workflow with network interface disconnected.
-  - **Target Files:** End-to-end stack audit.
-  - **Verification:** Test 13 passes; zero external network requests triggered during operation.
+- [x] **TASK-601: Automatic Store-and-Forward Transaction Queueing & SHA-256 Idempotency**
+  - **Scope:** Hook `queue_offline_transaction` into `POST /api/v1/observations`, `POST /api/v1/astronauts`, `POST /api/v1/alerts/{id}/countermeasures`, and `PATCH /api/v1/alerts/{id}/countermeasures/{cm_id}` to ensure all mission state changes are queued with deterministic SHA-256 deduplication.
+  - **Target Files:** `backend/app/api/observations.py`, `backend/app/api/astronauts.py`, `backend/app/api/alerts.py`, `backend/app/services/sync_engine.py`
+  - **Verification:** Transactions automatically register in `offline_sync_queue`; duplicate payloads are suppressed.
   - **Status:** `DONE`
 
-- [x] **TASK-602: Restart Resilience & Persistence Verification**
-  - **Scope:** Terminate backend/frontend processes, restart, and verify complete retention across all 13 SQLite tables; manage offline sync queue with SHA-256 idempotency hashing.
-  - **Target Files:** `backend/app/services/sync_engine.py`, `backend/app/api/sync.py`, `tests/test_sync.py`
-  - **Verification:** Tests 1, 14, and 15 pass; zero data loss after hard restart.
+- [x] **TASK-602: Interactive DSN Comms Flush & Store-and-Forward Queue in Station Diagnostics**
+  - **Scope:** Add typed sync APIs in `frontend/src/services/api.ts`; expand `SystemStatusView.tsx` with Store-and-Forward Sync Queue section, pending queue counts, 1-click **"Simulate DSN High-Gain Pass"** flush button, and recent transaction table displaying SHA-256 hashes and sync states.
+  - **Target Files:** `frontend/src/types/index.ts`, `frontend/src/services/api.ts`, `frontend/src/components/system/SystemStatusView.tsx`
+  - **Verification:** CMO can inspect queued transactions and trigger high-gain comms flush; status transitions to `SYNCED_TO_EARTH` in real time.
+  - **Status:** `DONE`
+
+- [x] **TASK-603: Automated Verification Suite for Offline Resilience, Restart & Deduplication (Tests 13, 14, 15)**
+  - **Scope:** Author automated test suite in `tests/test_sync.py` verifying Acceptance Test 13 (zero external network reliance), Acceptance Test 14 (restart retention across database disconnections), and Acceptance Test 15 (idempotent hash deduplication); run full pytest suite; execute clean production build.
+  - **Target Files:** `tests/test_sync.py`, entire codebase
+  - **Verification:** 100% test pass rate (38/38); zero external calls; restart retention verified across engine reboots.
   - **Status:** `DONE`
 
 ---

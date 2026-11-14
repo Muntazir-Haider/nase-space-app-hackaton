@@ -27,6 +27,7 @@ from backend.app.services.deterioration_engine import (
     run_fleet_deterioration_analysis,
     run_deterioration_analysis_for_astronaut,
 )
+from backend.app.services.sync_engine import queue_offline_transaction
 
 router = APIRouter(prefix="/alerts", tags=["Deterioration Alerts & Evidence"])
 runs_router = APIRouter(prefix="/analysis-runs", tags=["Analysis Execution Runs"])
@@ -128,6 +129,21 @@ def update_alert_status(
         recorded_at=datetime.now(timezone.utc).isoformat(),
     )
     db.add(followup)
+
+    # Queue status transition to offline sync queue
+    queue_offline_transaction(
+        db=db,
+        transaction_type="ALERT_STATUS_UPDATE",
+        entity_table="deterioration_alerts",
+        entity_id=alert.id,
+        payload={
+            "alert_id": alert.id,
+            "lifecycle_status": payload.lifecycle_status,
+            "reviewer_callsign": payload.reviewer_callsign,
+            "notes": payload.notes,
+        },
+    )
+
     db.commit()
     db.refresh(alert)
     return alert
@@ -157,6 +173,7 @@ def prescribe_countermeasure(
         outcome_status="ACTIVE",
     )
     db.add(countermeasure)
+    db.flush()
 
     # Transition alert status to MONITORING if currently NEW or UNDER_REVIEW
     if alert.lifecycle_status in ["NEW", "UNDER_REVIEW"]:
@@ -172,6 +189,23 @@ def prescribe_countermeasure(
             recorded_at=datetime.now(timezone.utc).isoformat(),
         )
         db.add(followup)
+
+    # Queue to offline sync queue
+    queue_offline_transaction(
+        db=db,
+        transaction_type="COUNTERMEASURE_PRESCRIBE",
+        entity_table="clinical_countermeasures",
+        entity_id=countermeasure.id,
+        payload={
+            "alert_id": alert.id,
+            "astronaut_id": alert.astronaut_id,
+            "prescribed_by": payload.prescribed_by,
+            "countermeasure_type": payload.countermeasure_type,
+            "title": payload.title,
+            "prescription_details": payload.prescription_details,
+            "target_duration_hours": payload.target_duration_hours,
+        },
+    )
 
     db.commit()
     db.refresh(countermeasure)
@@ -225,6 +259,21 @@ def update_countermeasure_status(
         recorded_at=datetime.now(timezone.utc).isoformat(),
     )
     db.add(followup)
+
+    # Queue outcome transition to offline sync queue
+    queue_offline_transaction(
+        db=db,
+        transaction_type="COUNTERMEASURE_STATUS_UPDATE",
+        entity_table="clinical_countermeasures",
+        entity_id=cm.id,
+        payload={
+            "alert_id": alert_id,
+            "countermeasure_id": countermeasure_id,
+            "outcome_status": payload.outcome_status,
+            "resolved_by": payload.resolved_by,
+            "resolution_notes": payload.resolution_notes or "",
+        },
+    )
 
     db.commit()
     db.refresh(cm)

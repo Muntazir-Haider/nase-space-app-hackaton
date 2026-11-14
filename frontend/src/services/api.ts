@@ -14,6 +14,7 @@ import {
   MissingDataGapsResponse,
   PersonalBaselineOut,
   ClinicalCountermeasure,
+  SyncQueueSummary,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -193,4 +194,16 @@ export async function ingestObservation(obs: {
 export async function fetchMissingDataGaps(astronautId: string, days: number = 7): Promise<MissingDataGapsResponse> {
   const res = await fetch(`${API_BASE}/data-quality/gaps?astronaut_id=${astronautId}&days=${days}`);
   return handleResponse<MissingDataGapsResponse>(res, 'Failed to fetch missing data gaps');
+}
+
+export async function fetchSyncStatus(): Promise<SyncQueueSummary> {
+  const res = await fetch(`${API_BASE}/sync/status`);
+  return handleResponse<SyncQueueSummary>(res, 'Failed to fetch offline sync queue status');
+}
+
+export async function triggerCommsFlush(): Promise<{ status: string; flushed_count: number; message: string }> {
+  const res = await fetch(`${API_BASE}/sync/flush`, {
+    method: 'POST',
+  });
+  return handleResponse<{ status: string; flushed_count: number; message: string }>(res, 'Failed to flush comms sync queue');
 }

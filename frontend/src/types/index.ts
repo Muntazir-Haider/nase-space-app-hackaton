@@ -231,3 +231,22 @@ export interface MissingDataGapsResponse {
   missing_gaps_count: number;
   gaps: MissingDataGapItem[];
 }
+
+export interface OfflineSyncItem {
+  id: string;
+  transaction_type: string;
+  entity_table: string;
+  idempotency_hash: string;
+  sync_status: string;
+  created_at: string;
+}
+
+export interface SyncQueueSummary {
+  total_transactions: number;
+  queued_pending: number;
+  synced_to_earth: number;
+  failed_retries: number;
+  comms_mode: string;
+  latency_simulation: string;
+  recent_items: OfflineSyncItem[];
+}

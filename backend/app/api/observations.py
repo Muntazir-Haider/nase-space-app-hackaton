@@ -9,6 +9,7 @@ from backend.app.schemas.schemas import (
     IngestionResultItem,
 )
 from backend.app.services.data_quality import validate_observation
+from backend.app.services.sync_engine import queue_offline_transaction
 
 router = APIRouter(prefix="/observations", tags=["Observations & Ingestion"])
 
@@ -37,6 +38,21 @@ def ingest_observations(payload: HealthObservationBatchIn, db: Session = Depends
             db.commit()
             db.refresh(obs)
             
+            # Queue to offline store-and-forward queue with SHA-256 idempotency protection
+            queue_offline_transaction(
+                db=db,
+                transaction_type="OBSERVATION_INGEST",
+                entity_table="health_observations",
+                entity_id=obs.id,
+                payload={
+                    "astronaut_id": item.astronaut_id,
+                    "indicator_key": item.indicator_key,
+                    "value": item.value,
+                    "unit": item.unit,
+                    "observation_time": item.observation_time,
+                },
+            )
+
             accepted_count += 1
             results.append(
                 IngestionResultItem(

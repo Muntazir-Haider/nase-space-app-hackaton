@@ -3,6 +3,7 @@ from dateutil import parser as date_parser
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from backend.app.database import get_db
+from backend.app.services.sync_engine import queue_offline_transaction
 from backend.app.models.entities import (
     AstronautProfile,
     Mission,
@@ -224,6 +225,22 @@ def create_astronaut(payload: AstronautProfileCreate, db: Session = Depends(get_
     db.add(astro)
     db.commit()
     db.refresh(astro)
+
+    # Queue profile registration to offline store-and-forward queue
+    queue_offline_transaction(
+        db=db,
+        transaction_type="ASTRONAUT_PROFILE_CREATE",
+        entity_table="astronaut_profiles",
+        entity_id=astro.id,
+        payload={
+            "mission_id": astro.mission_id,
+            "callsign": astro.callsign,
+            "full_name": astro.full_name,
+            "flight_role": astro.flight_role,
+            "medical_clearance_status": astro.medical_clearance_status,
+        },
+    )
+
     return astro
 
 # --- Missions endpoints ---
