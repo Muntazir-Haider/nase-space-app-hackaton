@@ -172,3 +172,46 @@ export interface DataQualityAuditLog {
   rejection_reason: string;
   flagged_at: string;
 }
+
+export interface IndicatorDefinitionOut {
+  id: string;
+  indicator_key: string;
+  category: string;
+  display_name: string;
+  standard_unit: string;
+  nominal_min: number;
+  nominal_max: number;
+  critical_min: number;
+  critical_max: number;
+  sampling_frequency_hours: number;
+  nasa_hrp_reference: string;
+  description: string;
+}
+
+export interface IngestionResultItem {
+  observation_id?: string | null;
+  indicator_key: string;
+  quality_status: string;
+  quality_notes?: string | null;
+}
+
+export interface IngestionResponse {
+  accepted_count: number;
+  rejected_count: number;
+  results: IngestionResultItem[];
+}
+
+export interface MissingDataGapItem {
+  date: string;
+  astronaut_id: string;
+  indicator_key: string;
+  status: string;
+  message: string;
+}
+
+export interface MissingDataGapsResponse {
+  astronaut_id: string;
+  window_days: number;
+  missing_gaps_count: number;
+  gaps: MissingDataGapItem[];
+}

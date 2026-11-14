@@ -134,3 +134,75 @@ def _log_audit(
     )
     db.add(audit_entry)
     db.commit()
+
+def detect_missing_data_gaps(
+    db: Session,
+    astronaut_id: str,
+    days: int = 7,
+    reference_time: Optional[datetime] = None,
+):
+    """
+    Scans the specified observation window (default: past 7 calendar days)
+    for missing daily biometric observations per astronaut.
+    Explicitly reports data gaps rather than assuming nominal health.
+    """
+    if reference_time is None:
+        latest = (
+            db.query(HealthObservation)
+            .filter(HealthObservation.astronaut_id == astronaut_id)
+            .order_by(HealthObservation.observation_time.desc())
+            .first()
+        )
+        if latest:
+            try:
+                reference_time = date_parser.isoparse(latest.observation_time)
+                if reference_time.tzinfo is None:
+                    reference_time = reference_time.replace(tzinfo=timezone.utc)
+            except Exception:
+                reference_time = datetime.now(timezone.utc)
+        else:
+            reference_time = datetime.now(timezone.utc)
+    elif reference_time.tzinfo is None:
+        reference_time = reference_time.replace(tzinfo=timezone.utc)
+
+    target_keys = ["RESTING_HEART_RATE", "SLEEP_DURATION", "HEART_RATE_RECOVERY_1MIN"]
+    gaps = []
+
+    # Map indicators to IDs
+    ind_map = {}
+    for k in target_keys:
+        ind = db.query(IndicatorDefinition).filter(IndicatorDefinition.indicator_key == k).first()
+        if ind:
+            ind_map[k] = ind.id
+
+    for day_offset in range(days):
+        target_date = (reference_time - timedelta(days=day_offset)).date()
+        date_prefix = target_date.isoformat()
+
+        for key in target_keys:
+            ind_id = ind_map.get(key)
+            if not ind_id:
+                continue
+
+            has_obs = (
+                db.query(HealthObservation)
+                .filter(
+                    HealthObservation.astronaut_id == astronaut_id,
+                    HealthObservation.indicator_id == ind_id,
+                    HealthObservation.observation_time.like(f"{date_prefix}%"),
+                    HealthObservation.quality_status.in_(["VALID", "STALE"]),
+                )
+                .first()
+            )
+
+            if not has_obs:
+                gaps.append({
+                    "date": date_prefix,
+                    "astronaut_id": astronaut_id,
+                    "indicator_key": key,
+                    "status": "MISSING_DATA_GAP",
+                    "message": f"No telemetry recorded for {key} on {date_prefix}. Telemetry gap detected (nominal health not assumed).",
+                })
+
+    return gaps
+

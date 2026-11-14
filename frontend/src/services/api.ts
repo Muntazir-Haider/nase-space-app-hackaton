@@ -9,6 +9,9 @@ import {
   MissionOut,
   AstronautCreateInput,
   StationDiagnosticsResponse,
+  IndicatorDefinitionOut,
+  IngestionResponse,
+  MissingDataGapsResponse,
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -106,4 +109,31 @@ export async function updateAlertStatus(
 export async function fetchDataQualityAudit(): Promise<DataQualityAuditLog[]> {
   const res = await fetch(`${API_BASE}/data-quality/audit`);
   return handleResponse<DataQualityAuditLog[]>(res, 'Failed to fetch data quality audit log');
+}
+
+export async function fetchIndicatorDefinitions(): Promise<IndicatorDefinitionOut[]> {
+  const res = await fetch(`${API_BASE}/data-quality/indicators`);
+  return handleResponse<IndicatorDefinitionOut[]>(res, 'Failed to fetch indicator definitions');
+}
+
+export async function ingestObservation(obs: {
+  astronaut_id: string;
+  indicator_key: string;
+  value: number;
+  unit: string;
+  observation_time: string;
+  data_origin?: string;
+  provenance_ref?: string;
+}): Promise<IngestionResponse> {
+  const res = await fetch(`${API_BASE}/observations`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ observations: [obs] }),
+  });
+  return handleResponse<IngestionResponse>(res, 'Failed to ingest observation');
+}
+
+export async function fetchMissingDataGaps(astronautId: string, days: number = 7): Promise<MissingDataGapsResponse> {
+  const res = await fetch(`${API_BASE}/data-quality/gaps?astronaut_id=${astronautId}&days=${days}`);
+  return handleResponse<MissingDataGapsResponse>(res, 'Failed to fetch missing data gaps');
 }

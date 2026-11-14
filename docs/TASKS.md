@@ -91,9 +91,9 @@
 
 ---
 
-## Phase 2: Ingestion, Environmental Telemetry & Data Quality Engine
-*Objective: Build pre-analysis validation engine, physiological & environmental bounds checking, and telemetry ingestion endpoints.*
-*Approval Gate: Requires Phase 1 verification and user sign-off.*
+## Phase 2: Ingestion, Environmental Telemetry & Data Quality Engine — Hardening & Verification
+*Objective: Build pre-analysis validation engine, physiological & environmental bounds checking, telemetry ingestion endpoints, missing data gap detection, and an interactive CMO telemetry ingestion testbench.*
+*Approval Gate: Approved by user for active execution.*
 
 - [x] **TASK-201: Ingestion & Data Quality Engine Implementation**
   - **Scope:** Implement numeric range plausibility checks, timestamp integrity, duplicate prevention, and staleness detection; log rejected/flagged records to `data_quality_audit_log`.
@@ -104,7 +104,25 @@
 - [x] **TASK-202: Observation & Environmental Ingestion Endpoints**
   - **Scope:** Implement `POST /api/v1/observations`, `POST /api/v1/environmental`, and `GET /api/v1/data-quality/audit`.
   - **Target Files:** `backend/app/api/observations.py`, `backend/app/api/data_quality.py`
-  - **Verification:** `pytest tests/test_ingestion.py -v` (Tests 2, 3, 4, 5, 15).
+  - **Verification:** `pytest tests/test_ingestion.py -v` (Tests 2, 3, 5, 15).
+  - **Status:** `DONE`
+
+- [x] **TASK-203: Missing Data Gap Detection & Reporting (Acceptance Test 4)**
+  - **Scope:** Implement calendar-window missing data gap detector in `backend/app/services/data_quality.py` and `backend/app/api/data_quality.py` (`GET /api/v1/data-quality/gaps`); add automated test `test_acceptance_4_missing_data_handling` in `tests/test_ingestion.py`.
+  - **Target Files:** `backend/app/services/data_quality.py`, `backend/app/api/data_quality.py`, `tests/test_ingestion.py`
+  - **Verification:** Test confirms simulated skipped days are explicitly identified as data gaps rather than assumed nominal.
+  - **Status:** `DONE`
+
+- [x] **TASK-204: Interactive Telemetry Ingestion Simulator & Data Quality Dashboard**
+  - **Scope:** Enhance `DataQualityModal.tsx` with a dual-tab interface: (1) Rejection & Dropouts Audit Log, (2) Interactive Telemetry Injection Simulator (allowing CMO/judges to inject valid/invalid packets and see immediate acceptance/rejection with live audit updates), and (3) Active Indicator Definitions Catalog.
+  - **Target Files:** `frontend/src/components/DataQualityModal.tsx`, `frontend/src/services/api.ts`
+  - **Verification:** UI allows selecting an astronaut and indicator, submitting test telemetry, and visually inspecting the validation result and audit log.
+  - **Status:** `DONE`
+
+- [x] **TASK-205: Full Phase 2 Automated & Manual Verification**
+  - **Scope:** Execute complete test suite (`tests/test_ingestion.py` and full pytest), run TypeScript build, verify real-time ingestion behavior, and check persistence in SQLite.
+  - **Target Files:** Entire repository
+  - **Verification:** All 35 tests pass; `npm run build` succeeds; interactive ingestion verified.
   - **Status:** `DONE`
 
 ---

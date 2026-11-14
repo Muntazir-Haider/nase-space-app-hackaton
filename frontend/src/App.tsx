@@ -244,7 +244,16 @@ export function App() {
 
       {/* Data Quality Rejection Audit Modal */}
       {showDataQualityModal && (
-        <DataQualityModal onClose={() => setShowDataQualityModal(false)} />
+        <DataQualityModal 
+          onClose={() => setShowDataQualityModal(false)} 
+          onTelemetryIngested={async () => {
+            if (selectedAstronautId) {
+              await loadAstronautDetails(selectedAstronautId);
+            }
+            const aData = await fetchAstronauts();
+            setAstronauts(aData);
+          }}
+        />
       )}
     </div>
   );

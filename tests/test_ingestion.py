@@ -179,6 +179,53 @@ def test_acceptance_5_stale_data_warning(client_with_seeded_db):
     assert data["results"][0]["quality_status"] == "STALE"
     assert "older than 36 hours" in data["results"][0]["quality_notes"]
 
+def test_acceptance_4_missing_data_handling(client_with_seeded_db):
+    """
+    Acceptance Test 4:
+    Simulate a skipped observation day; confirm the system reports a missing data gap
+    rather than assuming nominal health.
+    """
+    client = client_with_seeded_db
+    base_time = datetime(2026, 11, 10, 8, 0, 0, tzinfo=timezone.utc)
+    
+    # Ingest Day 1 (Nov 10), Day 2 (Nov 11), Day 3 (Nov 12), SKIP Day 4 (Nov 13), Ingest Day 5 (Nov 14)
+    days_to_ingest = [0, 1, 2, 4]  # Day index 3 (2026-11-13) is intentionally skipped
+    observations = []
+    for d in days_to_ingest:
+        obs_time = (base_time + timedelta(days=d)).isoformat()
+        observations.append({
+            "astronaut_id": "astro-vance-001",
+            "indicator_key": "RESTING_HEART_RATE",
+            "value": 63.0,
+            "unit": "bpm",
+            "observation_time": obs_time,
+            "data_origin": "SIMULATED",
+            "provenance_ref": "TEST-GAP-SIM",
+        })
+    
+    res = client.post("/api/v1/observations", json={"observations": observations})
+    assert res.status_code == 201
+    assert res.json()["accepted_count"] == 4
+
+    # Query missing data gaps endpoint over the 5-day window
+    gap_res = client.get("/api/v1/data-quality/gaps?astronaut_id=astro-vance-001&days=5")
+    assert gap_res.status_code == 200
+    gap_data = gap_res.json()
+    assert gap_data["missing_gaps_count"] > 0
+    
+    # Confirm 2026-11-13 was explicitly detected as a gap
+    skipped_date = (base_time + timedelta(days=3)).date().isoformat()
+    gap_dates = [g["date"] for g in gap_data["gaps"] if g["indicator_key"] == "RESTING_HEART_RATE"]
+    assert skipped_date in gap_dates
+    
+    # Confirm the message explicitly notes nominal health is not assumed
+    skipped_entry = next(
+        g for g in gap_data["gaps"] 
+        if g["date"] == skipped_date and g["indicator_key"] == "RESTING_HEART_RATE"
+    )
+    assert "nominal health not assumed" in skipped_entry["message"]
+
+
 def test_acceptance_15_duplicate_prevention(client_with_seeded_db):
     client = client_with_seeded_db
     fixed_time = "2026-11-14T05:00:00Z"
