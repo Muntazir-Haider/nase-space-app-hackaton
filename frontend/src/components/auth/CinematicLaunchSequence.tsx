@@ -68,7 +68,7 @@ export function CinematicLaunchSequence({ onComplete, callsign }: CinematicLaunc
       {!videoFailed ? (
         <video
           ref={videoRef}
-          src="/launch_cinematic.mp4"
+          src="./launch_cinematic.mp4"
           autoPlay
           muted
           playsInline

@@ -227,7 +227,7 @@ export function NASASpacecraftHologram({
                 >
                   {/* Authentic Real 3D NASA Orion Spacecraft Render */}
                   <img
-                    src="/real_orion_spacecraft_transparent.png"
+                    src="./real_orion_spacecraft_transparent.png"
                     alt="NASA Orion MPC-V 3D Deep Space Spacecraft"
                     className="h-[320px] w-auto max-w-[95%] object-contain filter contrast-115 brightness-105 pointer-events-none select-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]"
                   />

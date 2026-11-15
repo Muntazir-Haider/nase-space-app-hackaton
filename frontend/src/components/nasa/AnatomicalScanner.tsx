@@ -232,7 +232,7 @@ export function AnatomicalScanner({
               >
                 {/* Authentic Clinical Anatomy Skeleton & Organs Transparent Image */}
                 <img
-                  src="/real_human_anatomy_transparent.png"
+                  src="./real_human_anatomy_transparent.png"
                   alt="Clinical Anatomical Reference Model"
                   className="h-[380px] w-auto max-w-[90%] object-contain filter contrast-110 brightness-105 pointer-events-none select-none"
                 />

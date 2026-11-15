@@ -110,7 +110,7 @@ export function LoginPage() {
         muted
         playsInline
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        src="/iss_orbital_station.mp4"
+        src="./iss_orbital_station.mp4"
       />
 
       {/* Atmospheric Glass Vignette (translucent so Earth and space station shine through) */}

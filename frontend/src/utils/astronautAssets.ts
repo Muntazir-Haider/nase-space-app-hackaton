@@ -13,8 +13,8 @@ export function getAstronautVisuals(callsign: string): AstronautVisualProfile {
 
   if (norm.includes('01') || norm.includes('VANCE')) {
     return {
-      photoUrl: '/astronauts/elena_rostova.jpg',
-      badgeUrl: '/artemis_mission_patch.svg',
+      photoUrl: './astronauts/elena_rostova.jpg',
+      badgeUrl: './artemis_mission_patch.svg',
       roleIcon: 'CommandLead',
       flagCode: '🇺🇸',
       flightSuitColor: 'border-blue-500',
@@ -23,8 +23,8 @@ export function getAstronautVisuals(callsign: string): AstronautVisualProfile {
 
   if (norm.includes('02') || norm.includes('THORNE') || norm.includes('VANCE')) {
     return {
-      photoUrl: '/astronauts/marcus_vance.jpg',
-      badgeUrl: '/artemis_mission_patch.svg',
+      photoUrl: './astronauts/marcus_vance.jpg',
+      badgeUrl: './artemis_mission_patch.svg',
       roleIcon: 'PilotSystems',
       flagCode: '🇺🇸',
       flightSuitColor: 'border-indigo-500',
@@ -33,8 +33,8 @@ export function getAstronautVisuals(callsign: string): AstronautVisualProfile {
 
   // ARTEMIS-03 / Sarah Chen
   return {
-    photoUrl: '/astronauts/sarah_chen.jpg',
-    badgeUrl: '/artemis_mission_patch.svg',
+    photoUrl: './astronauts/sarah_chen.jpg',
+    badgeUrl: './artemis_mission_patch.svg',
     roleIcon: 'BioSpecialist',
     flagCode: '🇺🇸',
     flightSuitColor: 'border-emerald-500',

@@ -198,7 +198,7 @@ export function StationUnifiedDashboard({
           <div className="flex items-center gap-4 min-w-0">
             <div className="relative shrink-0">
               <img 
-                src="/artemis_mission_patch.svg" 
+                src="./artemis_mission_patch.svg" 
                 alt="NASA Artemis Mission Crest" 
                 className="w-14 h-14 object-contain drop-shadow-md select-none" 
               />
@@ -238,7 +238,7 @@ export function StationUnifiedDashboard({
               title="Inspect 360° NASA Orion MPC-V Deep Space Vehicle Telemetry"
             >
               <img 
-                src="/real_orion_spacecraft_transparent.png" 
+                src="./real_orion_spacecraft_transparent.png" 
                 alt="Orion MPC-V" 
                 className="w-7 h-7 object-contain drop-shadow-xs shrink-0" 
               />
@@ -343,9 +343,9 @@ export function StationUnifiedDashboard({
             </span>
             {/* Astronaut Avatar Photo Stack */}
             <div className="flex -space-x-2 overflow-hidden items-center">
-              <img src="/astronauts/elena_rostova.jpg" alt="Dr. Vance" className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" />
-              <img src="/astronauts/marcus_vance.jpg" alt="Marcus" className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" />
-              <img src="/astronauts/sarah_chen.jpg" alt="Dr. Chen" className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" />
+              <img src="./astronauts/elena_rostova.jpg" alt="Dr. Vance" className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" />
+              <img src="./astronauts/marcus_vance.jpg" alt="Marcus" className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" />
+              <img src="./astronauts/sarah_chen.jpg" alt="Dr. Chen" className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" />
             </div>
           </div>
           <div className="my-3">
