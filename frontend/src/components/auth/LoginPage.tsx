@@ -103,14 +103,25 @@ export function LoginPage() {
   return (
     <div className="min-h-screen relative overflow-hidden bg-slate-950 font-sans select-none text-slate-100 flex flex-col justify-between">
       
-      {/* ── BACKGROUND: ISS Orbit Video ── */}
+      {/* ── BACKGROUND: ISS Orbit Video with High-Res Fallback Poster ── */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+        preload="auto"
+        poster="./iss_poster.jpg"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-700"
         src="./iss_orbital_station.mp4"
+      />
+
+      {/* Background Preloader for Rocket Launch Video (Ensures 0ms startup lag upon login) */}
+      <video
+        preload="auto"
+        muted
+        playsInline
+        className="hidden"
+        src="./launch_cinematic.mp4"
       />
 
       {/* Atmospheric Glass Vignette (translucent so Earth and space station shine through) */}

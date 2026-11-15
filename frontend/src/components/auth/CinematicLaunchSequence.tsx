@@ -7,14 +7,11 @@ interface CinematicLaunchSequenceProps {
 }
 
 export function CinematicLaunchSequence({ onComplete, callsign }: CinematicLaunchSequenceProps) {
-  const [elapsed, setElapsed] = useState<number>(0);
+  const [progressPercent, setProgressPercent] = useState<number>(0);
   const [videoFailed, setVideoFailed] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hasFinishedRef = useRef<boolean>(false);
-
-  // Energetic rocket launch duration: 4.2 seconds at 2.2x speed
-  // Covers ~9.2 seconds of video flight so the rocket clears the pad, accelerates, and flies high into the sky!
-  const TOTAL_DURATION_SEC = 4.2;
 
   const finishSequence = () => {
     if (hasFinishedRef.current) return;
@@ -23,33 +20,61 @@ export function CinematicLaunchSequence({ onComplete, callsign }: CinematicLaunc
   };
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      // 2.2x speed so the rocket flies fast and dynamically
-      videoRef.current.playbackRate = 2.2;
-      const playPromise = videoRef.current.play();
+    const video = videoRef.current;
+    if (video) {
+      video.playbackRate = 2.0;
+      const playPromise = video.play();
       if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn('Video playback warning:', err);
-        });
+        playPromise
+          .then(() => setIsPlaying(true))
+          .catch((err) => {
+            console.warn('Launch video playback warning:', err);
+            setIsPlaying(true);
+          });
       }
     }
 
-    const startTime = Date.now();
-    const interval = setInterval(() => {
-      const currentElapsed = (Date.now() - startTime) / 1000;
-      setElapsed(currentElapsed);
+    // Safety fallback: complete after 5.2 seconds in all circumstances
+    const fallbackTimer = setTimeout(() => {
+      finishSequence();
+    }, 5200);
 
-      if (currentElapsed >= TOTAL_DURATION_SEC) {
+    return () => clearTimeout(fallbackTimer);
+  }, []);
+
+  // Update progress directly from video timeupdate
+  const handleTimeUpdate = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    const cur = video.currentTime;
+    const dur = video.duration || 10;
+    const targetEnd = dur * 0.90;
+    const currentPct = Math.min(100, Math.max(0, (cur / targetEnd) * 100));
+    setProgressPercent(currentPct);
+
+    if (cur >= targetEnd) {
+      finishSequence();
+    }
+  };
+
+  // Synthetic progress fallback if video fails to play
+  useEffect(() => {
+    if (isPlaying && !videoFailed) return;
+
+    const startTime = Date.now();
+    const duration = 4000;
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(100, (elapsed / duration) * 100);
+      setProgressPercent(pct);
+      if (elapsed >= duration) {
         clearInterval(interval);
         finishSequence();
       }
-    }, 30);
+    }, 35);
 
     return () => clearInterval(interval);
-  }, []);
-
-  const progressPercent = Math.min(100, (elapsed / TOTAL_DURATION_SEC) * 100);
+  }, [isPlaying, videoFailed]);
 
   // Dynamic telemetry calculations as the rocket ascends
   const altitudeKm = Math.round((Math.pow(progressPercent / 100, 1.8) * 52.4) * 10) / 10;
@@ -64,17 +89,31 @@ export function CinematicLaunchSequence({ onComplete, callsign }: CinematicLaunc
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex items-center justify-center overflow-hidden select-none animate-fadeIn font-sans">
-      {/* ── Background Video Layer (High-Speed Flight 2.2x) ── */}
+      
+      {/* ── Instant Fallback Poster Background (Prevents any black flash) ── */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center pointer-events-none filter contrast-125 brightness-105"
+        style={{ backgroundImage: 'url(./launch_poster.jpg)' }}
+      />
+
+      {/* ── Background Video Layer (High-Speed Flight 2.0x, Preloaded) ── */}
       {!videoFailed ? (
         <video
           ref={videoRef}
           src="./launch_cinematic.mp4"
+          poster="./launch_poster.jpg"
+          preload="auto"
           autoPlay
           muted
           playsInline
+          onTimeUpdate={handleTimeUpdate}
+          onPlaying={() => setIsPlaying(true)}
           onEnded={finishSequence}
           className="absolute inset-0 w-full h-full object-cover pointer-events-none filter contrast-125 brightness-105 transition-transform duration-1000 scale-105"
-          onError={() => setVideoFailed(true)}
+          onError={() => {
+            setVideoFailed(true);
+            setIsPlaying(false);
+          }}
         />
       ) : null}
 
@@ -82,7 +121,7 @@ export function CinematicLaunchSequence({ onComplete, callsign }: CinematicLaunc
       <div 
         className="absolute inset-0 pointer-events-none" 
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.7) 100%)',
+          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.7) 100%)',
           boxShadow: 'inset 0 0 100px rgba(0,0,0,0.85)'
         }} 
       />
