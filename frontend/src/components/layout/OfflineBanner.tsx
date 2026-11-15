@@ -15,11 +15,10 @@ export function OfflineBanner({ onRetry, retrying }: OfflineBannerProps) {
           </div>
           <div>
             <h4 className="text-sm font-bold tracking-wide text-white flex items-center gap-2">
-              STATION ENGINE CONNECTING · OFFLINE MODE ACTIVE
+              AUTONOMOUS OFFLINE MODE ACTIVE · NASA ARMED
             </h4>
             <p className="text-xs text-rose-200/90 mt-0.5">
-              Connecting to the local station engine at <code className="bg-rose-900/40 px-1 py-0.5 rounded font-mono text-rose-300">http://127.0.0.1:8000</code>.
-              The workstation is checking connection automatically every 2.5 seconds.
+              Operating with full client-side clinical telemetry corridors and offline decision support. Optional live local backend at <code className="bg-rose-900/40 px-1 py-0.5 rounded font-mono text-rose-300">http://127.0.0.1:8000</code>.
             </p>
             <div className="flex items-center gap-2 mt-1 text-[11px] font-mono text-rose-300">
               <Terminal className="w-3.5 h-3.5" />

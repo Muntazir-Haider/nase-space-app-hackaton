@@ -192,7 +192,7 @@ export function StationUnifiedDashboard({
       <div className="bg-white border border-black/[0.09] rounded-2xl p-4 sm:p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col gap-4 sm:gap-5">
         
         {/* Main Command Row */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5 pb-4 sm:pb-5 border-b border-black/[0.06]">
+        <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 sm:gap-5 pb-4 sm:pb-5 border-b border-black/[0.06]">
           
           {/* Left: Mission Patch & Title */}
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
@@ -200,13 +200,13 @@ export function StationUnifiedDashboard({
               <img 
                 src="./artemis_mission_patch.svg" 
                 alt="NASA Artemis Mission Crest" 
-                className="w-11 h-11 sm:w-14 sm:h-14 object-contain drop-shadow-md select-none" 
+                className="w-11 h-11 sm:w-14 sm:h-14 object-contain drop-shadow-md select-none shrink-0" 
               />
             </div>
 
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-sm sm:text-lg font-extrabold text-slate-950 tracking-tight font-mono break-words sm:whitespace-nowrap">
+                <h1 className="text-sm sm:text-base md:text-lg font-extrabold text-slate-950 tracking-tight font-mono break-words">
                   NASA Artemis Station · Flight Health Operations
                 </h1>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] font-bold border border-blue-200 shrink-0">
@@ -224,7 +224,7 @@ export function StationUnifiedDashboard({
           </div>
 
           {/* Right: Tactile Quick Actions Dock */}
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
             {/* Quick Link to 3D Orion Spacecraft Subsystem */}
             <button
               type="button"
@@ -234,17 +234,17 @@ export function StationUnifiedDashboard({
                 const el = document.getElementById('spatial-reference-section');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-black/[0.08] text-slate-800 transition shadow-2xs active:scale-[0.98] cursor-pointer whitespace-nowrap"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-black/[0.08] text-slate-800 transition shadow-2xs active:scale-[0.98] cursor-pointer whitespace-nowrap"
               title="Inspect 360° NASA Orion MPC-V Deep Space Vehicle Telemetry"
             >
               <img 
                 src="./real_orion_spacecraft_transparent.png" 
                 alt="Orion MPC-V" 
-                className="w-7 h-7 object-contain drop-shadow-xs shrink-0" 
+                className="w-6 h-6 object-contain drop-shadow-xs shrink-0" 
               />
               <div className="text-left leading-tight">
                 <div className="text-[11px] font-mono font-bold text-slate-950 uppercase tracking-tight">ORION MPC-V</div>
-                <div className="text-[10px] text-slate-500 font-medium">3D Flight Vehicle</div>
+                <div className="text-[10px] text-slate-500 font-medium">3D Vehicle</div>
               </div>
             </button>
 
@@ -394,12 +394,12 @@ export function StationUnifiedDashboard({
             </span>
           </div>
           <div className="my-3">
-            <div className="text-3xl font-extrabold font-mono tracking-tight flex items-baseline gap-2">
-              <span className={activeAlert ? 'text-rose-800' : 'text-slate-950'}>
+            <div className="flex flex-wrap items-baseline gap-2">
+              <span className={`text-2xl sm:text-3xl font-extrabold font-mono tracking-tight ${activeAlert ? 'text-rose-800' : 'text-slate-950'}`}>
                 {activeAlert ? '1 Advisory' : '0 Alerts'}
               </span>
               {activeAlert && (
-                <span className="text-xs font-mono font-bold text-rose-800 bg-rose-100 px-2.5 py-0.5 rounded-full border border-rose-200">
+                <span className="text-[11px] font-mono font-bold text-rose-800 bg-rose-100 px-2.5 py-0.5 rounded-full border border-rose-200 shrink-0">
                   {activeAlert.review_priority}
                 </span>
               )}
@@ -432,9 +432,11 @@ export function StationUnifiedDashboard({
             </span>
           </div>
           <div className="my-3">
-            <div className="text-3xl font-extrabold font-mono text-slate-950 tracking-tight flex items-baseline justify-between">
-              <span>3,450 <span className="text-sm font-bold text-slate-600">ppm</span></span>
-              <span className="text-sm font-mono text-emerald-800 font-extrabold">101.3 kPa</span>
+            <div className="flex flex-wrap items-baseline justify-between gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-950 tracking-tight">
+                3,450 <span className="text-xs sm:text-sm font-bold text-slate-600">ppm</span>
+              </span>
+              <span className="text-xs sm:text-sm font-mono text-emerald-800 font-extrabold">101.3 kPa</span>
             </div>
             <div className="text-xs font-semibold text-slate-600 mt-1">
               Elevated post-EVA · Scrubber cycling
@@ -462,8 +464,10 @@ export function StationUnifiedDashboard({
             </span>
           </div>
           <div className="my-3">
-            <div className="text-3xl font-extrabold font-mono text-slate-950 tracking-tight flex items-baseline justify-between">
-              <span>295 <span className="text-sm font-bold text-slate-600">μSv/d</span></span>
+            <div className="flex flex-wrap items-baseline justify-between gap-1.5">
+              <span className="text-2xl sm:text-3xl font-extrabold font-mono text-slate-950 tracking-tight">
+                295 <span className="text-xs sm:text-sm font-bold text-slate-600">μSv/d</span>
+              </span>
               <span className="text-xs font-mono text-purple-800 font-extrabold">Deep Space</span>
             </div>
             <div className="text-xs font-semibold text-slate-600 mt-1">

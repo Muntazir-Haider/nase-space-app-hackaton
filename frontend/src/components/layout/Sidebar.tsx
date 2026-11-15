@@ -96,7 +96,7 @@ export function Sidebar({
   };
 
   const renderNavBody = () => (
-    <div className="flex-1 overflow-y-auto p-3.5 space-y-5">
+    <div className="flex-1 overflow-y-auto p-3 space-y-4 scrollbar-thin">
       {/* SECTION 1: Core Navigation */}
       <div>
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 px-2 block mb-1.5 font-mono">
@@ -280,7 +280,7 @@ export function Sidebar({
   return (
     <>
       {/* ── Desktop Static Sidebar (Always visible on lg screens) ── */}
-      <aside className="hidden lg:flex w-68 shrink-0 h-screen sticky top-0 bg-white border-r border-black/[0.08] flex-col justify-between shadow-[0_0_24px_rgba(0,0,0,0.03)] z-30 select-none">
+      <aside className="hidden lg:flex w-72 shrink-0 h-screen sticky top-0 bg-white border-r border-black/[0.08] flex-col justify-between shadow-[0_0_24px_rgba(0,0,0,0.03)] z-30 select-none">
         {/* Top Header & Brand */}
         <div className="p-4 border-b border-black/[0.06] bg-[#fbfbfd] shrink-0">
           <div className="flex items-center gap-3 mb-3">

@@ -83,22 +83,15 @@ function StationDashboard() {
   }, []);
 
   useEffect(() => {
-    if (!isOffline) return;
-    const retryTimer = setInterval(() => {
-      loadInitialData();
-    }, 2500);
-    return () => clearInterval(retryTimer);
-  }, [isOffline]);
-
-  useEffect(() => {
     if (selectedAstronautId) {
       loadAstronautDetails(selectedAstronautId);
     }
   }, [selectedAstronautId]);
 
-  async function loadInitialData() {
-    setLoading(true);
-    setRetrying(true);
+  async function loadInitialData(isManual = false) {
+    if (isManual) {
+      setRetrying(true);
+    }
     try {
       const [hData, aData, auditLogs] = await Promise.all([
         fetchHealth(),
@@ -114,7 +107,7 @@ function StationDashboard() {
         setSelectedAstronautId(heroAstro.id);
       }
     } catch (err) {
-      console.warn('Backend connection failed:', err);
+      console.warn('Backend connection failed - operating in autonomous client-side offline mode:', err);
       setIsOffline(true);
     } finally {
       setLoading(false);
@@ -194,7 +187,7 @@ function StationDashboard() {
   const selectedAstro = astronauts.find(a => a.id === selectedAstronautId) || null;
 
   return (
-    <div className="min-h-screen bg-[#ebedf2] text-slate-900 flex font-sans">
+    <div className="min-h-screen w-full bg-[#ebedf2] text-slate-900 flex font-sans overflow-x-hidden">
       {/* Left Navigation Sidebar (Desktop + Mobile Drawer) */}
       <Sidebar
         health={health}
@@ -225,7 +218,7 @@ function StationDashboard() {
       />
 
       {/* Main Right View Workspace */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+      <div className="flex-1 flex flex-col min-w-0 w-full min-h-screen lg:h-screen lg:overflow-y-auto overflow-x-hidden">
         {/* Mobile Navigation Header (visible only on < lg) */}
         <header className="lg:hidden flex items-center justify-between px-3.5 py-2.5 bg-white border-b border-black/[0.08] sticky top-0 z-20 shadow-2xs shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -269,7 +262,7 @@ function StationDashboard() {
         {/* Offline Banner */}
         {isOffline && (
           <OfflineBanner
-            onRetry={loadInitialData}
+            onRetry={() => loadInitialData(true)}
             retrying={retrying}
           />
         )}
