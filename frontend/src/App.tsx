@@ -30,7 +30,8 @@ import { AnatomicalScanner } from './components/nasa/AnatomicalScanner';
 import { StationUnifiedDashboard } from './components/dashboard/StationUnifiedDashboard';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginPage } from './components/auth/LoginPage';
-import { HeartPulse, Menu } from 'lucide-react';
+import { WelcomeGuideModal } from './components/WelcomeGuideModal';
+import { HeartPulse, Menu, BookOpen } from 'lucide-react';
 
 function StationBootScreen() {
   return (
@@ -44,7 +45,7 @@ function StationBootScreen() {
 }
 
 function StationDashboard() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, operator } = useAuth();
 
   const [health, setHealth] = useState<HealthCheckResponse | null>(null);
   const [isOffline, setIsOffline] = useState<boolean>(false);
@@ -69,6 +70,13 @@ function StationDashboard() {
   const [showEvidenceModal, setShowEvidenceModal] = useState<boolean>(false);
   const [showDataQualityModal, setShowDataQualityModal] = useState<boolean>(false);
   const [showJudgeTour, setShowJudgeTour] = useState<boolean>(false);
+  const [showWelcomeGuide, setShowWelcomeGuide] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('mission_sentinel_suppress_welcome_guide') !== 'true';
+    } catch {
+      return true;
+    }
+  });
 
   useEffect(() => {
     loadInitialData();
@@ -205,6 +213,7 @@ function StationDashboard() {
         onScenarioSwitch={handleScenarioSwitch}
         rejectedAuditCount={rejectedAuditCount}
         onOpenJudgeTour={() => setShowJudgeTour(true)}
+        onOpenWelcomeGuide={() => setShowWelcomeGuide(true)}
         astronauts={astronauts}
         selectedAstronautId={selectedAstronautId}
         onSelectAstronaut={(id) => {
@@ -239,6 +248,15 @@ function StationDashboard() {
           </div>
 
           <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowWelcomeGuide(true)}
+              className="px-2 py-1 rounded-lg bg-blue-50 text-[#0b3d91] border border-blue-200 hover:bg-blue-100 transition active:scale-95 cursor-pointer flex items-center gap-1 text-[10px] font-bold"
+              title="Open Operator Guide"
+            >
+              <BookOpen className="w-3 h-3" />
+              <span>Guide</span>
+            </button>
             <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] border border-blue-200">
               FD 14
             </span>
@@ -419,6 +437,21 @@ function StationDashboard() {
           }}
         />
       )}
+
+      {/* Operator Welcome Guide & Walkthrough Popup */}
+      <WelcomeGuideModal
+        isOpen={showWelcomeGuide}
+        onClose={() => setShowWelcomeGuide(false)}
+        onNavigateView={(v) => {
+          if (v === 'register') {
+            setShowRegisterModal(true);
+          } else {
+            setActiveView(v);
+          }
+        }}
+        onLoadScenario={handleScenarioSwitch}
+        operatorCallsign={operator?.callsign}
+      />
     </div>
   );
 }

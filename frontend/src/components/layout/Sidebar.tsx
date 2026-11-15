@@ -14,7 +14,9 @@ import {
   ShieldCheck,
   Sparkles,
   LayoutDashboard,
-  X
+  X,
+  BookOpen,
+  FileDown
 } from 'lucide-react';
 import { HealthCheckResponse, AstronautSummary } from '../../types';
 import { useAuth } from '../../context/AuthContext';
@@ -33,6 +35,7 @@ interface SidebarProps {
   onScenarioSwitch: (scenarioKey: string) => void;
   rejectedAuditCount?: number;
   onOpenJudgeTour?: () => void;
+  onOpenWelcomeGuide?: () => void;
   astronauts?: AstronautSummary[];
   selectedAstronautId?: string | null;
   onSelectAstronaut?: (id: string) => void;
@@ -51,6 +54,7 @@ export function Sidebar({
   onScenarioSwitch,
   rejectedAuditCount: _rejectedAuditCount = 0,
   onOpenJudgeTour,
+  onOpenWelcomeGuide,
   astronauts = [],
   selectedAstronautId = null,
   onSelectAstronaut,
@@ -169,7 +173,26 @@ export function Sidebar({
         </div>
       </div>
 
-      {/* SECTION 3: Interactive Judge Tour Button */}
+      {/* SECTION 3: User Guide & Walkthrough Modal Button */}
+      {onOpenWelcomeGuide && (
+        <div>
+          <button
+            onClick={() => {
+              onOpenWelcomeGuide();
+              onCloseMobile?.();
+            }}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200/80 text-[#0b3d91] text-xs font-bold transition shadow-2xs active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-[#0b3d91]" />
+              <span>User Guide &amp; Docs</span>
+            </div>
+            <FileDown className="w-3.5 h-3.5 text-blue-600" />
+          </button>
+        </div>
+      )}
+
+      {/* SECTION 4: Interactive Judge Tour Button */}
       {onOpenJudgeTour && (
         <div>
           <button
@@ -188,7 +211,7 @@ export function Sidebar({
         </div>
       )}
 
-      {/* SECTION 4: Flight Scenarios */}
+      {/* SECTION 5: Flight Scenarios */}
       <div>
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 px-2 block mb-1.5 font-mono">
           Clinical Scenarios
