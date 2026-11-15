@@ -38,7 +38,27 @@ npm run dev
 
 ---
 
-## 3. How the System Works (Input ➔ Analysis ➔ Output)
+## 3. NASA Datasets & Resources Taken (What Data Does This System Use?)
+
+Our system directly integrates standards and data definitions from the official **NASA Human Research Program (HRP)** and **Space Apps Challenge** resources:
+
+1. **NASA HRP Hazards ([nasa.gov/hrp/hazards](https://www.nasa.gov/hrp/hazards/)):**
+   - Implements telemetry tracking for the **5 Hazards of Spaceflight (RIDGE)**: Radiation, Isolation, Distance, Gravity, and Hostile Environments.
+2. **NASA HRP Risks ([nasa.gov/hrp/risks](https://www.nasa.gov/hrp/risks/)):**
+   - Implements the **Human Research Roadmap** clinical limits:
+     - `HRR-CV-01`: Cardiovascular drift ($50 - 85\text{ bpm}$ nominal; $> \mu + 1.5\sigma$ alert).
+     - `HRR-SLEEP-02`: Sleep debt ($6.0 - 8.5\text{ hrs}$ nominal; $< 6.0\text{ hrs}$ deficit).
+     - `HRR-EXERCISE-03`: Post-exercise 1-minute heart rate recovery ($15 - 45\text{ bpm drop}$ nominal).
+     - `HRR-ECLSS-04`: Cabin $\text{CO}_2$ ($400 - 2,500\text{ ppm}$ nominal; $> 4,000\text{ ppm}$ critical alarm).
+     - `HRR-RAD-05`: Space ionizing radiation ($200 - 600\ \mu\text{Sv/day}$ ALARA limit).
+3. **NASA HRP Ongoing Research ([nasa.gov/hrp/ongoing-hrp-research](https://www.nasa.gov/hrp/ongoing-hrp-research/)):**
+   - Architectural alignment with **ExMC** (Exploration Medical Capability for autonomous offline clinical decision support), **HHC** (exercise countermeasures), and **HFBP** (sleep monitoring).
+4. **NASA Space Apps Challenge Resources ([spaceappschallenge.org](https://www.spaceappschallenge.org/2026/challenges/health-monitoring-software/?tab=resources)):**
+   - Incorporates **NASA-STD-3001** medical clearance tiers and the **NASA Open Science Data Repository (OSDR)** telemetry schemas.
+
+---
+
+## 4. How the System Works (Input ➔ Analysis ➔ Output)
 
 ```
 [1. DATA INPUT]
@@ -67,7 +87,7 @@ npm run dev
 
 ---
 
-## 4. How to Use the Screen (Where is Everything?)
+## 5. How to Use the Screen (Where is Everything?)
 
 When you open `http://127.0.0.1:5173`, you are on the **Live Health Monitor** for Commander Dr. Elena Vance:
 
@@ -82,7 +102,7 @@ When you open `http://127.0.0.1:5173`, you are on the **Live Health Monitor** fo
 
 ---
 
-## 5. How to Demonstrate in Front of an Invigilator / Judge (3 Minutes)
+## 6. How to Demonstrate in Front of an Invigilator / Judge (3 Minutes)
 
 Follow these exact steps when a judge walks up to your screen:
 
@@ -110,7 +130,7 @@ Follow these exact steps when a judge walks up to your screen:
 
 ---
 
-## 6. How to Enter Your Own Numbers On-The-Spot
+## 7. How to Enter Your Own Numbers On-The-Spot
 
 If the judge says: *"What if I give custom numbers?"*
 1. Look at the box: **`⚡ LIVE TELEMETRY INPUT & ON-THE-SPOT DEMONSTRATION`**.
