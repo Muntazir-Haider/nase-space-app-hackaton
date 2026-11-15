@@ -2,19 +2,31 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import declarative_base, sessionmaker
 from backend.app.core.config import settings
 
-# SQLite connection with foreign keys and WAL mode enabled
-engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    echo=False,
-)
+is_sqlite = settings.DATABASE_URL.startswith("sqlite")
 
-@event.listens_for(engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.execute("PRAGMA journal_mode=WAL")
-    cursor.close()
+if is_sqlite:
+    # SQLite local file connection with foreign keys and WAL mode enabled
+    engine = create_engine(
+        settings.DATABASE_URL,
+        connect_args={"check_same_thread": False},
+        echo=False,
+    )
+
+    @event.listens_for(engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.close()
+else:
+    # PostgreSQL / Neon Serverless Postgres connection with connection health verification
+    engine = create_engine(
+        settings.DATABASE_URL,
+        pool_pre_ping=True,  # Vital for Neon serverless idle connection recycling
+        pool_size=10,
+        max_overflow=20,
+        echo=False,
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -37,4 +49,3 @@ def init_db():
         seed_default_indicators(db)
         if db.query(AstronautProfile).count() == 0:
             load_scenario(db, "SCENARIO_C_SILENT_DETERIORATION")
-

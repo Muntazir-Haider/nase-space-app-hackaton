@@ -88,8 +88,9 @@ def root():
 
 @app.get(f"{settings.API_V1_STR}/health")
 def health_check():
+    is_sqlite = settings.DATABASE_URL.startswith("sqlite")
     db_size = 0
-    if settings.DATABASE_PATH.exists():
+    if is_sqlite and settings.DATABASE_PATH.exists():
         try:
             db_size = os.path.getsize(settings.DATABASE_PATH)
         except OSError:
@@ -100,10 +101,12 @@ def health_check():
         "system": settings.PROJECT_NAME,
         "version": settings.VERSION,
         "offline_storage_ready": True,
-        "database_file": str(settings.DATABASE_PATH.name),
-        "database_path": str(settings.DATABASE_PATH),
+        "database_engine": "SQLite WAL" if is_sqlite else "PostgreSQL (Neon)",
+        "database_provider": "SQLite (Local Spacecraft Storage)" if is_sqlite else "Neon Serverless PostgreSQL (Cloud Connected)",
+        "database_file": str(settings.DATABASE_PATH.name) if is_sqlite else "neondb",
+        "database_path": str(settings.DATABASE_PATH) if is_sqlite else "cloud://neon.tech/postgresql",
         "database_size_bytes": db_size,
-        "sqlite_mode": "WAL",
+        "sqlite_mode": "WAL" if is_sqlite else "N/A (PostgreSQL Cloud)",
         "foreign_keys_enforced": True,
         "comms_latency": "22m 14s (One-Way Mars Sim)",
         "active_role": "CREW_MEDICAL_OFFICER",
@@ -112,7 +115,8 @@ def health_check():
 
 @app.get(f"{settings.API_V1_STR}/health/diagnostics")
 def station_diagnostics(db: Session = Depends(get_db)):
-    """Provides deep diagnostic metrics across all 14 SQLite relational tables."""
+    """Provides deep diagnostic metrics across all 14 relational tables (SQLite or Neon PostgreSQL)."""
+    is_sqlite = settings.DATABASE_URL.startswith("sqlite")
     tables = [
         "missions",
         "astronaut_profiles",
@@ -138,7 +142,7 @@ def station_diagnostics(db: Session = Depends(get_db)):
             counts[tbl] = f"Error: {str(e)}"
 
     db_size = 0
-    if settings.DATABASE_PATH.exists():
+    if is_sqlite and settings.DATABASE_PATH.exists():
         try:
             db_size = os.path.getsize(settings.DATABASE_PATH)
         except OSError:
@@ -146,11 +150,12 @@ def station_diagnostics(db: Session = Depends(get_db)):
 
     return {
         "station_status": "OPERATIONAL",
-        "database_file": str(settings.DATABASE_PATH.name),
+        "database_engine": "SQLite WAL" if is_sqlite else "PostgreSQL (Neon)",
+        "database_file": str(settings.DATABASE_PATH.name) if is_sqlite else "neondb",
         "database_size_bytes": db_size,
         "table_counts": counts,
         "total_records": sum(v for v in counts.values() if isinstance(v, int)),
-        "sqlite_journal_mode": "WAL",
+        "sqlite_journal_mode": "WAL" if is_sqlite else "N/A (PostgreSQL Cloud)",
         "timestamp_utc": datetime.now(timezone.utc).isoformat(),
     }
 
