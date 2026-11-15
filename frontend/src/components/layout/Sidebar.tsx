@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { HealthCheckResponse, AstronautSummary } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { AstronautAvatar } from '../crew/AstronautAvatar';
 
 export type ActiveView = 'dashboard' | 'review' | 'fleet' | 'spacecraft' | 'benchmark' | 'diagnostics' | 'register';
 
@@ -182,14 +183,11 @@ export function Sidebar({
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <span
-                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-                        hasAlert
-                          ? isSelected
-                            ? 'bg-rose-500 animate-pulse'
-                            : 'bg-rose-600 animate-ping'
-                          : 'bg-emerald-500'
-                      }`}
+                    <AstronautAvatar 
+                      callsign={astro.callsign} 
+                      name={astro.full_name} 
+                      size="sm" 
+                      hasAlert={hasAlert} 
                     />
                     <div className="truncate text-left">
                       <span className="block truncate leading-tight font-mono text-xs font-bold text-slate-950">

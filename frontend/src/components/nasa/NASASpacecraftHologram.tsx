@@ -103,38 +103,38 @@ export function NASASpacecraftHologram({
       
       {/* ── Apple-Grade Hardware Card Header ── */}
       <div className="px-6 py-4 bg-slate-50/80 border-b border-black/[0.06] flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div className="w-10 h-10 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs shrink-0">
             <Orbit className="w-5 h-5 text-white" />
           </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <span className="font-extrabold text-sm text-slate-950 tracking-tight uppercase">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="font-extrabold text-sm text-slate-950 tracking-tight uppercase whitespace-nowrap">
                 NASA Orion MPC-V · 3D Flight Telemetry
               </span>
-              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] font-bold border border-blue-200">
+              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] font-bold border border-blue-200 whitespace-nowrap shrink-0">
                 {activeMission} · DAY {flightDay}
               </span>
             </div>
-            <div className="text-xs text-slate-600 font-semibold mt-0.5">
+            <div className="text-xs text-slate-600 font-semibold mt-0.5 truncate">
               Deep Space Vehicle Systems & Cabin Environmental Telemetry
             </div>
           </div>
         </div>
 
         {/* Status Pill & Mode Toggle */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
           {/* Real DSN Carrier Status */}
-          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-full text-xs font-mono font-bold shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse" />
+          <div className="flex items-center gap-2 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-full text-xs font-mono font-bold shadow-2xs whitespace-nowrap shrink-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0" />
             <span>DSN: CANBERRA 70M ACTIVE</span>
           </div>
 
           {/* Mode Switcher */}
-          <div className="flex items-center bg-[#f4f5f8] p-1 rounded-xl border border-black/[0.05] text-xs">
+          <div className="flex items-center bg-[#f4f5f8] p-1 rounded-xl border border-black/[0.05] text-xs shrink-0 whitespace-nowrap">
             <button
               onClick={() => setActiveTab('schematic')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer active:scale-[0.98] ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer active:scale-[0.98] whitespace-nowrap ${
                 activeTab === 'schematic'
                   ? 'bg-white text-slate-950 shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-950'
@@ -145,7 +145,7 @@ export function NASASpacecraftHologram({
             </button>
             <button
               onClick={() => setActiveTab('orbit')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer active:scale-[0.98] ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer active:scale-[0.98] whitespace-nowrap ${
                 activeTab === 'orbit'
                   ? 'bg-white text-slate-950 shadow-xs font-bold'
                   : 'text-slate-600 hover:text-slate-950'
@@ -159,22 +159,22 @@ export function NASASpacecraftHologram({
       </div>
 
       {/* ── Main Display Grid ── */}
-      <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch bg-[#fbfbfd]">
+      <div className="p-6 grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch bg-[#fbfbfd]">
         
         {/* Left Column: 360-Degree 3D CAD Stage (8 cols) */}
-        <div className="lg:col-span-8 bg-[#090d16] rounded-2xl p-5 relative overflow-hidden flex flex-col items-center justify-between min-h-[480px] border border-black/[0.15] shadow-lg">
+        <div className="xl:col-span-8 bg-[#090d16] rounded-2xl p-5 relative overflow-hidden flex flex-col items-center justify-between min-h-[480px] border border-black/[0.15] shadow-lg">
           
           {/* Stage Header Info Bar */}
-          <div className="w-full flex items-center justify-between z-10 bg-slate-900/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 text-xs font-mono text-slate-300">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-400" />
+          <div className="w-full flex flex-wrap items-center justify-between z-10 bg-slate-900/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 text-xs font-mono text-slate-300 gap-2">
+            <div className="flex items-center gap-2 whitespace-nowrap shrink-0">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
               <span className="text-white font-bold tracking-wider">
                 3D CAD MODEL · YAW: {displayAngle}°
               </span>
             </div>
             
             {/* Subsystem Focus Pills */}
-            <div className="hidden sm:flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
               {[
                 { id: 'airlock', label: 'ECLSS Hatch', angle: 0 },
                 { id: 'cabin', label: 'Crew Module', angle: 90 },
@@ -188,7 +188,7 @@ export function NASASpacecraftHologram({
                     setIsAutoRotating(false);
                     setRotationAngle(sub.angle);
                   }}
-                  className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer whitespace-nowrap ${
                     selectedZone === sub.id
                       ? 'bg-blue-600 text-white font-bold'
                       : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
@@ -199,7 +199,7 @@ export function NASASpacecraftHologram({
               ))}
             </div>
 
-            <div className="text-slate-400 text-[11px]">
+            <div className="text-slate-400 text-[11px] whitespace-nowrap shrink-0">
               LATENCY: 22m 14s
             </div>
           </div>
@@ -407,14 +407,15 @@ export function NASASpacecraftHologram({
         </div>
 
         {/* Right Column: Solid Physical Telemetry Breakdown Cards (4 cols) */}
-        <div className="lg:col-span-4 flex flex-col justify-between gap-4">
+        {/* Right Column: Solid Physical Telemetry Breakdown Cards (4 cols on desktop, responsive stack) */}
+        <div className="xl:col-span-4 flex flex-col justify-between gap-4">
           <div className="bg-white border border-black/[0.08] rounded-2xl p-5 shadow-[0_4px_16px_rgba(0,0,0,0.04)] flex flex-col gap-4">
             <div className="flex items-center justify-between border-b border-black/[0.05] pb-3">
-              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <Layers className="w-4 h-4 text-[#0b3d91]" />
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2 whitespace-nowrap">
+                <Layers className="w-4 h-4 text-[#0b3d91] shrink-0" />
                 <span>Life Support Subsystems</span>
               </span>
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono ${
+              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono whitespace-nowrap shrink-0 ${
                 isCo2Elevated 
                   ? 'bg-rose-50 text-rose-800 border border-rose-200' 
                   : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
@@ -423,7 +424,7 @@ export function NASASpacecraftHologram({
               </span>
             </div>
 
-            <div className="space-y-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-3.5">
               {/* Card 1: CO2 */}
               <div 
                 onClick={() => setSelectedZone('airlock')}
@@ -433,12 +434,12 @@ export function NASASpacecraftHologram({
                     : 'bg-[#f4f5f8] border-black/[0.06] hover:border-black/[0.12]'
                 }`}
               >
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-bold text-slate-800 flex items-center gap-1.5 uppercase text-[11px]">
-                    <Wind className="w-3.5 h-3.5 text-blue-600" />
-                    Airlock CO₂ Concentration
+                <div className="flex items-center justify-between text-xs mb-1 gap-2">
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5 uppercase text-[11px] whitespace-nowrap">
+                    <Wind className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                    Airlock CO₂
                   </span>
-                  <span className={`font-mono font-extrabold text-sm flex items-center gap-1 ${
+                  <span className={`font-mono font-extrabold text-sm flex items-center gap-1 whitespace-nowrap ${
                     isCo2Elevated ? 'text-rose-600' : 'text-slate-950'
                   }`}>
                     {liveCo2} ppm
@@ -453,8 +454,8 @@ export function NASASpacecraftHologram({
                   />
                 </div>
                 <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold mt-2">
-                  <span>Limit: 2,500 ppm</span>
-                  <span>Scrubber Bed: Active</span>
+                  <span className="whitespace-nowrap">Limit: 2,500 ppm</span>
+                  <span className="whitespace-nowrap">Bed B: Active</span>
                 </div>
               </div>
 
@@ -467,12 +468,12 @@ export function NASASpacecraftHologram({
                     : 'bg-[#f4f5f8] border-black/[0.06] hover:border-black/[0.12]'
                 }`}
               >
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-bold text-slate-800 flex items-center gap-1.5 uppercase text-[11px]">
-                    <Activity className="w-3.5 h-3.5 text-emerald-600" />
-                    Cabin Atmospheric Pressure
+                <div className="flex items-center justify-between text-xs mb-1 gap-2">
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5 uppercase text-[11px] whitespace-nowrap">
+                    <Activity className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    Cabin Pressure
                   </span>
-                  <span className="font-mono font-extrabold text-sm text-slate-950">
+                  <span className="font-mono font-extrabold text-sm text-slate-950 whitespace-nowrap">
                     {livePressure.toFixed(1)} kPa
                   </span>
                 </div>
@@ -480,8 +481,8 @@ export function NASASpacecraftHologram({
                   <div className="h-full rounded-full bg-emerald-500" style={{ width: '99%' }} />
                 </div>
                 <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold mt-2">
-                  <span>Nominal: 101.3 kPa</span>
-                  <span>O₂: 21.2 kPa</span>
+                  <span className="whitespace-nowrap">Nominal: 101.3 kPa</span>
+                  <span className="whitespace-nowrap">O₂: 21.2 kPa</span>
                 </div>
               </div>
 
@@ -494,38 +495,38 @@ export function NASASpacecraftHologram({
                     : 'bg-[#f4f5f8] border-black/[0.06] hover:border-black/[0.12]'
                 }`}
               >
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-bold text-slate-800 flex items-center gap-1.5 uppercase text-[11px]">
-                    <Sun className="w-3.5 h-3.5 text-purple-600" />
-                    Galactic Cosmic Radiation
+                <div className="flex items-center justify-between text-xs mb-1 gap-2">
+                  <span className="font-bold text-slate-800 flex items-center gap-1.5 uppercase text-[11px] whitespace-nowrap">
+                    <Sun className="w-3.5 h-3.5 text-purple-600 shrink-0" />
+                    Galactic Rad
                   </span>
-                  <span className="font-mono font-extrabold text-sm text-slate-950">
-                    {liveRad} μSv/day
+                  <span className="font-mono font-extrabold text-sm text-slate-950 whitespace-nowrap">
+                    {liveRad} μSv/d
                   </span>
                 </div>
                 <div className="w-full bg-slate-200/80 h-2 rounded-full overflow-hidden mt-2">
                   <div className="h-full rounded-full bg-purple-500" style={{ width: '42%' }} />
                 </div>
                 <div className="flex items-center justify-between text-[11px] text-slate-600 font-semibold mt-2">
-                  <span>NASA ALARA Limit: Safe</span>
-                  <span>Dose: 14.2 mSv</span>
+                  <span className="whitespace-nowrap">ALARA: Safe</span>
+                  <span className="whitespace-nowrap">14.2 mSv</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* DSN Downlink Solid Box */}
-          <div className="p-4 bg-[#f4f5f8] border border-black/[0.06] rounded-2xl flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800">
+          <div className="p-4 bg-[#f4f5f8] border border-black/[0.06] rounded-2xl flex items-center justify-between shadow-[0_2px_8px_rgba(0,0,0,0.03)] gap-2">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-800 shrink-0">
                 <Radio className="w-4 h-4" />
               </div>
-              <div>
-                <div className="text-xs font-bold text-slate-900">DSN Telemetry Downlink</div>
-                <div className="text-[11px] text-slate-600 font-semibold">Store & Forward Mode · 360° Drag Supported</div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-slate-900 whitespace-nowrap">DSN Telemetry Downlink</div>
+                <div className="text-[11px] text-slate-600 font-semibold truncate">Store & Forward · 360° Drag Supported</div>
               </div>
             </div>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0 whitespace-nowrap">
               LOCKED
             </span>
           </div>

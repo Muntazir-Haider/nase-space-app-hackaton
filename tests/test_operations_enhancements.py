@@ -1,4 +1,5 @@
 import pytest
+import uuid
 from fastapi.testclient import TestClient
 from backend.app.main import app
 from backend.app.database import init_db
@@ -104,11 +105,13 @@ def test_mission_events_lifecycle():
     astro_id = astros[0]["id"]
 
     # 2. Create mission event
+    unique_key = uuid.uuid4().hex[:8]
+    event_title = f"Lunar South Pole Geotechnical Sortie {unique_key}"
     event_payload = {
         "astronaut_id": astro_id,
         "event_type": "EVA",
-        "title": "Lunar South Pole Geotechnical Sortie",
-        "start_time": "2026-11-14T08:00:00Z",
+        "title": event_title,
+        "start_time": f"2026-11-14T{unique_key[:2]}:00:00Z",
         "end_time": "2026-11-14T14:30:00Z",
         "workload_intensity": "HIGH",
         "notes": "Surface sample collection and seismic sensor deployment.",
@@ -126,7 +129,7 @@ def test_mission_events_lifecycle():
     assert list_res.status_code == 200
     events = list_res.json()
     assert len(events) >= 1
-    assert any(e["title"] == "Lunar South Pole Geotechnical Sortie" for e in events)
+    assert any(e["title"] == event_title for e in events)
 
     # 4. Verify offline sync queue contains MISSION_EVENT_CREATE
     sync_res = client.get("/api/v1/sync/status").json()

@@ -11,13 +11,11 @@ import {
   RefreshCw, 
   Users, 
   ChevronRight, 
-  HeartPulse, 
   ShieldCheck, 
   Thermometer, 
   Clock, 
   Database, 
   Compass,
-  PlusCircle,
   Loader2,
   FileSearch,
   Wifi,
@@ -25,7 +23,9 @@ import {
   ChevronDown,
   ChevronUp,
   Stethoscope,
-  AlertTriangle
+  AlertTriangle,
+  Orbit,
+  UserPlus
 } from 'lucide-react';
 import { 
   AstronautSummary, 
@@ -35,6 +35,7 @@ import {
 import { AnatomicalScanner } from '../nasa/AnatomicalScanner';
 import { NASASpacecraftHologram } from '../nasa/NASASpacecraftHologram';
 import { SynchronizedCharts } from '../SynchronizedCharts';
+import { AstronautAvatar } from '../crew/AstronautAvatar';
 import { ingestObservation, runDeteriorationAnalysis } from '../../services/api';
 
 interface StationUnifiedDashboardProps {
@@ -175,9 +176,9 @@ export function StationUnifiedDashboard({
     }
   };
 
-  // Optional Spatial Reference Toggle
-  const [showSpatialReference, setShowSpatialReference] = useState<boolean>(false);
-  const [referenceMode, setReferenceMode] = useState<'anatomy' | 'spacecraft'>('anatomy');
+  // Spatial Reference (Default open with 3D Spacecraft)
+  const [showSpatialReference, setShowSpatialReference] = useState<boolean>(true);
+  const [referenceMode, setReferenceMode] = useState<'anatomy' | 'spacecraft'>('spacecraft');
 
   // Baseline corridors from timeline
   const rhrBaseline = timeline?.baselines ? timeline.baselines['RESTING_HEART_RATE'] : undefined;
@@ -188,59 +189,75 @@ export function StationUnifiedDashboard({
     <div className="flex flex-col gap-8 font-sans">
       
       {/* ── 1. Top Station Operational Command Header (Apple Solid Card) ── */}
-      <div className="bg-white border border-black/[0.09] rounded-2xl p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)]">
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-black/[0.06]">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs">
-              <HeartPulse className="w-6 h-6 text-white" />
+      <div className="bg-white border border-black/[0.09] rounded-2xl p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col gap-5">
+        
+        {/* Main Command Row */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 border-b border-black/[0.06]">
+          
+          {/* Left: Mission Patch & Title */}
+          <div className="flex items-center gap-4 min-w-0">
+            <div className="relative shrink-0">
+              <img 
+                src="/artemis_mission_patch.svg" 
+                alt="NASA Artemis Mission Crest" 
+                className="w-14 h-14 object-contain drop-shadow-md select-none" 
+              />
             </div>
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-lg font-bold text-slate-900 tracking-tight">
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h1 className="text-lg font-extrabold text-slate-950 tracking-tight font-mono whitespace-nowrap">
                   NASA Artemis Station · Flight Health Operations
                 </h1>
-                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] font-bold border border-blue-200/80">
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] font-bold border border-blue-200 whitespace-nowrap">
                   DAY 14
                 </span>
-                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300/80 font-bold flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold flex items-center gap-1.5 whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
                   ORION MPC-V
                 </span>
               </div>
+              <p className="text-xs text-slate-500 font-medium mt-1 truncate">
+                Autonomous Lunar Transit Health Monitoring & Telemetry Hub
+              </p>
             </div>
           </div>
 
-          {/* Quick Actions Toolbar */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Right: Tactile Quick Actions Dock */}
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {/* Primary Action: Sync Wearables */}
             <button
               onClick={handleMasterStationSync}
               disabled={syncingAll}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0b3d91] hover:bg-[#092d6c] text-white text-xs font-semibold shadow-xs transition active:scale-[0.98] cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0b3d91] hover:bg-[#072b68] text-white text-xs font-bold shadow-xs transition active:scale-[0.98] cursor-pointer whitespace-nowrap disabled:opacity-70"
             >
               {syncingAll ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-              <span>{syncingAll ? 'Syncing...' : 'Sync Wearables'}</span>
+              <span>{syncingAll ? 'Syncing Streams...' : 'Sync Wearables'}</span>
             </button>
 
+            {/* Register Crew */}
             <button
               onClick={onOpenRegisterModal}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-black/[0.08] text-xs font-semibold text-slate-700 transition shadow-2xs active:scale-[0.98] cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#f4f5f8] hover:bg-white border border-black/[0.06] hover:border-black/[0.12] text-xs font-bold text-slate-800 transition shadow-2xs active:scale-[0.98] cursor-pointer whitespace-nowrap"
             >
-              <PlusCircle className="w-3.5 h-3.5 text-[#0b3d91]" />
+              <UserPlus className="w-3.5 h-3.5 text-[#0b3d91]" />
               <span>+ Register Crew</span>
             </button>
 
+            {/* Audit Log */}
             <button
               onClick={onOpenDataQuality}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-black/[0.08] text-xs font-semibold text-slate-700 transition shadow-2xs active:scale-[0.98] cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#f4f5f8] hover:bg-white border border-black/[0.06] hover:border-black/[0.12] text-xs font-bold text-slate-800 transition shadow-2xs active:scale-[0.98] cursor-pointer whitespace-nowrap"
             >
               <FileSearch className="w-3.5 h-3.5 text-[#0b3d91]" />
               <span>Audit Log</span>
             </button>
 
+            {/* Station Tour */}
             {onOpenJudgeTour && (
               <button
                 onClick={onOpenJudgeTour}
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200/80 text-xs font-semibold text-purple-900 transition shadow-2xs active:scale-[0.98] cursor-pointer"
+                className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200/80 text-xs font-bold text-purple-900 transition shadow-2xs active:scale-[0.98] cursor-pointer whitespace-nowrap"
               >
                 <Compass className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
                 <span>Station Tour</span>
@@ -249,30 +266,38 @@ export function StationUnifiedDashboard({
           </div>
         </div>
 
-        {/* Live Sub-Status Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600 pt-3.5">
-          <div className="flex flex-wrap items-center gap-4 text-[11px] font-mono">
-            <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-slate-500" />
-              <span className="font-bold text-slate-800">{utcTime || '03:45:10 UTC'}</span>
-              <span className="text-slate-400">· MET 14d 08h</span>
+        {/* Bottom Operational Telemetry Strip (Aerospace Hardware Tray) */}
+        <div className="bg-[#f4f5f8] rounded-xl px-4 py-2.5 border border-black/[0.05] flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-[11px] font-mono">
+            {/* Clock & MET */}
+            <div className="flex items-center gap-2">
+              <Clock className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span className="font-extrabold text-slate-900">{utcTime || '03:45:10 UTC'}</span>
+              <span className="text-slate-300">|</span>
+              <span className="text-slate-600 font-semibold">MET 14d 08h</span>
             </div>
 
-            <div className="flex items-center gap-1.5">
-              <Radio className="w-3.5 h-3.5 text-emerald-600" />
-              <span className="text-emerald-700 font-bold">DSN: ACTIVE</span>
-              <span className="text-slate-500">Canberra 70m</span>
+            {/* DSN Link */}
+            <div className="flex items-center gap-2 bg-white px-2.5 py-1 rounded-lg border border-black/[0.06] shadow-2xs">
+              <Radio className="w-3.5 h-3.5 text-emerald-600 animate-pulse shrink-0" />
+              <span className="text-emerald-800 font-extrabold">DSN: ACTIVE</span>
+              <span className="text-slate-500 font-medium">Canberra 70m</span>
             </div>
 
-            <div className="flex items-center gap-1.5">
-              <Database className="w-3.5 h-3.5 text-blue-600" />
-              <span className="text-blue-800 font-bold">SQLite WAL Offline</span>
+            {/* Storage Engine */}
+            <div className="flex items-center gap-2 bg-white px-2.5 py-1 rounded-lg border border-black/[0.06] shadow-2xs">
+              <Database className="w-3.5 h-3.5 text-[#0b3d91] shrink-0" />
+              <span className="text-slate-900 font-extrabold">SQLite WAL</span>
+              <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                Offline Ready
+              </span>
             </div>
           </div>
 
+          {/* Sync Feedback Toast */}
           {syncFeedback && (
-            <div className="text-[11px] font-mono font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-300 flex items-center gap-1.5 shadow-2xs">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <div className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-300 flex items-center gap-1.5 shadow-2xs">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>{syncFeedback}</span>
             </div>
           )}
@@ -287,20 +312,25 @@ export function StationUnifiedDashboard({
           className="bg-white border border-black/[0.09] hover:border-black/[0.16] rounded-2xl p-5 flex flex-col justify-between shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-200 cursor-pointer group"
         >
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-slate-800 flex items-center gap-1.5">
-              <Users className="w-4 h-4 text-[#0b3d91]" />
-              <span>Active Crew</span>
+            <span className="font-bold text-slate-800 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#0b3d91] flex items-center justify-center border border-blue-200/60 shadow-2xs">
+                <Users className="w-4 h-4" />
+              </div>
+              <span className="text-xs uppercase font-mono font-extrabold text-slate-900">Active Crew</span>
             </span>
-            <span className="text-[10px] font-mono bg-blue-50 text-[#0b3d91] px-2.5 py-0.5 rounded-full border border-blue-200/80 font-bold">
-              ROSTER
-            </span>
+            {/* Astronaut Avatar Photo Stack */}
+            <div className="flex -space-x-2 overflow-hidden items-center">
+              <img src="/astronauts/elena_rostova.jpg" alt="Dr. Vance" className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" />
+              <img src="/astronauts/marcus_vance.jpg" alt="Marcus" className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" />
+              <img src="/astronauts/sarah_chen.jpg" alt="Dr. Chen" className="inline-block h-6 w-6 rounded-full ring-2 ring-white object-cover" />
+            </div>
           </div>
           <div className="my-3">
             <div className="text-3xl font-extrabold font-mono text-slate-950 tracking-tight">
               {astronauts.length} <span className="text-sm font-bold text-slate-600">Astronauts</span>
             </div>
             <div className="text-xs font-semibold text-slate-600 mt-1">
-              12 Active Sensor Channels
+              12 Active Sensor Channels Synced
             </div>
           </div>
           <div className="pt-3 border-t border-black/[0.05] flex items-center justify-between text-[11px]">
@@ -326,9 +356,13 @@ export function StationUnifiedDashboard({
           }`}
         >
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-slate-800 flex items-center gap-1.5">
-              <ShieldAlert className={`w-4 h-4 ${activeAlert ? 'text-rose-600' : 'text-emerald-600'}`} />
-              <span>Health Advisories</span>
+            <span className="font-bold text-slate-800 flex items-center gap-2">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-2xs border ${
+                activeAlert ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+              }`}>
+                <ShieldAlert className="w-4 h-4" />
+              </div>
+              <span className="text-xs uppercase font-mono font-extrabold text-slate-900">Health Advisories</span>
             </span>
             <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full border font-bold ${
               activeAlert ? 'bg-rose-100 text-rose-900 border-rose-300' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
@@ -364,9 +398,11 @@ export function StationUnifiedDashboard({
         {/* Card 3: Cabin Atmosphere & CO₂ */}
         <div className="bg-white border border-black/[0.09] hover:border-black/[0.16] rounded-2xl p-5 flex flex-col justify-between shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-200 cursor-pointer">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-slate-800 flex items-center gap-1.5">
-              <Wind className="w-4 h-4 text-teal-600" />
-              <span>Atmosphere & CO₂</span>
+            <span className="font-bold text-slate-800 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center border border-teal-200/60 shadow-2xs">
+                <Wind className="w-4 h-4" />
+              </div>
+              <span className="text-xs uppercase font-mono font-extrabold text-slate-900">Atmosphere & CO₂</span>
             </span>
             <span className="text-[10px] font-mono bg-amber-50 text-amber-900 px-2.5 py-0.5 rounded-full border border-amber-300 font-bold">
               Airlock Active
@@ -392,9 +428,11 @@ export function StationUnifiedDashboard({
         {/* Card 4: Radiation Dosimetry */}
         <div className="bg-white border border-black/[0.09] hover:border-black/[0.16] rounded-2xl p-5 flex flex-col justify-between shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-200 cursor-pointer">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-slate-800 flex items-center gap-1.5">
-              <Thermometer className="w-4 h-4 text-purple-600" />
-              <span>Radiation Dosimetry</span>
+            <span className="font-bold text-slate-800 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center border border-purple-200/60 shadow-2xs">
+                <Thermometer className="w-4 h-4" />
+              </div>
+              <span className="text-xs uppercase font-mono font-extrabold text-slate-900">Radiation</span>
             </span>
             <span className="text-[10px] font-mono bg-purple-50 text-purple-900 px-2.5 py-0.5 rounded-full border border-purple-200 font-bold">
               ALARA
@@ -418,13 +456,13 @@ export function StationUnifiedDashboard({
         </div>
       </div>
 
-      {/* ── 3. Active Crew Fleet Biometric Roster Strip ── */}
+      {/* ── 3. Active Crew Fleet Biometric Roster Strip (with Real Astronaut Portraits) ── */}
       <div className="bg-white border border-black/[0.09] rounded-2xl p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)]">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3.5 border-b border-black/[0.05]">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-[#0b3d91]" />
             <h2 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-900">
-              Crew Fleet Biometrics
+              Active Crew Fleet Biometrics
             </h2>
           </div>
           <div className="text-xs font-mono text-slate-600 font-medium">
@@ -451,13 +489,23 @@ export function StationUnifiedDashboard({
                 }`}
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div>
-                      <div className="font-extrabold text-base text-slate-950 tracking-tight group-hover:text-[#0b3d91] transition-colors">
-                        {astro.full_name}
-                      </div>
-                      <div className="text-xs text-slate-600 font-mono font-medium">
-                        {astro.callsign} · {astro.mission_role}
+                  {/* Top: Astronaut Portrait Photo + Name & Callsign */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <AstronautAvatar
+                        callsign={astro.callsign}
+                        name={astro.full_name}
+                        size="md"
+                        hasAlert={hasAlert}
+                      />
+                      <div>
+                        <div className="font-extrabold text-base text-slate-950 tracking-tight group-hover:text-[#0b3d91] transition-colors flex items-center gap-1.5">
+                          <span>{astro.full_name}</span>
+                          <span className="text-xs">🇺🇸</span>
+                        </div>
+                        <div className="text-xs text-slate-600 font-mono font-semibold">
+                          {astro.callsign} · {astro.mission_role}
+                        </div>
                       </div>
                     </div>
                     <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
@@ -884,66 +932,92 @@ export function StationUnifiedDashboard({
             </div>
           </div>
 
-          {/* Optional Collapsible Technical Spatial Reference (Apple Solid Card) */}
-          <div className="bg-white border border-black/[0.09] rounded-2xl overflow-hidden shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)]">
-            <button
-              onClick={() => setShowSpatialReference(!showSpatialReference)}
-              className="w-full p-5 flex items-center justify-between text-left hover:bg-slate-50 transition cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <Stethoscope className="w-4 h-4 text-[#0b3d91]" />
-                <span className="font-bold text-xs uppercase tracking-wider text-slate-900 font-mono">
-                  3D Spatial Reference Viewer
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
-                <span>{showSpatialReference ? 'Hide' : 'Expand'}</span>
-                {showSpatialReference ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </div>
-            </button>
-
-            {showSpatialReference && (
-              <div className="p-5 border-t border-slate-100 flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setReferenceMode('anatomy')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition active:scale-[0.98] cursor-pointer ${
-                      referenceMode === 'anatomy' ? 'bg-[#0b3d91] text-white shadow-xs' : 'bg-[#f5f5f7] text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    360° Human Anatomy
-                  </button>
-                  <button
-                    onClick={() => setReferenceMode('spacecraft')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition active:scale-[0.98] cursor-pointer ${
-                      referenceMode === 'spacecraft' ? 'bg-[#0b3d91] text-white shadow-xs' : 'bg-[#f5f5f7] text-slate-700 hover:bg-slate-200'
-                    }`}
-                  >
-                    360° Orion Spacecraft
-                  </button>
-                </div>
-
-                <div className="rounded-xl overflow-hidden border border-slate-800">
-                  {referenceMode === 'anatomy' && currentAstro && (
-                    <AnatomicalScanner
-                      astronaut={currentAstro}
-                      activeAlert={activeAlert}
-                      latestVitals={liveVitals}
-                    />
-                  )}
-                  {referenceMode === 'spacecraft' && (
-                    <NASASpacecraftHologram
-                      activeMission={currentAstro?.mission_code || 'ARTEMIS-III'}
-                      flightDay={14}
-                    />
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
         </div>
 
+      </div>
+
+      {/* ── 5. Full-Width 3D Spatial Systems & Human Telemetry Reference ── */}
+      <div className="bg-white border border-black/[0.09] rounded-2xl overflow-hidden shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)]">
+        <div className="px-6 py-4 bg-slate-50/80 border-b border-black/[0.06] flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs shrink-0">
+              <Stethoscope className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <h3 className="font-extrabold text-sm text-slate-950 tracking-tight uppercase font-mono whitespace-nowrap">
+                  3D Spatial Reference & Vehicle Systems Telemetry
+                </h3>
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-300 whitespace-nowrap">
+                  REAL-TIME SYNC
+                </span>
+              </div>
+              <div className="text-xs text-slate-600 font-semibold mt-0.5">
+                Interactive 360° human anatomical scanner & Orion MPC-V deep space vehicle telemetry
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Mode Switcher Tabs */}
+            <div className="flex items-center bg-[#f4f5f8] p-1 rounded-xl border border-black/[0.06] shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setReferenceMode('anatomy')}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer active:scale-[0.98] whitespace-nowrap ${
+                  referenceMode === 'anatomy'
+                    ? 'bg-[#0b3d91] text-white shadow-xs'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/60'
+                }`}
+              >
+                <Stethoscope className="w-3.5 h-3.5" />
+                <span>360° Human Anatomy</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setReferenceMode('spacecraft')}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer active:scale-[0.98] whitespace-nowrap ${
+                  referenceMode === 'spacecraft'
+                    ? 'bg-[#0b3d91] text-white shadow-xs'
+                    : 'text-slate-700 hover:text-slate-950 hover:bg-white/60'
+                }`}
+              >
+                <Orbit className="w-3.5 h-3.5" />
+                <span>360° Orion Spacecraft</span>
+              </button>
+            </div>
+
+            {/* Collapse / Expand Toggle */}
+            <button
+              type="button"
+              onClick={() => setShowSpatialReference(!showSpatialReference)}
+              className="px-3 py-1.5 rounded-xl border border-black/[0.08] bg-white hover:bg-slate-50 text-slate-700 text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer shadow-2xs"
+            >
+              <span>{showSpatialReference ? 'Hide' : 'Expand'}</span>
+              {showSpatialReference ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+          </div>
+        </div>
+
+        {showSpatialReference && (
+          <div className="p-6 bg-[#fbfbfd]">
+            <div className="rounded-2xl overflow-hidden border border-black/[0.09] shadow-inner">
+              {referenceMode === 'anatomy' && currentAstro && (
+                <AnatomicalScanner
+                  astronaut={currentAstro}
+                  activeAlert={activeAlert}
+                  latestVitals={liveVitals}
+                />
+              )}
+              {referenceMode === 'spacecraft' && (
+                <NASASpacecraftHologram
+                  activeMission={currentAstro?.mission_code || 'ARTEMIS-III'}
+                  flightDay={14}
+                />
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
     </div>

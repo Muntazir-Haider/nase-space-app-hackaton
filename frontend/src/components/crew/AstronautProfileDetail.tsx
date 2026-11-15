@@ -34,6 +34,7 @@ import { MedicalHandoverModal } from './MedicalHandoverModal';
 import { QuickTelemetryModal } from './QuickTelemetryModal';
 import { ClearanceUpdateModal } from './ClearanceUpdateModal';
 import { LiveTelemetryTester } from './LiveTelemetryTester';
+import { AstronautAvatar } from './AstronautAvatar';
 import { AnatomicalScanner } from '../nasa/AnatomicalScanner';
 import { NASASpacecraftHologram } from '../nasa/NASASpacecraftHologram';
 import { runDeteriorationAnalysis } from '../../services/api';
@@ -181,43 +182,52 @@ export function AstronautProfileDetail({
 
   return (
     <section className="bg-white border border-black/[0.09] rounded-2xl p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col gap-8 font-sans">
-      {/* Header Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-black/[0.06] pb-5">
-        <div>
-          <div className="flex flex-wrap items-center gap-2.5">
-            <h2 className="font-bold text-2xl text-slate-900 tracking-tight">{astronaut.full_name}</h2>
-            <span className="text-xs font-mono font-bold text-[#0b3d91] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200/80">
-              {astronaut.callsign}
-            </span>
-            <span className="text-xs text-slate-600">
-              {astronaut.mission_role} · <span className="font-semibold text-slate-800">{astronaut.mission_code}</span>
-            </span>
-            <button
-              onClick={() => setShowClearanceModal(true)}
-              className={`text-xs font-semibold px-3 py-1 rounded-full border transition flex items-center gap-1.5 cursor-pointer active:scale-[0.98] ${
-                astronaut.medical_clearance_status === 'FULL_FLIGHT_CLEARANCE'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
-                  : astronaut.medical_clearance_status === 'TEMPORARY_MEDICAL_HOLD'
-                  ? 'bg-red-50 text-red-800 border-red-300 hover:bg-red-100'
-                  : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'
-              }`}
-            >
-              <UserCheck className="w-3.5 h-3.5" />
-              <span>
-                {astronaut.medical_clearance_status === 'FULL_FLIGHT_CLEARANCE'
-                  ? 'Cleared for Duty'
-                  : astronaut.medical_clearance_status === 'TEMPORARY_MEDICAL_HOLD'
-                  ? 'Medical Hold'
-                  : 'Restricted Duty'}
+      {/* Header Banner with Real Astronaut Photo & Mission Badges */}
+      <div className="flex flex-wrap items-center justify-between gap-5 border-b border-black/[0.06] pb-6">
+        <div className="flex items-center gap-4">
+          <AstronautAvatar
+            callsign={astronaut.callsign}
+            name={astronaut.full_name}
+            size="xl"
+            hasAlert={Boolean(activeAlert)}
+          />
+          <div>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h2 className="font-extrabold text-2xl text-slate-950 tracking-tight font-mono">{astronaut.full_name}</h2>
+              <span className="text-sm">🇺🇸</span>
+              <span className="text-xs font-mono font-bold text-[#0b3d91] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200/80">
+                {astronaut.callsign}
               </span>
-            </button>
-          </div>
-          {analysisFeedback && (
-            <div className="mt-2 text-xs text-[#0b3d91] flex items-center gap-1.5 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>{analysisFeedback}</span>
+              <span className="text-xs font-semibold text-slate-700">
+                {astronaut.mission_role} · <span className="font-extrabold text-slate-950">{astronaut.mission_code}</span>
+              </span>
+              <button
+                onClick={() => setShowClearanceModal(true)}
+                className={`text-xs font-bold px-3 py-1 rounded-full border transition flex items-center gap-1.5 cursor-pointer active:scale-[0.98] ${
+                  astronaut.medical_clearance_status === 'FULL_FLIGHT_CLEARANCE'
+                    ? 'bg-emerald-50 text-emerald-900 border-emerald-300 hover:bg-emerald-100'
+                    : astronaut.medical_clearance_status === 'TEMPORARY_MEDICAL_HOLD'
+                    ? 'bg-rose-50 text-rose-900 border-rose-300 hover:bg-rose-100'
+                    : 'bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100'
+                }`}
+              >
+                <UserCheck className="w-3.5 h-3.5" />
+                <span>
+                  {astronaut.medical_clearance_status === 'FULL_FLIGHT_CLEARANCE'
+                    ? 'Cleared for Duty'
+                    : astronaut.medical_clearance_status === 'TEMPORARY_MEDICAL_HOLD'
+                    ? 'Medical Hold'
+                    : 'Restricted Duty'}
+                </span>
+              </button>
             </div>
-          )}
+            {analysisFeedback && (
+              <div className="mt-2 text-xs text-[#0b3d91] font-bold flex items-center gap-1.5 bg-blue-50 px-3 py-1 rounded-full border border-blue-200">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <span>{analysisFeedback}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -462,11 +472,11 @@ export function AstronautProfileDetail({
               <span className="font-bold text-slate-700 font-mono text-[11px] uppercase">
                 3D View:
               </span>
-              <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-black/[0.06] shadow-2xs">
+              <div className="flex flex-wrap items-center gap-1 bg-white p-1 rounded-lg border border-black/[0.06] shadow-2xs">
                 <button
                   type="button"
                   onClick={() => setVisualizerMode('anatomy')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer active:scale-[0.98] ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer active:scale-[0.98] whitespace-nowrap shrink-0 ${
                     visualizerMode === 'anatomy'
                       ? 'bg-[#0b3d91] text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
@@ -479,7 +489,7 @@ export function AstronautProfileDetail({
                 <button
                   type="button"
                   onClick={() => setVisualizerMode('spacecraft')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer active:scale-[0.98] ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer active:scale-[0.98] whitespace-nowrap shrink-0 ${
                     visualizerMode === 'spacecraft'
                       ? 'bg-[#0b3d91] text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
@@ -492,7 +502,7 @@ export function AstronautProfileDetail({
                 <button
                   type="button"
                   onClick={() => setVisualizerMode('dual')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer active:scale-[0.98] ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition cursor-pointer active:scale-[0.98] whitespace-nowrap shrink-0 ${
                     visualizerMode === 'dual'
                       ? 'bg-[#0b3d91] text-white shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
