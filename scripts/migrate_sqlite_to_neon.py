@@ -39,7 +39,7 @@ TABLE_ORDER = [
 
 def migrate(neon_url: str = None):
     # Determine target Neon URL
-    target_url = neon_url or os.getenv("NEON_DATABASE_URL") or os.getenv("DATABASE_URL")
+    target_url = neon_url or settings.NEON_DATABASE_URL or settings.DATABASE_URL
     if not target_url or target_url.startswith("sqlite"):
         print("❌ Error: No Neon PostgreSQL connection string provided.")
         print("Please provide it as an argument or set NEON_DATABASE_URL in .env")
@@ -48,6 +48,12 @@ def migrate(neon_url: str = None):
 
     if target_url.startswith("postgres://"):
         target_url = target_url.replace("postgres://", "postgresql://", 1)
+
+    if "channel_binding=" in target_url:
+        import re
+        target_url = re.sub(r"[?&]channel_binding=[^&]*", "", target_url)
+        if "?" not in target_url and "&" in target_url:
+            target_url = target_url.replace("&", "?", 1)
 
     sqlite_path = settings.DATABASE_PATH
     if not sqlite_path.exists():
@@ -65,7 +71,8 @@ def migrate(neon_url: str = None):
     src_engine = create_engine(sqlite_url, echo=False)
     dst_engine = create_engine(target_url, pool_pre_ping=True, echo=False)
 
-    print("Step 1/3: Creating table schemas on Neon PostgreSQL...")
+    print("Step 1/3: Preparing table schemas on Neon PostgreSQL...")
+    Base.metadata.drop_all(bind=dst_engine)
     Base.metadata.create_all(bind=dst_engine)
     print("✅ All 14 relational schemas created on Neon.")
 

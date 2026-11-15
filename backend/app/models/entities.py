@@ -240,7 +240,7 @@ class DeteriorationAlert(Base):
     math_summary = Column(Text, nullable=False)  # JSON-encoded statistics summary
     mission_context_notes = Column(Text, nullable=False)
     environmental_context_notes = Column(Text, nullable=True)
-    scientific_ref = Column(String(250), nullable=False)
+    scientific_ref = Column(Text, nullable=False)
     rule_version = Column(String(50), nullable=False)
     created_at = Column(String(50), nullable=False, default=get_utc_now_iso)
     updated_at = Column(String(50), nullable=False, default=get_utc_now_iso)

@@ -42,6 +42,12 @@ class Settings(BaseSettings):
             # Normalize legacy postgres:// prefix to postgresql:// for SQLAlchemy
             if cleaned.startswith("postgres://"):
                 cleaned = cleaned.replace("postgres://", "postgresql://", 1)
+            # Remove channel_binding parameter if present (libpq SCRAM timeout on Windows)
+            if "channel_binding=" in cleaned:
+                import re
+                cleaned = re.sub(r"[?&]channel_binding=[^&]*", "", cleaned)
+                if "?" not in cleaned and "&" in cleaned:
+                    cleaned = cleaned.replace("&", "?", 1)
             self.DATABASE_URL = cleaned
         else:
             self.DATABASE_URL = f"sqlite:///{self.DATABASE_PATH.as_posix()}"
