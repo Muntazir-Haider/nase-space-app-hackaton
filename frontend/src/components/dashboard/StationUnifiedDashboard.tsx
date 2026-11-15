@@ -189,30 +189,30 @@ export function StationUnifiedDashboard({
     <div className="flex flex-col gap-8 font-sans">
       
       {/* ── 1. Top Station Operational Command Header (Apple Solid Card) ── */}
-      <div className="bg-white border border-black/[0.09] rounded-2xl p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col gap-5">
+      <div className="bg-white border border-black/[0.09] rounded-2xl p-4 sm:p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col gap-4 sm:gap-5">
         
         {/* Main Command Row */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 border-b border-black/[0.06]">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-5 pb-4 sm:pb-5 border-b border-black/[0.06]">
           
           {/* Left: Mission Patch & Title */}
-          <div className="flex items-center gap-4 min-w-0">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <div className="relative shrink-0">
               <img 
                 src="./artemis_mission_patch.svg" 
                 alt="NASA Artemis Mission Crest" 
-                className="w-14 h-14 object-contain drop-shadow-md select-none" 
+                className="w-11 h-11 sm:w-14 sm:h-14 object-contain drop-shadow-md select-none" 
               />
             </div>
 
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <h1 className="text-lg font-extrabold text-slate-950 tracking-tight font-mono whitespace-nowrap">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-sm sm:text-lg font-extrabold text-slate-950 tracking-tight font-mono break-words sm:whitespace-nowrap">
                   NASA Artemis Station · Flight Health Operations
                 </h1>
-                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] font-bold border border-blue-200 whitespace-nowrap">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] font-bold border border-blue-200 shrink-0">
                   DAY 14
                 </span>
-                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold flex items-center gap-1.5 whitespace-nowrap">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold flex items-center gap-1.5 shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse shrink-0" />
                   ORION MPC-V
                 </span>
@@ -961,17 +961,17 @@ export function StationUnifiedDashboard({
 
       {/* ── 5. Full-Width 3D Spatial Systems & Human Telemetry Reference ── */}
       <div id="spatial-reference-section" className="bg-white border border-black/[0.09] rounded-2xl overflow-hidden shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] scroll-mt-6">
-        <div className="px-6 py-4 bg-slate-50/80 border-b border-black/[0.06] flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs shrink-0">
-              <Stethoscope className="w-5 h-5 text-white" />
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50/80 border-b border-black/[0.06] flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs shrink-0">
+              <Stethoscope className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2.5">
-                <h3 className="font-extrabold text-sm text-slate-950 tracking-tight uppercase font-mono whitespace-nowrap">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="font-extrabold text-xs sm:text-sm text-slate-950 tracking-tight uppercase font-mono break-words sm:whitespace-nowrap">
                   3D Spatial Reference & Vehicle Systems Telemetry
                 </h3>
-                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-300 whitespace-nowrap shrink-0">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-300 shrink-0">
                   REAL-TIME SYNC
                 </span>
               </div>
@@ -981,13 +981,13 @@ export function StationUnifiedDashboard({
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
             {/* Mode Switcher Tabs */}
-            <div className="flex items-center bg-[#f4f5f8] p-1 rounded-xl border border-black/[0.06] shadow-2xs">
+            <div className="flex flex-wrap sm:flex-nowrap items-center bg-[#f4f5f8] p-1 rounded-xl border border-black/[0.06] shadow-2xs gap-1">
               <button
                 type="button"
                 onClick={() => setReferenceMode('anatomy')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer active:scale-[0.98] whitespace-nowrap ${
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition cursor-pointer active:scale-[0.98] whitespace-nowrap ${
                   referenceMode === 'anatomy'
                     ? 'bg-[#0b3d91] text-white shadow-xs'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/60'
@@ -999,7 +999,7 @@ export function StationUnifiedDashboard({
               <button
                 type="button"
                 onClick={() => setReferenceMode('spacecraft')}
-                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer active:scale-[0.98] whitespace-nowrap ${
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition cursor-pointer active:scale-[0.98] whitespace-nowrap ${
                   referenceMode === 'spacecraft'
                     ? 'bg-[#0b3d91] text-white shadow-xs'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-white/60'
@@ -1023,7 +1023,7 @@ export function StationUnifiedDashboard({
         </div>
 
         {showSpatialReference && (
-          <div className="p-6 bg-[#fbfbfd]">
+          <div className="p-3 sm:p-6 bg-[#fbfbfd]">
             <div className="rounded-2xl overflow-hidden border border-black/[0.09] shadow-inner">
               {referenceMode === 'anatomy' && currentAstro && (
                 <AnatomicalScanner

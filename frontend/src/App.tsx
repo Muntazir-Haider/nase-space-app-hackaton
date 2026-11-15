@@ -30,7 +30,7 @@ import { AnatomicalScanner } from './components/nasa/AnatomicalScanner';
 import { StationUnifiedDashboard } from './components/dashboard/StationUnifiedDashboard';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginPage } from './components/auth/LoginPage';
-import { HeartPulse } from 'lucide-react';
+import { HeartPulse, Menu } from 'lucide-react';
 
 function StationBootScreen() {
   return (
@@ -63,6 +63,7 @@ function StationDashboard() {
   const [scenarioLoading, setScenarioLoading] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [rejectedAuditCount, setRejectedAuditCount] = useState<number>(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   
   const [showRegisterModal, setShowRegisterModal] = useState<boolean>(false);
   const [showEvidenceModal, setShowEvidenceModal] = useState<boolean>(false);
@@ -186,7 +187,7 @@ function StationDashboard() {
 
   return (
     <div className="min-h-screen bg-[#ebedf2] text-slate-900 flex font-sans">
-      {/* Left Navigation Sidebar */}
+      {/* Left Navigation Sidebar (Desktop + Mobile Drawer) */}
       <Sidebar
         health={health}
         isOffline={isOffline}
@@ -210,10 +211,43 @@ function StationDashboard() {
           setSelectedAstronautId(id);
           setActiveView('review');
         }}
+        isOpenMobile={mobileMenuOpen}
+        onCloseMobile={() => setMobileMenuOpen(false)}
       />
 
       {/* Main Right View Workspace */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+        {/* Mobile Navigation Header (visible only on < lg) */}
+        <header className="lg:hidden flex items-center justify-between px-3.5 py-2.5 bg-white border-b border-black/[0.08] sticky top-0 z-20 shadow-2xs shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 transition active:scale-95 cursor-pointer shrink-0"
+              aria-label="Open Navigation Menu"
+            >
+              <Menu className="w-5 h-5 text-slate-900" />
+            </button>
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-7 h-7 rounded-lg bg-[#0b3d91] flex items-center justify-center text-white shrink-0 shadow-2xs">
+                <HeartPulse className="w-4 h-4 animate-heart-pulse" />
+              </div>
+              <span className="font-extrabold text-xs font-mono tracking-tight text-slate-950 uppercase truncate">
+                Mission Sentinel
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] border border-blue-200">
+              FD 14
+            </span>
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300">
+              ONLINE
+            </span>
+          </div>
+        </header>
+
         {/* Offline Banner */}
         {isOffline && (
           <OfflineBanner
@@ -233,7 +267,7 @@ function StationDashboard() {
         )}
 
         {/* Main Content Area */}
-        <main className="flex-1 p-6 w-full flex flex-col gap-6">
+        <main className="flex-1 p-3 sm:p-6 w-full flex flex-col gap-4 sm:gap-6">
         {activeView === 'dashboard' && (
           <StationUnifiedDashboard
             astronauts={astronauts}

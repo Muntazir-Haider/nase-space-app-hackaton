@@ -102,21 +102,21 @@ export function NASASpacecraftHologram({
     <div className="bg-white rounded-2xl border border-black/[0.09] shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] overflow-hidden flex flex-col font-sans select-none">
       
       {/* ── Apple-Grade Hardware Card Header ── */}
-      <div className="px-6 py-4 bg-slate-50/80 border-b border-black/[0.06] flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs shrink-0">
-            <Orbit className="w-5 h-5 text-white" />
+      <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50/80 border-b border-black/[0.06] flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs shrink-0">
+            <Orbit className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="font-extrabold text-sm text-slate-950 tracking-tight uppercase whitespace-nowrap">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              <span className="font-extrabold text-xs sm:text-sm text-slate-950 tracking-tight uppercase break-words sm:whitespace-nowrap">
                 NASA Orion MPC-V · 3D Flight Telemetry
               </span>
-              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] font-bold border border-blue-200 whitespace-nowrap shrink-0">
+              <span className="text-[10px] font-mono px-2 sm:px-2.5 py-0.5 rounded-full bg-blue-50 text-[#0b3d91] font-bold border border-blue-200 whitespace-nowrap shrink-0">
                 {activeMission} · DAY {flightDay}
               </span>
             </div>
-            <div className="text-xs text-slate-600 font-semibold mt-0.5 truncate">
+            <div className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-0.5 truncate">
               Deep Space Vehicle Systems & Cabin Environmental Telemetry
             </div>
           </div>
@@ -162,19 +162,19 @@ export function NASASpacecraftHologram({
       <div className="p-4 sm:p-6 grid grid-cols-1 2xl:grid-cols-12 gap-6 items-stretch bg-[#fbfbfd]">
         
         {/* Left Column: 360-Degree 3D CAD Stage (8 cols on 2xl, full width below) */}
-        <div className="2xl:col-span-8 bg-[#090d16] rounded-2xl p-4 sm:p-5 relative overflow-hidden flex flex-col items-center justify-between min-h-[460px] border border-black/[0.15] shadow-lg w-full min-w-0">
+        <div className="2xl:col-span-8 bg-[#090d16] rounded-2xl p-3 sm:p-5 relative overflow-hidden flex flex-col items-center justify-between min-h-[350px] sm:min-h-[460px] border border-black/[0.15] shadow-lg w-full min-w-0">
           
           {/* Stage Header Info Bar */}
-          <div className="w-full flex flex-wrap items-center justify-between z-10 bg-slate-900/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/10 text-xs font-mono text-slate-300 gap-2">
+          <div className="w-full flex flex-wrap items-center justify-between z-10 bg-slate-900/90 backdrop-blur-md px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-white/10 text-xs font-mono text-slate-300 gap-2">
             <div className="flex items-center gap-2 whitespace-nowrap shrink-0">
               <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0" />
-              <span className="text-white font-bold tracking-wider">
+              <span className="text-white font-bold tracking-wider text-[11px] sm:text-xs">
                 3D CAD MODEL · YAW: {displayAngle}°
               </span>
             </div>
             
             {/* Subsystem Focus Pills */}
-            <div className="flex items-center gap-1.5 flex-wrap">
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
               {[
                 { id: 'airlock', label: 'ECLSS Hatch', angle: 0 },
                 { id: 'cabin', label: 'Crew Module', angle: 90 },
@@ -188,7 +188,7 @@ export function NASASpacecraftHologram({
                     setIsAutoRotating(false);
                     setRotationAngle(sub.angle);
                   }}
-                  className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer whitespace-nowrap ${
+                  className={`px-2 sm:px-2.5 py-1 rounded-md text-[10px] sm:text-[11px] font-semibold transition cursor-pointer whitespace-nowrap ${
                     selectedZone === sub.id
                       ? 'bg-blue-600 text-white font-bold shadow-xs'
                       : 'bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700'
@@ -199,7 +199,7 @@ export function NASASpacecraftHologram({
               ))}
             </div>
 
-            <div className="text-slate-400 text-[11px] whitespace-nowrap shrink-0">
+            <div className="text-slate-400 text-[10px] sm:text-[11px] whitespace-nowrap shrink-0">
               LATENCY: 22m 14s
             </div>
           </div>
@@ -215,7 +215,7 @@ export function NASASpacecraftHologram({
               title="Click and drag horizontally to spin NASA Orion spacecraft 360 degrees"
             >
               {/* Stationary Viewport Frame */}
-              <div className="relative w-full h-[360px] flex items-center justify-center overflow-hidden">
+              <div className="relative w-full h-[260px] sm:h-[360px] flex items-center justify-center overflow-hidden">
                 {/* 3D Rotational Spacecraft Wrapper */}
                 <div
                   className="w-full h-full flex items-center justify-center pointer-events-none"
@@ -229,7 +229,7 @@ export function NASASpacecraftHologram({
                   <img
                     src="./real_orion_spacecraft_transparent.png"
                     alt="NASA Orion MPC-V 3D Deep Space Spacecraft"
-                    className="h-[320px] w-auto max-w-[95%] object-contain filter contrast-115 brightness-105 pointer-events-none select-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]"
+                    className="h-[220px] sm:h-[320px] w-auto max-w-[95%] object-contain filter contrast-115 brightness-105 pointer-events-none select-none drop-shadow-[0_20px_40px_rgba(0,0,0,0.8)]"
                   />
                 </div>
 
@@ -343,13 +343,13 @@ export function NASASpacecraftHologram({
 
           {/* ── Rotation Controls Toolbar ── */}
           {activeTab === 'schematic' && (
-            <div className="w-full flex flex-wrap items-center justify-between gap-3 text-xs font-mono bg-slate-900/90 backdrop-blur-md p-3 rounded-xl border border-white/10 text-slate-300 z-10">
+            <div className="w-full flex flex-wrap items-center justify-between gap-2 sm:gap-3 text-xs font-mono bg-slate-900/90 backdrop-blur-md p-2.5 sm:p-3 rounded-xl border border-white/10 text-slate-300 z-10">
               {/* Play / Pause Rotation */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   type="button"
                   onClick={() => setIsAutoRotating(!isAutoRotating)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border font-semibold transition cursor-pointer active:scale-[0.98] ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border font-semibold transition cursor-pointer active:scale-[0.98] text-[11px] sm:text-xs ${
                     isAutoRotating
                       ? 'bg-blue-600 text-white border-blue-500 shadow-xs'
                       : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
@@ -363,7 +363,7 @@ export function NASASpacecraftHologram({
                 <button
                   type="button"
                   onClick={() => setRotationAngle(0)}
-                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer active:scale-[0.98]"
+                  className="p-1 sm:p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer active:scale-[0.98]"
                   title="Reset Yaw angle to 0°"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
@@ -371,7 +371,7 @@ export function NASASpacecraftHologram({
               </div>
 
               {/* Angle Presets */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-1 sm:gap-1.5">
                 {[
                   { angle: 0,   label: '0° Profile' },
                   { angle: 90,  label: '90° Nose' },
@@ -384,7 +384,7 @@ export function NASASpacecraftHologram({
                       setIsAutoRotating(false);
                       setRotationAngle(preset.angle);
                     }}
-                    className={`px-3 py-1.5 rounded-lg border text-xs cursor-pointer active:scale-[0.98] transition font-semibold ${
+                    className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border text-[11px] sm:text-xs cursor-pointer active:scale-[0.98] transition font-semibold ${
                       Math.abs(displayAngle - preset.angle) < 10
                         ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 font-bold'
                         : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
@@ -396,7 +396,7 @@ export function NASASpacecraftHologram({
               </div>
 
               {/* Status */}
-              <div className="flex items-center gap-2 font-bold">
+              <div className="flex items-center gap-2 font-bold text-[11px] sm:text-xs">
                 <span className="text-cyan-400 flex items-center gap-1">
                   <Compass className="w-3.5 h-3.5" />
                   <span>YAW {displayAngle}°</span>

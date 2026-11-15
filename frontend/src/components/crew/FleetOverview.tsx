@@ -61,12 +61,12 @@ export function FleetOverview({
   });
 
   return (
-    <div className="flex flex-col gap-8 font-sans">
+    <div className="flex flex-col gap-6 sm:gap-8 font-sans">
       {/* Fleet Readiness Summary Cards (Apple Solid Cards) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         <div 
           onClick={() => setStatusFilter('ALL')}
-          className={`bg-white border rounded-2xl p-5 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 cursor-pointer transition-all duration-200 ${
+          className={`bg-white border rounded-2xl p-4 sm:p-5 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 cursor-pointer transition-all duration-200 ${
             statusFilter === 'ALL' ? 'border-[#0b3d91] ring-2 ring-blue-500/30' : 'border-black/[0.09] hover:border-black/[0.16]'
           }`}
         >
@@ -74,13 +74,13 @@ export function FleetOverview({
             <span className="font-semibold text-slate-700">All Crew</span>
             <Users className="w-4 h-4 text-[#0b3d91]" />
           </div>
-          <div className="text-3xl font-bold font-mono text-slate-900 mt-2">{totalCount}</div>
+          <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 mt-2">{totalCount}</div>
           <p className="text-xs text-slate-400 mt-0.5">Active Crew</p>
         </div>
 
         <div 
           onClick={() => setStatusFilter('NOMINAL')}
-          className={`bg-white border rounded-2xl p-5 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 cursor-pointer transition-all duration-200 ${
+          className={`bg-white border rounded-2xl p-4 sm:p-5 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 cursor-pointer transition-all duration-200 ${
             statusFilter === 'NOMINAL' ? 'border-emerald-600 ring-2 ring-emerald-500/30' : 'border-black/[0.09] hover:border-black/[0.16]'
           }`}
         >
@@ -88,13 +88,13 @@ export function FleetOverview({
             <span className="font-semibold text-slate-700">Fit for Duty</span>
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-3xl font-bold font-mono text-emerald-700 mt-2">{nominalCount}</div>
+          <div className="text-2xl sm:text-3xl font-bold font-mono text-emerald-700 mt-2">{nominalCount}</div>
           <p className="text-xs text-slate-400 mt-0.5">Cleared</p>
         </div>
 
         <div 
           onClick={() => setStatusFilter('OBSERVATION')}
-          className={`bg-white border rounded-2xl p-5 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 cursor-pointer transition-all duration-200 ${
+          className={`bg-white border rounded-2xl p-4 sm:p-5 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 cursor-pointer transition-all duration-200 ${
             statusFilter === 'OBSERVATION' ? 'border-amber-500 ring-2 ring-amber-500/30' : 'border-black/[0.09] hover:border-black/[0.16]'
           }`}
         >
@@ -102,13 +102,13 @@ export function FleetOverview({
             <span className="font-semibold text-slate-700">Observation</span>
             <AlertTriangle className="w-4 h-4 text-amber-600" />
           </div>
-          <div className="text-3xl font-bold font-mono text-amber-700 mt-2">{observationCount}</div>
+          <div className="text-2xl sm:text-3xl font-bold font-mono text-amber-700 mt-2">{observationCount}</div>
           <p className="text-xs text-slate-400 mt-0.5">Monitoring</p>
         </div>
 
         <div 
           onClick={() => setStatusFilter('ALERTS_ONLY')}
-          className={`bg-white border rounded-2xl p-5 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 cursor-pointer transition-all duration-200 ${
+          className={`bg-white border rounded-2xl p-4 sm:p-5 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-6px_rgba(0,0,0,0.12)] hover:-translate-y-1 cursor-pointer transition-all duration-200 ${
             statusFilter === 'ALERTS_ONLY' ? 'border-red-500 ring-2 ring-red-500/30' : 'border-black/[0.09] hover:border-black/[0.16]'
           }`}
         >
@@ -116,7 +116,7 @@ export function FleetOverview({
             <span className="font-semibold text-slate-700">Review Needed</span>
             <ShieldAlert className="w-4 h-4 text-red-600" />
           </div>
-          <div className="text-3xl font-bold font-mono text-red-700 mt-2">{alertCount}</div>
+          <div className="text-2xl sm:text-3xl font-bold font-mono text-red-700 mt-2">{alertCount}</div>
           <p className="text-xs text-slate-400 mt-0.5">Alerts Active</p>
         </div>
       </div>

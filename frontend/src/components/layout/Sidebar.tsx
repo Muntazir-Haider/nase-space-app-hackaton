@@ -2,24 +2,19 @@ import { useState, useEffect } from 'react';
 import { 
   HeartPulse, 
   Clock, 
-  Database, 
-  FileSearch, 
-  Play, 
-  Loader2, 
   Users, 
   Activity, 
-  UserPlus, 
   Wind, 
   Compass, 
   LogOut,
   UserCheck,
-  RadioTower,
   Cpu,
   Orbit,
   ChevronRight,
   ShieldCheck,
   Sparkles,
-  LayoutDashboard
+  LayoutDashboard,
+  X
 } from 'lucide-react';
 import { HealthCheckResponse, AstronautSummary } from '../../types';
 import { useAuth } from '../../context/AuthContext';
@@ -28,11 +23,11 @@ import { AstronautAvatar } from '../crew/AstronautAvatar';
 export type ActiveView = 'dashboard' | 'review' | 'fleet' | 'spacecraft' | 'benchmark' | 'diagnostics' | 'register';
 
 interface SidebarProps {
-  health: HealthCheckResponse | null;
-  isOffline: boolean;
+  health?: HealthCheckResponse | null;
+  isOffline?: boolean;
   activeView: ActiveView;
   onSelectView: (view: ActiveView) => void;
-  onOpenDataQuality: () => void;
+  onOpenDataQuality?: () => void;
   activeScenario: string;
   scenarioLoading: boolean;
   onScenarioSwitch: (scenarioKey: string) => void;
@@ -41,22 +36,26 @@ interface SidebarProps {
   astronauts?: AstronautSummary[];
   selectedAstronautId?: string | null;
   onSelectAstronaut?: (id: string) => void;
+  isOpenMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export function Sidebar({
-  health,
-  isOffline,
+  health: _health,
+  isOffline: _isOffline,
   activeView,
   onSelectView,
-  onOpenDataQuality,
+  onOpenDataQuality: _onOpenDataQuality,
   activeScenario,
   scenarioLoading,
   onScenarioSwitch,
-  rejectedAuditCount = 0,
+  rejectedAuditCount: _rejectedAuditCount = 0,
   onOpenJudgeTour,
   astronauts = [],
   selectedAstronautId = null,
   onSelectAstronaut,
+  isOpenMobile = false,
+  onCloseMobile,
 }: SidebarProps) {
   const { operator, logout } = useAuth();
   const [currentTime, setCurrentTime] = useState<string>('');
@@ -80,267 +79,266 @@ export function Sidebar({
     { key: 'diagnostics' as ActiveView,label: 'Station Systems',  Icon: Wind,     desc: 'Environmental Life Support' },
   ];
 
-  return (
-    <aside className="w-68 shrink-0 h-screen sticky top-0 bg-white border-r border-black/[0.08] flex flex-col justify-between shadow-[0_0_24px_rgba(0,0,0,0.03)] z-30 select-none">
-      
-      {/* ── Top Header & Brand ── */}
-      <div className="p-4 border-b border-black/[0.06] bg-[#fbfbfd]">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shrink-0 shadow-xs relative overflow-hidden">
-            <HeartPulse className="w-5 h-5 animate-heart-pulse z-10 text-white" />
-            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#fc3d21] rounded-full opacity-90" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-xs tracking-wider text-slate-950 uppercase font-mono">
-                Mission Sentinel
-              </span>
-              <span className="text-[9px] font-mono uppercase bg-blue-50 text-[#0b3d91] px-1.5 py-0.5 rounded-full border border-blue-200 font-extrabold">
-                FD 14
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-600 font-semibold tracking-tight">Orion MPC-V · Lunar Orbit</p>
-          </div>
-        </div>
+  const handleNavClick = (view: ActiveView) => {
+    onSelectView(view);
+    onCloseMobile?.();
+  };
 
-        {/* Live Station Telemetry Bar */}
-        <div className="flex items-center justify-between text-[11px] font-mono text-slate-700 bg-[#f4f5f8] p-2 rounded-xl border border-black/[0.05] shadow-2xs">
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-slate-500" />
-            <span className="font-bold text-slate-950">{currentTime} UTC</span>
-          </div>
-          <div className="flex items-center gap-1 text-emerald-800 font-extrabold">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>ONLINE</span>
-          </div>
-        </div>
-      </div>
+  const handleAstronautClick = (id: string) => {
+    if (onSelectAstronaut) {
+      onSelectAstronaut(id);
+    }
+    onCloseMobile?.();
+  };
 
-      {/* ── Scrollable Navigation Sections ── */}
-      <div className="flex-1 overflow-y-auto p-3.5 space-y-5">
-        
-        {/* SECTION 1: Core Navigation */}
-        <div>
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 px-2 block mb-1.5 font-mono">
-            Navigation
-          </span>
-          <nav className="space-y-1">
-            {NAV_ITEMS.map(({ key, label, Icon }) => {
-              const active = activeView === key;
-              return (
-                <button
-                  key={key}
-                  onClick={() => onSelectView(key)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer active:scale-[0.98] ${
-                    active
-                      ? 'bg-[#0b3d91] text-white shadow-[0_4px_12px_rgba(11,61,145,0.25)]'
-                      : 'bg-transparent text-slate-800 hover:text-slate-950 hover:bg-[#f4f5f8]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-slate-600'}`} />
-                    <span>{label}</span>
-                  </div>
-                  {active && <ChevronRight className="w-3.5 h-3.5 text-blue-200" />}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* SECTION 2: Active Crew Telemetry */}
-        <div>
-          <div className="flex items-center justify-between px-2 mb-1.5">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 font-mono">
-              Crew Roster ({astronauts.length})
-            </span>
-            <button
-              onClick={() => onSelectView('register')}
-              className="text-[10px] text-[#0b3d91] font-bold flex items-center gap-1 hover:underline cursor-pointer"
-              title="Enroll new astronaut"
-            >
-              <UserPlus className="w-3 h-3" />
-              <span>+ Enroll</span>
-            </button>
-          </div>
-          <div className="space-y-1.5">
-            {astronauts.map((astro) => {
-              const isSelected = astro.id === selectedAstronautId;
-              const hasAlert = astro.active_alert_count > 0;
-              return (
-                <button
-                  key={astro.id}
-                  onClick={() => {
-                    if (onSelectAstronaut) {
-                      onSelectAstronaut(astro.id);
-                    }
-                    onSelectView('review');
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs transition border cursor-pointer active:scale-[0.98] ${
-                    isSelected
-                      ? 'bg-blue-50/80 border-blue-500 text-blue-950 font-bold shadow-xs ring-1 ring-blue-500/20'
-                      : 'bg-[#f4f5f8] border-black/[0.05] hover:bg-white hover:border-black/[0.12] text-slate-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <AstronautAvatar 
-                      callsign={astro.callsign} 
-                      name={astro.full_name} 
-                      size="sm" 
-                      hasAlert={hasAlert} 
-                    />
-                    <div className="truncate text-left">
-                      <span className="block truncate leading-tight font-mono text-xs font-bold text-slate-950">
-                        {astro.callsign}
-                      </span>
-                      <span className="block text-[10px] text-slate-600 truncate leading-tight font-medium mt-0.5">
-                        {astro.full_name.split(' ')[0]} · {astro.mission_role}
-                      </span>
-                    </div>
-                  </div>
-
-                  {hasAlert ? (
-                    <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-900 text-[9px] font-extrabold uppercase border border-rose-300 shrink-0 font-mono">
-                      Alert
-                    </span>
-                  ) : (
-                    <span className="text-[10px] text-emerald-800 font-mono font-extrabold shrink-0">
-                      NOMINAL
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* SECTION 3: Flight Physiological Conditions */}
-        <div>
-          <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 px-2 block mb-1.5 font-mono">
-            Flight States
-          </span>
-          <div className="space-y-1.5">
-            {[
-              { key: 'SCENARIO_A_NOMINAL',              label: '1. Nominal Baseline',   color: 'bg-emerald-600 border-emerald-700' },
-              { key: 'SCENARIO_B_ACUTE_SPIKE',          label: '2. EVA Exertion',       color: 'bg-amber-600 border-amber-700'   },
-              { key: 'SCENARIO_C_SILENT_DETERIORATION',  label: '3. Multi-Day Drift',   color: 'bg-rose-600 border-rose-700'    },
-            ].map(({ key, label, color }) => {
-              const active = activeScenario === key;
-              return (
-                <button
-                  key={key}
-                  disabled={scenarioLoading}
-                  onClick={() => onScenarioSwitch(key)}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs transition border cursor-pointer flex items-center justify-between active:scale-[0.98] ${
-                    active
-                      ? `${color} text-white font-bold shadow-xs`
-                      : 'bg-[#f4f5f8] border-black/[0.05] hover:bg-white hover:border-black/[0.12] text-slate-800 font-semibold'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {scenarioLoading && active ? (
-                      <Loader2 className="w-3 h-3 animate-spin text-white" />
-                    ) : (
-                      <Play className={`w-3 h-3 ${active ? 'text-white' : 'text-slate-400'}`} />
-                    )}
-                    <span className="font-semibold">{label}</span>
-                  </div>
-                  {active && <span className="text-[9px] uppercase tracking-wider opacity-90 font-mono">Active</span>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* SECTION 4: System Tools & Compliance */}
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1.5 block mb-1 font-mono">
-            System & Compliance
-          </span>
-          <div className="space-y-1">
-            {/* Interactive Tour */}
-            {onOpenJudgeTour && (
+  const renderNavBody = () => (
+    <div className="flex-1 overflow-y-auto p-3.5 space-y-5">
+      {/* SECTION 1: Core Navigation */}
+      <div>
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 px-2 block mb-1.5 font-mono">
+          Navigation
+        </span>
+        <nav className="space-y-1">
+          {NAV_ITEMS.map(({ key, label, Icon }) => {
+            const active = activeView === key;
+            return (
               <button
-                onClick={onOpenJudgeTour}
-                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 transition font-semibold cursor-pointer"
+                key={key}
+                onClick={() => handleNavClick(key)}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer active:scale-[0.98] ${
+                  active
+                    ? 'bg-[#0b3d91] text-white shadow-[0_4px_12px_rgba(11,61,145,0.25)]'
+                    : 'bg-transparent text-slate-800 hover:text-slate-950 hover:bg-[#f4f5f8]'
+                }`}
               >
-                <div className="flex items-center gap-2">
-                  <Compass className="w-3.5 h-3.5 text-purple-600 animate-pulse" />
-                  <span>Interactive Tour</span>
+                <div className="flex items-center gap-2.5">
+                  <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-slate-600'}`} />
+                  <span>{label}</span>
                 </div>
-                <Sparkles className="w-3 h-3 text-purple-500" />
+                {active && <ChevronRight className="w-3.5 h-3.5 text-white/80" />}
               </button>
-            )}
+            );
+          })}
+        </nav>
+      </div>
 
-            {/* Data Quality Audit */}
+      {/* SECTION 2: Active Crew Roster Quick Access */}
+      <div>
+        <div className="flex items-center justify-between px-2 mb-1.5">
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 font-mono">
+            Active Crew ({astronauts.length})
+          </span>
+          <button
+            onClick={() => handleNavClick('fleet')}
+            className="text-[10px] text-blue-700 hover:underline font-bold"
+          >
+            All
+          </button>
+        </div>
+        <div className="space-y-1">
+          {astronauts.map((astro) => {
+            const isSelected = selectedAstronautId === astro.id;
+            return (
+              <button
+                key={astro.id}
+                onClick={() => handleAstronautClick(astro.id)}
+                className={`w-full flex items-center justify-between p-2 rounded-xl text-xs transition cursor-pointer active:scale-[0.98] ${
+                  isSelected
+                    ? 'bg-blue-50 border border-blue-300 text-blue-950 font-bold'
+                    : 'hover:bg-slate-100 text-slate-700 border border-transparent'
+                }`}
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <AstronautAvatar
+                    callsign={astro.callsign}
+                    name={astro.full_name}
+                    size="sm"
+                    hasAlert={astro.active_alert_count > 0}
+                  />
+                  <div className="truncate text-left">
+                    <div className="font-bold text-xs truncate leading-tight">{astro.full_name}</div>
+                    <div className="text-[10px] text-slate-500 font-mono">{astro.callsign}</div>
+                  </div>
+                </div>
+                {astro.active_alert_count > 0 && (
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* SECTION 3: Interactive Judge Tour Button */}
+      {onOpenJudgeTour && (
+        <div>
+          <button
+            onClick={() => {
+              onOpenJudgeTour();
+              onCloseMobile?.();
+            }}
+            className="w-full flex items-center justify-between p-3 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200/80 text-purple-950 text-xs font-bold transition shadow-2xs active:scale-[0.98] cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <Compass className="w-4 h-4 text-purple-600 animate-pulse" />
+              <span>Judge Interactive Tour</span>
+            </div>
+            <Sparkles className="w-3.5 h-3.5 text-purple-500" />
+          </button>
+        </div>
+      )}
+
+      {/* SECTION 4: Flight Scenarios */}
+      <div>
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-700 px-2 block mb-1.5 font-mono">
+          Clinical Scenarios
+        </span>
+        <div className="space-y-1">
+          {[
+            { key: 'SCENARIO_A_NOMINAL', label: 'Nominal Baseline', desc: 'FD 1-14 healthy corridor' },
+            { key: 'SCENARIO_B_ACUTE_HYPOXIA', label: 'ECLSS Scrubber Drift', desc: 'CO2 spike & tachycardia' },
+            { key: 'SCENARIO_C_SILENT_DETERIORATION', label: 'Silent Deterioration', desc: 'Multi-indicator divergence' },
+          ].map((sc) => (
             <button
-              onClick={onOpenDataQuality}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 hover:border-slate-300 transition font-medium cursor-pointer"
+              key={sc.key}
+              onClick={() => {
+                onScenarioSwitch(sc.key);
+                onCloseMobile?.();
+              }}
+              disabled={scenarioLoading}
+              className={`w-full text-left p-2.5 rounded-xl border text-xs transition cursor-pointer active:scale-[0.98] ${
+                activeScenario === sc.key
+                  ? 'bg-amber-50/80 border-amber-400 text-amber-950 font-bold shadow-2xs'
+                  : 'bg-white hover:bg-slate-50 border-black/[0.06] text-slate-700'
+              }`}
             >
-              <div className="flex items-center gap-2">
-                <FileSearch className="w-3.5 h-3.5 text-slate-500" />
-                <span>Sensor Validation Audit</span>
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[11px] truncate">{sc.label}</span>
+                {activeScenario === sc.key && <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />}
               </div>
-              {rejectedAuditCount > 0 && (
-                <span className="px-1 py-0.2 rounded-sm bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300 font-mono">
-                  {rejectedAuditCount}
-                </span>
-              )}
+              <div className="text-[10px] text-slate-500 truncate mt-0.5">{sc.desc}</div>
             </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
-            {/* Offline Database Status */}
-            <div className="flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs bg-slate-50 border border-slate-200 text-slate-700">
-              <div className="flex items-center gap-2">
-                <Database className="w-3.5 h-3.5 text-slate-500" />
-                <span>Local Storage</span>
-              </div>
-              <span className={`text-[10px] font-mono font-bold ${isOffline ? 'text-rose-600' : 'text-emerald-700'}`}>
-                {isOffline ? 'Offline' : (health?.database_file ? 'SQLite WAL' : 'Active')}
+  const renderFooter = () => (
+    <div className="p-3 border-t border-slate-200 bg-slate-50 shrink-0">
+      {operator && (
+        <div className="flex items-center justify-between bg-white p-2 rounded-xl border border-slate-200 shadow-2xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 shrink-0">
+              <UserCheck className="w-4 h-4" />
+            </div>
+            <div className="truncate">
+              <span className="text-xs font-bold text-slate-900 block truncate leading-tight">
+                {operator.callsign}
+              </span>
+              <span className="text-[10px] text-slate-500 block truncate leading-tight font-medium">
+                {operator.role_display}
               </span>
             </div>
+          </div>
 
-            {/* DSN Latency Simulation */}
-            <div className="flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs bg-slate-50 border border-slate-200 text-slate-700">
-              <div className="flex items-center gap-2">
-                <RadioTower className="w-3.5 h-3.5 text-amber-600" />
-                <span>DSN Uplink</span>
+          <button
+            onClick={logout}
+            className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 text-slate-500 hover:text-rose-700 transition cursor-pointer"
+            title="Sign Out"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      {/* ── Desktop Static Sidebar (Always visible on lg screens) ── */}
+      <aside className="hidden lg:flex w-68 shrink-0 h-screen sticky top-0 bg-white border-r border-black/[0.08] flex-col justify-between shadow-[0_0_24px_rgba(0,0,0,0.03)] z-30 select-none">
+        {/* Top Header & Brand */}
+        <div className="p-4 border-b border-black/[0.06] bg-[#fbfbfd] shrink-0">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-9 h-9 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shrink-0 shadow-xs relative overflow-hidden">
+              <HeartPulse className="w-5 h-5 animate-heart-pulse z-10 text-white" />
+              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#fc3d21] rounded-full opacity-90" />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="font-extrabold text-xs tracking-wider text-slate-950 uppercase font-mono">
+                  Mission Sentinel
+                </span>
+                <span className="text-[9px] font-mono uppercase bg-blue-50 text-[#0b3d91] px-1.5 py-0.5 rounded-full border border-blue-200 font-extrabold">
+                  FD 14
+                </span>
               </div>
-              <span className="text-[10px] font-mono text-slate-500">22m Delay</span>
+              <p className="text-[11px] text-slate-600 font-semibold tracking-tight">Orion MPC-V · Lunar Orbit</p>
+            </div>
+          </div>
+
+          {/* Live Station Telemetry Bar */}
+          <div className="flex items-center justify-between text-[11px] font-mono text-slate-700 bg-[#f4f5f8] p-2 rounded-xl border border-black/[0.05] shadow-2xs">
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-slate-500" />
+              <span className="font-bold text-slate-950">{currentTime} UTC</span>
+            </div>
+            <div className="flex items-center gap-1 text-emerald-800 font-extrabold">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>ONLINE</span>
             </div>
           </div>
         </div>
 
-      </div>
+        {/* Scrollable Navigation */}
+        {renderNavBody()}
 
-      {/* ── Bottom Operator Card & Sign Out ── */}
-      <div className="p-3 border-t border-slate-200 bg-slate-50">
-        {operator && (
-          <div className="flex items-center justify-between bg-white p-2 rounded-md border border-slate-200 shadow-2xs">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="w-7 h-7 rounded-md bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 shrink-0">
-                <UserCheck className="w-4 h-4" />
+        {/* Bottom Operator Card */}
+        {renderFooter()}
+      </aside>
+
+      {/* ── Mobile Sliding Drawer (Visible on < lg when isOpenMobile is true) ── */}
+      {isOpenMobile && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Dark Backdrop */}
+          <div 
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs transition-opacity" 
+            onClick={onCloseMobile} 
+          />
+          {/* Drawer Body */}
+          <aside className="relative w-72 max-w-[85vw] h-full bg-white flex flex-col justify-between shadow-2xl z-10 select-none">
+            {/* Mobile Header with Close X */}
+            <div className="p-4 border-b border-black/[0.06] bg-[#fbfbfd] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shrink-0 shadow-xs">
+                  <HeartPulse className="w-4 h-4 animate-heart-pulse text-white" />
+                </div>
+                <div>
+                  <span className="font-extrabold text-xs tracking-wider text-slate-950 uppercase font-mono block">
+                    Mission Sentinel
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium">FD 14 · Orion MPC-V</span>
+                </div>
               </div>
-              <div className="truncate">
-                <span className="text-xs font-bold text-slate-900 block truncate leading-tight">
-                  {operator.callsign}
-                </span>
-                <span className="text-[10px] text-slate-500 block truncate leading-tight font-medium">
-                  {operator.role_display}
-                </span>
-              </div>
+              <button
+                type="button"
+                onClick={onCloseMobile}
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition cursor-pointer"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <button
-              onClick={logout}
-              className="p-1.5 rounded-md bg-slate-100 hover:bg-rose-50 border border-slate-200 hover:border-rose-300 text-slate-500 hover:text-rose-700 transition cursor-pointer"
-              title="Sign Out"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        )}
-      </div>
+            {/* Scrollable Nav */}
+            {renderNavBody()}
 
-    </aside>
+            {/* Footer */}
+            {renderFooter()}
+          </aside>
+        </div>
+      )}
+    </>
   );
 }

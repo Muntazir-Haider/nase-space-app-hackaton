@@ -181,10 +181,10 @@ export function AstronautProfileDetail({
   }, [baseLatestRhr, baseLatestSleep, baseLatestHrr, baseLatestSpo2, baseLatestTemp]);
 
   return (
-    <section className="bg-white border border-black/[0.09] rounded-2xl p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col gap-8 font-sans">
+    <section className="bg-white border border-black/[0.09] rounded-2xl p-4 sm:p-6 shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] flex flex-col gap-6 sm:gap-8 font-sans">
       {/* Header Banner with Real Astronaut Photo & Mission Badges */}
-      <div className="flex flex-wrap items-center justify-between gap-5 border-b border-black/[0.06] pb-6">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 sm:gap-5 border-b border-black/[0.06] pb-5 sm:pb-6">
+        <div className="flex items-center gap-3.5 sm:gap-4">
           <AstronautAvatar
             callsign={astronaut.callsign}
             name={astronaut.full_name}
@@ -192,8 +192,8 @@ export function AstronautProfileDetail({
             hasAlert={Boolean(activeAlert)}
           />
           <div>
-            <div className="flex flex-wrap items-center gap-2.5">
-              <h2 className="font-extrabold text-2xl text-slate-950 tracking-tight font-mono">{astronaut.full_name}</h2>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              <h2 className="font-extrabold text-xl sm:text-2xl text-slate-950 tracking-tight font-mono">{astronaut.full_name}</h2>
               <span className="text-sm">🇺🇸</span>
               <span className="text-xs font-mono font-bold text-[#0b3d91] bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200/80">
                 {astronaut.callsign}

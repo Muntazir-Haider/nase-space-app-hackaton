@@ -95,31 +95,31 @@ export function AnatomicalScanner({
     <div className="bg-white rounded-md border border-slate-300 shadow-2xs overflow-hidden flex flex-col font-sans select-none">
 
       {/* ── Top Header ── */}
-      <div className="px-5 py-3.5 bg-slate-50/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-md bg-[#0b3d91] flex items-center justify-center text-white shadow-xs">
+      <div className="px-3.5 sm:px-5 py-3 sm:py-3.5 bg-slate-50/80 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2.5 sm:gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <div className="w-8 h-8 rounded-md bg-[#0b3d91] flex items-center justify-center text-white shadow-xs shrink-0">
             <Stethoscope className="w-4 h-4" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-xs text-slate-900 tracking-wider uppercase">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-bold text-xs text-slate-900 tracking-wider uppercase break-words sm:whitespace-nowrap">
                 360° Real Human Anatomical Scanner & Skeletal Mesh
               </span>
-              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-sm font-bold border ${hasAlert
+              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-sm font-bold border shrink-0 ${hasAlert
                 ? 'bg-rose-50 text-rose-800 border-rose-300'
                 : 'bg-emerald-50 text-emerald-800 border-emerald-300'
                 }`}>
                 {hasAlert ? 'CLINICAL ALERT DETECTED' : 'ANATOMY NOMINAL'}
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 font-sans">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 font-sans truncate">
               Continuous 360° rotational CT / MRI volumetric scan with active vertical laser sweeping
             </p>
           </div>
         </div>
 
         {/* Flight clearance badge */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <span className="text-xs font-semibold text-slate-500">Flight Status:</span>
           <span className={`text-xs px-2.5 py-1 rounded-md font-bold flex items-center gap-1.5 border ${astronaut.medical_clearance_status === 'FULL_FLIGHT_CLEARANCE'
             ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
@@ -136,12 +136,12 @@ export function AnatomicalScanner({
       </div>
 
       {/* ── Layer Filter Toolbar ── */}
-      <div className="px-5 py-2 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div className="flex items-center gap-1 text-slate-400 font-mono text-[11px]">
-          <Layers className="w-3.5 h-3.5 text-cyan-400" />
+      <div className="px-3.5 sm:px-5 py-2 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-1 text-slate-400 font-mono text-[10px] sm:text-[11px]">
+          <Layers className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
           <span>ANATOMICAL LAYER:</span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex flex-wrap items-center gap-1">
           {[
             { id: 'all', label: 'Complete Skeleton & Organs' },
             { id: 'cardiovascular', label: 'Heart & Circulatory' },
@@ -152,7 +152,7 @@ export function AnatomicalScanner({
             <button
               key={layer.id}
               onClick={() => setAnatomyLayer(layer.id as any)}
-              className={`px-2.5 py-1 rounded-sm text-[11px] font-mono transition cursor-pointer border ${anatomyLayer === layer.id
+              className={`px-2 sm:px-2.5 py-1 rounded-sm text-[10px] sm:text-[11px] font-mono transition cursor-pointer border whitespace-nowrap ${anatomyLayer === layer.id
                 ? 'bg-cyan-600 text-white font-bold border-cyan-400 shadow-xs'
                 : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:bg-slate-700'
                 }`}
@@ -164,10 +164,10 @@ export function AnatomicalScanner({
       </div>
 
       {/* ── Main Scanner Area ── */}
-      <div className="p-5 grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch bg-slate-950">
+      <div className="p-3.5 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch bg-slate-950">
 
         {/* Anatomical Holographic Scanner (Left 7 cols) */}
-        <div className="lg:col-span-7 bg-slate-900/90 rounded-md p-4 relative overflow-hidden flex flex-col items-center justify-between min-h-[530px] border border-slate-800 shadow-inner">
+        <div className="lg:col-span-7 bg-slate-900/90 rounded-md p-3 sm:p-4 relative overflow-hidden flex flex-col items-center justify-between min-h-[380px] sm:min-h-[530px] border border-slate-800 shadow-inner">
 
           {/* Subtle Precision Grid Lines */}
           <div
@@ -179,15 +179,15 @@ export function AnatomicalScanner({
           />
 
           {/* Real-Time Live Animated ECG Strip */}
-          <div className="w-full bg-slate-950/90 border border-slate-800 rounded-md p-2.5 relative z-10">
-            <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
-              <span className="flex items-center gap-1.5 text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="w-full bg-slate-950/90 border border-slate-800 rounded-md p-2 sm:p-2.5 relative z-10">
+            <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-slate-400 mb-1">
+              <span className="flex items-center gap-1.5 text-emerald-400 truncate">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
                 ECG LEAD II · CONTINUOUS TELEMETRY
               </span>
-              <span className="font-bold text-slate-200">{(latestVitals.rhr ?? 68.9).toFixed(1)} BPM</span>
+              <span className="font-bold text-slate-200 shrink-0">{(latestVitals.rhr ?? 68.9).toFixed(1)} BPM</span>
             </div>
-            <svg viewBox="0 0 500 36" className="w-full h-7">
+            <svg viewBox="0 0 500 36" className="w-full h-6 sm:h-7">
               <path
                 d="M 0 18 L 40 18 L 50 18 L 55 10 L 62 28 L 70 4 L 78 24 L 85 18 L 140 18 L 150 18 L 155 10 L 162 28 L 170 4 L 178 24 L 185 18 L 240 18 L 250 18 L 255 10 L 262 28 L 270 4 L 278 24 L 285 18 L 340 18 L 350 18 L 355 10 L 362 28 L 370 4 L 378 24 L 385 18 L 440 18 L 450 18 L 455 10 L 462 28 L 470 4 L 478 24 L 485 18 L 500 18"
                 fill="none"
@@ -210,7 +210,7 @@ export function AnatomicalScanner({
           >
             {/* Stationary Box Frame (Remains stable with solid corners; does NOT rotate) */}
             <div
-              className="relative w-full h-[395px] flex items-center justify-center overflow-hidden rounded-md border border-slate-700 bg-slate-950 shadow-sm"
+              className="relative w-full h-[300px] sm:h-[395px] flex items-center justify-center overflow-hidden rounded-md border border-slate-700 bg-slate-950 shadow-sm"
             >
               {/* Subtle Medical Coordinate Grid */}
               <div 
@@ -234,7 +234,7 @@ export function AnatomicalScanner({
                 <img
                   src="./real_human_anatomy_transparent.png"
                   alt="Clinical Anatomical Reference Model"
-                  className="h-[380px] w-auto max-w-[90%] object-contain filter contrast-110 brightness-105 pointer-events-none select-none"
+                  className="h-[285px] sm:h-[380px] w-auto max-w-[90%] object-contain filter contrast-110 brightness-105 pointer-events-none select-none"
                 />
               </div>
 
@@ -342,20 +342,20 @@ export function AnatomicalScanner({
           </div>
 
           {/* ── 360° ROTATION & SCANNER CONTROLS BAR ── */}
-          <div className="w-full flex flex-wrap items-center justify-between gap-2 text-[10px] font-mono bg-slate-950 p-2 rounded-md border border-slate-800 text-slate-400">
+          <div className="w-full flex flex-wrap items-center justify-between gap-2 sm:gap-3 text-[10px] font-mono bg-slate-950 p-2 sm:p-2.5 rounded-md border border-slate-800 text-slate-400">
             {/* Auto Spin Toggle */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 type="button"
                 onClick={() => setIsAutoRotating(!isAutoRotating)}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-sm border font-semibold transition cursor-pointer ${isAutoRotating
+                className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-sm border font-semibold transition cursor-pointer text-[10px] sm:text-[11px] ${isAutoRotating
                   ? 'bg-blue-600/90 text-white border-blue-500'
                   : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
                   }`}
                 title="Toggle continuous 360 degree body rotation"
               >
                 {isAutoRotating ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-                <span>{isAutoRotating ? 'Auto 360° Spin: ON' : 'Auto 360° Spin: OFF'}</span>
+                <span>{isAutoRotating ? 'Auto Spin: ON' : 'Auto Spin: OFF'}</span>
               </button>
 
               <button
@@ -369,7 +369,7 @@ export function AnatomicalScanner({
             </div>
 
             {/* Quick Angle Snap Buttons */}
-            <div className="flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-1">
               {[
                 { angle: 0, label: '0° (Front)' },
                 { angle: 90, label: '90° (Right)' },
@@ -382,8 +382,8 @@ export function AnatomicalScanner({
                     setIsAutoRotating(false);
                     setRotationAngle(preset.angle);
                   }}
-                  className={`px-2 py-0.5 rounded-sm border cursor-pointer ${Math.abs(displayAngle - preset.angle) < 10
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50'
+                  className={`px-1.5 sm:px-2 py-0.5 rounded-sm border cursor-pointer text-[10px] sm:text-[11px] ${Math.abs(displayAngle - preset.angle) < 10
+                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400/50 font-bold'
                     : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800 hover:text-slate-200'
                     }`}
                 >
@@ -393,7 +393,7 @@ export function AnatomicalScanner({
             </div>
 
             {/* Real-time Angle & Scanner Status */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-[10px] sm:text-[11px]">
               <span className="text-cyan-400 font-bold flex items-center gap-1">
                 <Compass className="w-3 h-3 animate-spin" style={{ animationDuration: '8s' }} />
                 <span>YAW: {displayAngle}°</span>
