@@ -225,6 +225,29 @@ export function StationUnifiedDashboard({
 
           {/* Right: Tactile Quick Actions Dock */}
           <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            {/* Quick Link to 3D Orion Spacecraft Subsystem */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowSpatialReference(true);
+                setReferenceMode('spacecraft');
+                const el = document.getElementById('spatial-reference-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 border border-black/[0.08] text-slate-800 transition shadow-2xs active:scale-[0.98] cursor-pointer whitespace-nowrap"
+              title="Inspect 360° NASA Orion MPC-V Deep Space Vehicle Telemetry"
+            >
+              <img 
+                src="/real_orion_spacecraft_transparent.png" 
+                alt="Orion MPC-V" 
+                className="w-7 h-7 object-contain drop-shadow-xs shrink-0" 
+              />
+              <div className="text-left leading-tight">
+                <div className="text-[11px] font-mono font-bold text-slate-950 uppercase tracking-tight">ORION MPC-V</div>
+                <div className="text-[10px] text-slate-500 font-medium">3D Flight Vehicle</div>
+              </div>
+            </button>
+
             {/* Primary Action: Sync Wearables */}
             <button
               onClick={handleMasterStationSync}
@@ -937,28 +960,28 @@ export function StationUnifiedDashboard({
       </div>
 
       {/* ── 5. Full-Width 3D Spatial Systems & Human Telemetry Reference ── */}
-      <div className="bg-white border border-black/[0.09] rounded-2xl overflow-hidden shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)]">
+      <div id="spatial-reference-section" className="bg-white border border-black/[0.09] rounded-2xl overflow-hidden shadow-[0_10px_30px_-4px_rgba(0,0,0,0.08),0_3px_10px_-1px_rgba(0,0,0,0.04),0_0_0_1px_rgba(0,0,0,0.03)] scroll-mt-6">
         <div className="px-6 py-4 bg-slate-50/80 border-b border-black/[0.06] flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-xl bg-[#0b3d91] flex items-center justify-center text-white shadow-xs shrink-0">
               <Stethoscope className="w-5 h-5 text-white" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2.5">
                 <h3 className="font-extrabold text-sm text-slate-950 tracking-tight uppercase font-mono whitespace-nowrap">
                   3D Spatial Reference & Vehicle Systems Telemetry
                 </h3>
-                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-300 whitespace-nowrap">
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold border border-emerald-300 whitespace-nowrap shrink-0">
                   REAL-TIME SYNC
                 </span>
               </div>
-              <div className="text-xs text-slate-600 font-semibold mt-0.5">
+              <div className="text-xs text-slate-600 font-semibold mt-0.5 truncate">
                 Interactive 360° human anatomical scanner & Orion MPC-V deep space vehicle telemetry
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
             {/* Mode Switcher Tabs */}
             <div className="flex items-center bg-[#f4f5f8] p-1 rounded-xl border border-black/[0.06] shadow-2xs">
               <button
